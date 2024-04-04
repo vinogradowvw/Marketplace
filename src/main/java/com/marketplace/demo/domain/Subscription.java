@@ -16,7 +16,9 @@ public class Subscription implements EntityWithId<Long>{
     private Long id;
     private Timestamp timestamp;
 
-    //TODO: add user relationship
+    @ManyToOne
+    @JoinColumn(name = "id_user")
+    User user;
 
     @Override
     public Long getID() {
