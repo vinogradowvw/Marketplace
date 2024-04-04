@@ -4,20 +4,20 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.sql.Timestamp;
+import java.util.List;
 
 @Entity
-@Getter
 @Setter
-public class Subscription implements EntityWithId<Long>{
+@Getter
+public class Tag implements EntityWithId<Long>{
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @Column(name = "id_subscription")
-    private Long id;
-    private Timestamp timestamp;
+    @Column(name = "id_tag")
+    Long id;
+    String name;
 
-    private User subscriber;
-    private User user;
+    @ManyToMany(mappedBy = "tags")
+    List<Post> posts;
 
     @Override
     public Long getID() {

@@ -19,6 +19,9 @@ public class Like implements EntityWithId<Long>{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_user")
     User author;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="id_post")
+    Post post;
 
     @Override
     public Long getID() {

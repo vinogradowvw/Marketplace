@@ -17,7 +17,6 @@ public class Payment implements EntityWithId<Long>{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_user")
     User user;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_product")
     Product product;

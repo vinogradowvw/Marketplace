@@ -17,10 +17,10 @@ public class Product implements EntityWithId<Long> {
     @Column(name = "id_product")
     private Long id;
 
-    @ManyToMany
+    @ManyToMany(mappedBy = "productsWithImg")
     Set<Image> productImages;
 
-    @ManyToMany
+    @ManyToMany(mappedBy = "productsInPost")
     Set<Post> postsWithProduct;
 
     @NotBlank(message = "Price can not be empty")

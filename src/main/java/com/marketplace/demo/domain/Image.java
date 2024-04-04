@@ -1,6 +1,6 @@
 package com.marketplace.demo.domain;
 
-import java.util.Set;
+import java.util.List;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -13,14 +13,19 @@ import lombok.Setter;
 public class Image implements EntityWithId<Long> {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @Column(name = "id_like")
+    @Column(name = "id_image")
     private Long id;
 
     @NotBlank(message="Path can not be empty")
     private String path;
 
-    @ManyToMany
-    Set<Product> productsWithImg;
+    @ManyToMany(targetEntity = Product.class)
+    @JoinTable(
+            name = "product_image",
+            joinColumns = @JoinColumn(name="id_product"),
+            inverseJoinColumns = @JoinColumn(name="id_image")
+    )
+    List<Product> productsWithImg;
 
     @Override
     public Long getID() {
