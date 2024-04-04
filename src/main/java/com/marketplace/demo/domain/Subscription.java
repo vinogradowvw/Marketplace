@@ -16,7 +16,11 @@ public class Subscription implements EntityWithId<Long>{
     private Long id;
     private Timestamp timestamp;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="id_user")
     private User subscriber;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="id_user")
     private User user;
 
     @Override

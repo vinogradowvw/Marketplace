@@ -31,7 +31,9 @@ public class User implements EntityWithId<Long>{
     private List<Payment> payments;
     @OneToMany(targetEntity = Post.class, mappedBy = "user", fetch = FetchType.LAZY)
     private List<Post> posts;
+    @OneToMany(targetEntity = Subscription.class, mappedBy = "subscriber", fetch = FetchType.LAZY)
     private List<Subscription> subscribers;
+    @OneToMany(targetEntity = Subscription.class, mappedBy = "user", fetch = FetchType.LAZY)
     private List<Subscription> subscriptions;
 
     @Override
