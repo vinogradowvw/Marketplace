@@ -31,6 +31,8 @@ public class User implements EntityWithId<Long>{
     private List<Payment> payments;
     @OneToMany(targetEntity = Post.class, mappedBy = "user", fetch = FetchType.LAZY)
     private List<Post> posts;
+    private List<Subscription> subscribers;
+    private List<Subscription> subscriptions;
 
     @Override
     public Long getID() {
