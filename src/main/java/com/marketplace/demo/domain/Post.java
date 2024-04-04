@@ -1,7 +1,6 @@
 package com.marketplace.demo.domain;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,7 +9,7 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
-public class Post implements EntityWithId {
+public class Post implements EntityWithId<Long> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
