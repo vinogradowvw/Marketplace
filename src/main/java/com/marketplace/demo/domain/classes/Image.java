@@ -1,4 +1,4 @@
-package com.marketplace.demo.domain;
+package com.marketplace.demo.domain.classes;
 
 import java.util.List;
 
@@ -11,6 +11,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Image implements EntityWithId<Long> {
+
+    Image() {}
+    
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id_image")

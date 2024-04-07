@@ -1,4 +1,4 @@
-package com.marketplace.demo.domain;
+package com.marketplace.demo.domain.classes;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -13,6 +13,9 @@ import java.util.List;
 @Setter
 @Table(name = "users")
 public class User implements EntityWithId<Long>{
+
+    public User() {}
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id_user")
@@ -25,8 +28,8 @@ public class User implements EntityWithId<Long>{
     @NotBlank(message = "Password can not be empty.")
     private String password;
 
-    @OneToMany(targetEntity = Like.class, mappedBy = "author", fetch = FetchType.LAZY)
-    private List<Like> likes;
+    @OneToMany(targetEntity = Likes.class, mappedBy = "author", fetch = FetchType.LAZY)
+    private List<Likes> likes;
     @OneToMany(targetEntity = Payment.class, mappedBy = "user", fetch = FetchType.LAZY)
     private List<Payment> payments;
     @OneToMany(targetEntity = Post.class, mappedBy = "user", fetch = FetchType.LAZY)

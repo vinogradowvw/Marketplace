@@ -1,25 +1,30 @@
-package com.marketplace.demo.domain;
+package com.marketplace.demo.domain.classes;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.sql.Timestamp;
+
 @Entity
 @Getter
 @Setter
-public class Payment implements EntityWithId<Long>{
+public class Likes implements EntityWithId<Long>{
+
+    Likes() {}
+    
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @Column(name = "id_payment")
+    @Column(name = "id_like")
     private Long id;
-    private Integer amount;
+    private Timestamp timestamp;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_user")
-    User user;
+    User author;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_product")
-    Product product;
+    @JoinColumn(name="id_post")
+    Post post;
 
     @Override
     public Long getID() {

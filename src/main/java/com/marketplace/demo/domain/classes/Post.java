@@ -1,16 +1,18 @@
-package com.marketplace.demo.domain;
+package com.marketplace.demo.domain.classes;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Getter
 @Setter
 public class Post implements EntityWithId<Long> {
+
+    Post() {}
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id_post")
@@ -27,8 +29,8 @@ public class Post implements EntityWithId<Long> {
     @ManyToOne
     @JoinColumn(name = "id_user")
     private User user;
-    @OneToMany(targetEntity = Like.class, mappedBy = "post", fetch = FetchType.LAZY)
-    private List<Like> likes;
+    @OneToMany(targetEntity = Likes.class, mappedBy = "post", fetch = FetchType.LAZY)
+    private List<Likes> likes;
     @ManyToMany(targetEntity = Tag.class)
     @JoinTable(
             name = "post_tag",
