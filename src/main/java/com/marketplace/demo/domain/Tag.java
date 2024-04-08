@@ -1,4 +1,4 @@
-package com.marketplace.demo.domain.classes;
+package com.marketplace.demo.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;

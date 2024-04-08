@@ -1,4 +1,4 @@
-package com.marketplace.demo.domain.classes;
+package com.marketplace.demo.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -14,7 +14,15 @@ import java.util.List;
 @Table(name = "users")
 public class User implements EntityWithId<Long>{
 
-    public User() {}
+    public User (
+        String username,
+        String email,
+        String password
+    ) {
+        this.email = email;
+        this.username = username;
+        this.password = password;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)

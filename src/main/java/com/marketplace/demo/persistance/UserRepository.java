@@ -1,8 +1,8 @@
-package com.marketplace.demo.domain.repositories;
+package com.marketplace.demo.persistance;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.marketplace.demo.domain.classes.User;
+import com.marketplace.demo.domain.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 

@@ -1,12 +1,11 @@
-package com.marketplace.demo.domain.classes;
+package com.marketplace.demo.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Set;
-
+import java.util.List;
 
 @Entity
 @Getter
@@ -21,10 +20,10 @@ public class Product implements EntityWithId<Long> {
     private Long id;
 
     @ManyToMany(mappedBy = "productsWithImg")
-    Set<Image> productImages;
+    List<Image> productImages;
 
     @ManyToMany(mappedBy = "productsInPost")
-    Set<Post> postsWithProduct;
+    List<Post> postsWithProduct;
 
     @NotBlank(message = "Price can not be empty")
     private int price;
