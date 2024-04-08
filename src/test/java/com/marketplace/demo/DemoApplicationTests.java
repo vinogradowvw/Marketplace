@@ -20,8 +20,6 @@ import com.marketplace.demo.persistance.ProductRepository;
 import com.marketplace.demo.service.ImageService.ImageService;
 import com.marketplace.demo.service.ProductService.ProductService;
 
-
-
 @SpringBootTest
 class DemoApplicationTests {
 

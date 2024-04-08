@@ -1,20 +1,20 @@
 package com.marketplace.demo.service.ImageService;
 
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import com.marketplace.demo.domain.Image;
 import com.marketplace.demo.persistance.ImageRepository;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.transaction.annotation.Transactional;
+
 @Service
+@Transactional
+@AllArgsConstructor
 public class ImageService implements ImageServiceInterface {
     
     private ImageRepository imageRepository;
-
-    public ImageService(ImageRepository imageRepository) {
-        this.imageRepository = imageRepository;
-    }
-
 
     @Override
     public Image getImageById(Long id) throws EntityNotFoundException {

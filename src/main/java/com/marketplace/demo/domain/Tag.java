@@ -2,6 +2,7 @@ package com.marketplace.demo.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
@@ -9,10 +10,8 @@ import java.util.List;
 @Entity
 @Setter
 @Getter
+@NoArgsConstructor
 public class Tag implements EntityWithId<Long>{
-
-    Tag() {}
-
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id_tag")

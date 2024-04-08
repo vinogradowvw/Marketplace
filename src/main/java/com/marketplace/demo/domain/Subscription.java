@@ -1,7 +1,9 @@
 package com.marketplace.demo.domain;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.sql.Timestamp;
@@ -9,10 +11,8 @@ import java.sql.Timestamp;
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
 public class Subscription implements EntityWithId<Long> {
-
-    Subscription() {}
-
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id_subscription")

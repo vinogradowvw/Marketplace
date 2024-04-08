@@ -2,6 +2,7 @@ package com.marketplace.demo.service.ProductService;
 
 import java.util.List;
 
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import com.marketplace.demo.domain.Image;
@@ -10,17 +11,15 @@ import com.marketplace.demo.persistance.ImageRepository;
 import com.marketplace.demo.persistance.ProductRepository;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.transaction.annotation.Transactional;
+
 @Service
+@Transactional
+@AllArgsConstructor
 public class ProductService implements ProductServiceInterface {
 
     private ProductRepository productRepository;
-
     private ImageRepository imageRepository;
-
-    public ProductService(ProductRepository productRepository, ImageRepository imageRepository) {
-        this.productRepository = productRepository;
-        this.imageRepository = imageRepository;
-    }
 
     @Override
     public Product getProductById(Long id) throws EntityNotFoundException {

@@ -1,5 +1,6 @@
 package com.marketplace.demo.service.UserService;
 
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.regex.Pattern;
@@ -9,23 +10,20 @@ import com.marketplace.demo.domain.User;
 import com.marketplace.demo.persistance.UserRepository;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
+@AllArgsConstructor
 public class UserService implements UserServiceInterface {
-    
-    
-    private UserRepository userRepository;
 
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+    private UserRepository userRepository;
 
 
     @Override
     public User getUserById(Long id) throws EntityNotFoundException {
         return userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("No user with id " + id + " found."));
     }
-
 
     @Override
     public User createUser(User user) throws IllegalArgumentException {
@@ -64,6 +62,7 @@ public class UserService implements UserServiceInterface {
     public void deleteUser(User user) {
         if (userRepository.existsById(user.getID())) {
             userRepository.delete(user);
+            return;
         }
         throw new IllegalArgumentException("User with this ID does not exists");
     }

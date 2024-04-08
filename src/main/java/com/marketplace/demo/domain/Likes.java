@@ -2,6 +2,7 @@ package com.marketplace.demo.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.sql.Timestamp;
@@ -9,10 +10,8 @@ import java.sql.Timestamp;
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
 public class Likes implements EntityWithId<Long>{
-
-    Likes() {}
-    
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id_like")
