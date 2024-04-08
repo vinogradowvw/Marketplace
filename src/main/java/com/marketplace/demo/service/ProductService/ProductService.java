@@ -2,13 +2,15 @@ package com.marketplace.demo.service.ProductService;
 
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+
 import com.marketplace.demo.domain.Image;
 import com.marketplace.demo.domain.Product;
 import com.marketplace.demo.persistance.ImageRepository;
 import com.marketplace.demo.persistance.ProductRepository;
 
 import jakarta.persistence.EntityNotFoundException;
-
+@Service
 public class ProductService implements ProductServiceInterface {
 
     private ProductRepository productRepository;

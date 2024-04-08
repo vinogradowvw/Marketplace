@@ -12,7 +12,7 @@ import java.util.List;
 @Setter
 public class Product implements EntityWithId<Long> {
 
-    Product() {}
+    public Product() {}
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)

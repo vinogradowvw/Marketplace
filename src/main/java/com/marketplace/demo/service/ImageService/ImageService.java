@@ -1,10 +1,12 @@
 package com.marketplace.demo.service.ImageService;
 
+import org.springframework.stereotype.Service;
+
 import com.marketplace.demo.domain.Image;
 import com.marketplace.demo.persistance.ImageRepository;
 
 import jakarta.persistence.EntityNotFoundException;
-
+@Service
 public class ImageService implements ImageServiceInterface {
     
     private ImageRepository imageRepository;

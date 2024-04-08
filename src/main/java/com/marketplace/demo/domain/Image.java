@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 public class Image implements EntityWithId<Long> {
 
-    Image() {}
+    public Image() {}
     
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
