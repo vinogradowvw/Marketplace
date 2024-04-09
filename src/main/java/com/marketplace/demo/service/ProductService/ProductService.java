@@ -46,7 +46,7 @@ public class ProductService implements ProductServiceInterface {
                 return productRepository.save(product);
             }
 
-        throw new IllegalArgumentException("Description is too long must be less than 300 characters");
+            throw new IllegalArgumentException("Description is too long must be less than 300 characters");
 
         }
         
@@ -66,6 +66,7 @@ public class ProductService implements ProductServiceInterface {
 
     @Override
     public Product addProductImages(Product product, List<Image> images) throws IllegalArgumentException {
+        
         if (productRepository.existsById(product.getID())) {
             
             for (Image image:images){

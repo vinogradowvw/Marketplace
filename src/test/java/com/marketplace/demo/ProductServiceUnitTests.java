@@ -21,7 +21,7 @@ import com.marketplace.demo.service.ImageService.ImageService;
 import com.marketplace.demo.service.ProductService.ProductService;
 
 @SpringBootTest
-class DemoApplicationTests {
+class ProductServiceUnitTests {
 
 	@Autowired
 	ProductService productService;
@@ -46,11 +46,11 @@ class DemoApplicationTests {
 		product.setPostsWithProduct(new ArrayList<>());
 		product.setProductImages(new ArrayList<>());
 
-		Image image1 = new Image();
+		image1 = new Image();
 		image1.setPath("/test/path/1");
 		image1.setProductsWithImg(new ArrayList<>());
 
-		Image image2 = new Image();
+		image2 = new Image();
 		image2.setPath("/test/path/2");
 		image2.setProductsWithImg(new ArrayList<>());
 
@@ -95,8 +95,7 @@ class DemoApplicationTests {
 		Assertions.assertEquals(1, image2.getProductsWithImg().size());
 
 		Mockito.verify(productRepository, Mockito.atLeastOnce()).save(product);
-        Mockito.verify(imageRepository, Mockito.atLeastOnce()).save(image1);
-		Mockito.verify(imageRepository, Mockito.atLeastOnce()).save(image2);
+        Mockito.verify(imageRepository, Mockito.atLeastOnce()).saveAll(images);
 
 	}
 }

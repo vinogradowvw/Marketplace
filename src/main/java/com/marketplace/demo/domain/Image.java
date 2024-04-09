@@ -29,6 +29,14 @@ public class Image implements EntityWithId<Long> {
     )
     List<Product> productsWithImg;
 
+    @ManyToMany(targetEntity = Post.class)
+    @JoinTable(
+            name = "post_image",
+            joinColumns = @JoinColumn(name="id_image"),
+            inverseJoinColumns = @JoinColumn(name="id_post")
+    )
+    private List<Post> postsWithImg;
+
     @Override
     public Long getID() {
         return id;
