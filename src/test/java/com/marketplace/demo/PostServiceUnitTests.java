@@ -15,16 +15,14 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import com.marketplace.demo.domain.Image;
 import com.marketplace.demo.domain.Post;
-import com.marketplace.demo.domain.Product;
 import com.marketplace.demo.persistance.ImageRepository;
 import com.marketplace.demo.persistance.PostRepository;
-import com.marketplace.demo.persistance.ProductRepository;
 import com.marketplace.demo.service.ImageService.ImageService;
 import com.marketplace.demo.service.PostService.PostService;
 import com.marketplace.demo.service.ProductService.ProductService;
 
 @SpringBootTest
-class PostServiceUnitTest {
+class PostServiceUnitTests {
 
 	@Autowired
 	ProductService productService;
@@ -32,14 +30,11 @@ class PostServiceUnitTest {
 	ImageService imageService;
 	@Autowired
 	PostService postService;
-	@Autowired
+	@MockBean
 	PostRepository postRepository;
 	@MockBean
 	ImageRepository imageRepository;
-	@MockBean
-	ProductRepository productRepository;
 
-	Product product;
 	Post post;
 	Image image1;
 	Image image2;
@@ -47,51 +42,32 @@ class PostServiceUnitTest {
 
 	@BeforeEach
 	void setUp() {
-		product = new Product();
-		product.setDescription("testDescr");
-		product.setName("testProduct");
-		product.setPrice(100);
-		product.setPostsWithProduct(new ArrayList<>());
-
 		image1 = new Image();
+		image1.setId(1L);
 		image1.setPath("/test/path/1");
 		image1.setPostsWithImg(new ArrayList<>());
 
 		image2 = new Image();
+		image1.setId(2L);
 		image2.setPath("/test/path/2");
 		image2.setPostsWithImg(new ArrayList<>());
 
 		post = new Post();
+		post.setId(1L);
 		post.setDescription("testDescr");
+		post.setImages(new ArrayList<>());
 
 		images = new ArrayList<Image>();
 		images.add(image1);
 		images.add(image2);
 
-		Mockito.when(
-                productRepository.findById(product.getID())
-        ).thenReturn(Optional.of(product));
+		Mockito.when(postRepository.existsById(post.getID())).thenReturn(true);
+		Mockito.when(imageRepository.existsById(image1.getID())).thenReturn(true);
+		Mockito.when(imageRepository.existsById(image2.getID())).thenReturn(true);
 
-		Mockito.when(
-                productRepository.existsById(product.getID())
-        ).thenReturn(true);
-
-		Mockito.when(
-                imageRepository.existsById(image1.getID())
-        ).thenReturn(true);
-
-		Mockito.when(
-                imageRepository.existsById(image2.getID())
-        ).thenReturn(true);
-
-        Mockito.when(
-                imageRepository.findById(image1.getID())
-        ).thenReturn(Optional.of(image1));
-		Mockito.when(
-                imageRepository.findById(image2.getID())
-        ).thenReturn(Optional.of(image2));
+		Mockito.when(imageRepository.findById(image1.getID())).thenReturn(Optional.of(image1));
+		Mockito.when(imageRepository.findById(image2.getID())).thenReturn(Optional.of(image2));
 	}
-
 	@Test
 	void addPostWithImage() {
 		postService.addPostImage(post, image1);
