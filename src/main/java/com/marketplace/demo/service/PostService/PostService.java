@@ -1,6 +1,5 @@
 package com.marketplace.demo.service.PostService;
 
-import java.util.List;
 
 import com.marketplace.demo.service.CrudServiceImpl;
 import org.springframework.data.repository.CrudRepository;
@@ -13,7 +12,6 @@ import com.marketplace.demo.persistance.ImageRepository;
 import com.marketplace.demo.persistance.PostRepository;
 import com.marketplace.demo.persistance.ProductRepository;
 
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 

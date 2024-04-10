@@ -1,13 +1,9 @@
 package com.marketplace.demo.service.ProductService;
 
-import java.util.List;
-
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import com.marketplace.demo.domain.Image;
 import com.marketplace.demo.domain.Product;
-import com.marketplace.demo.persistance.ImageRepository;
 import com.marketplace.demo.persistance.ProductRepository;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -19,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProductService implements ProductServiceInterface {
 
     private ProductRepository productRepository;
-    private ImageRepository imageRepository;
 
     @Override
     public Product getProductById(Long id) throws EntityNotFoundException {
@@ -63,31 +58,4 @@ public class ProductService implements ProductServiceInterface {
 
         throw new IllegalArgumentException("Product with this ID does not exists");
     }
-
-    @Override
-    public Product addProductImages(Product product, List<Image> images) throws IllegalArgumentException {
-        
-        if (productRepository.existsById(product.getID())) {
-            
-            for (Image image:images){
-                if (!imageRepository.existsById(image.getID())) {
-                    throw new IllegalArgumentException("Image with ID " + image.getID() +" does not exists");
-                }
-                else {
-                    image.getProductsWithImg().add(product);
-                }
-            }
-
-            product.setProductImages(images);
-
-            imageRepository.saveAll(images);
-
-            return productRepository.save(product);
-            
-        }
-
-        throw new IllegalArgumentException("Product with this ID does not exists");
-
-    }
-
 }
