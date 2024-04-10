@@ -1,6 +1,5 @@
 package com.marketplace.demo.service.PostService;
 
-import java.util.List;
 
 import org.springframework.stereotype.Service;
 
@@ -69,22 +68,22 @@ public class PostService implements PostServiceInterface {
     }
 
 
-    public Post addProductsToPost(Post post, List<Product> products) {
+
+    @Override
+    public Post addProductToPost(Post post, Product product) throws IllegalArgumentException {
 
         if (postRepository.existsById(post.getID())) {
-            
-            for (Product product:products){
-                if (!productRepository.existsById(product.getID())) {
-                    throw new IllegalArgumentException("Product with ID " + product.getID() +" does not exists");
-                }
-                else {
-                    product.getPostsWithProduct().add(post);
-                }
+
+            if (productRepository.existsById(product.getID())) {
+                product.getPostsWithProduct().add(post);
+            }
+            else {
+                throw new IllegalArgumentException("Product with ID " + product.getID() +" does not exists");
             }
 
-            post.setProductsInPost(products);
+            post.getProductsInPost().add(product);
 
-            productRepository.saveAll(products);
+            productRepository.save(product);
 
             return postRepository.save(post);
             
@@ -95,21 +94,20 @@ public class PostService implements PostServiceInterface {
     }
 
 
-    public Post addPostImages(Post post, List<Image> images) {
+    @Override
+    public Post addPostImage(Post post, Image image) {
         if (postRepository.existsById(post.getID())) {
             
-            for (Image image:images){
-                if (!imageRepository.existsById(image.getID())) {
-                    throw new IllegalArgumentException("Image with ID " + image.getID() +" does not exists");
-                }
-                else {
-                    image.getPostsWithImg().add(post);
-                }
+            if (imageRepository.existsById(image.getID())) {
+                image.getPostsWithImg().add(post);
+            }
+            else {
+                throw new IllegalArgumentException("Image with ID " + image.getID() +" does not exists");
             }
 
-            post.setImages(images);
+            post.getImages().add(image);
 
-            imageRepository.saveAll(images);
+            imageRepository.save(image);
 
             return postRepository.save(post);
             

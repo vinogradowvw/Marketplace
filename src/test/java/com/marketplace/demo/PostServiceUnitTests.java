@@ -14,25 +14,33 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import com.marketplace.demo.domain.Image;
+import com.marketplace.demo.domain.Post;
 import com.marketplace.demo.domain.Product;
 import com.marketplace.demo.persistance.ImageRepository;
+import com.marketplace.demo.persistance.PostRepository;
 import com.marketplace.demo.persistance.ProductRepository;
 import com.marketplace.demo.service.ImageService.ImageService;
+import com.marketplace.demo.service.PostService.PostService;
 import com.marketplace.demo.service.ProductService.ProductService;
 
 @SpringBootTest
-class ProductServiceUnitTests {
+class PostServiceUnitTest {
 
 	@Autowired
 	ProductService productService;
 	@Autowired
 	ImageService imageService;
+	@Autowired
+	PostService postService;
+	@Autowired
+	PostRepository postRepository;
 	@MockBean
 	ImageRepository imageRepository;
 	@MockBean
 	ProductRepository productRepository;
 
 	Product product;
+	Post post;
 	Image image1;
 	Image image2;
 	List<Image> images;
@@ -44,15 +52,17 @@ class ProductServiceUnitTests {
 		product.setName("testProduct");
 		product.setPrice(100);
 		product.setPostsWithProduct(new ArrayList<>());
-		product.setProductImages(new ArrayList<>());
 
 		image1 = new Image();
 		image1.setPath("/test/path/1");
-		image1.setProductsWithImg(new ArrayList<>());
+		image1.setPostsWithImg(new ArrayList<>());
 
 		image2 = new Image();
 		image2.setPath("/test/path/2");
-		image2.setProductsWithImg(new ArrayList<>());
+		image2.setPostsWithImg(new ArrayList<>());
+
+		post = new Post();
+		post.setDescription("testDescr");
 
 		images = new ArrayList<Image>();
 		images.add(image1);
@@ -83,19 +93,22 @@ class ProductServiceUnitTests {
 	}
 
 	@Test
-	void addProductWithImage() {
-		productService.addProductImages(product, images);
+	void addPostWithImage() {
+		postService.addPostImage(post, image1);
+		postService.addPostImage(post, image2);
 
-		Assertions.assertTrue(product.getProductImages().contains(image1));
-		Assertions.assertTrue(product.getProductImages().contains(image2));
-        Assertions.assertTrue(image1.getProductsWithImg().contains(product));
+		Assertions.assertTrue(post.getImages().contains(image1));
+		Assertions.assertTrue(post.getImages().contains(image2));
+        Assertions.assertTrue(image1.getPostsWithImg().contains(post));
+		Assertions.assertTrue(image2.getPostsWithImg().contains(post));
 
-		Assertions.assertEquals(2, product.getProductImages().size());
-        Assertions.assertEquals(1, image1.getProductsWithImg().size());
-		Assertions.assertEquals(1, image2.getProductsWithImg().size());
+		Assertions.assertEquals(2, post.getImages().size());
+        Assertions.assertEquals(1, image1.getPostsWithImg().size());
+		Assertions.assertEquals(1, image2.getPostsWithImg().size());
 
-		Mockito.verify(productRepository, Mockito.atLeastOnce()).save(product);
-        Mockito.verify(imageRepository, Mockito.atLeastOnce()).saveAll(images);
+		Mockito.verify(postRepository, Mockito.atLeastOnce()).save(post);
+        Mockito.verify(imageRepository, Mockito.atLeastOnce()).save(image1);
+		Mockito.verify(imageRepository, Mockito.atLeastOnce()).save(image2);
 
 	}
 }

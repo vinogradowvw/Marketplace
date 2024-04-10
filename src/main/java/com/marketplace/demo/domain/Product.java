@@ -18,9 +18,6 @@ public class Product implements EntityWithId<Long> {
     @Column(name = "id_product")
     private Long id;
 
-    @ManyToMany(mappedBy = "productsWithImg")
-    List<Image> productImages;
-
     @ManyToMany(mappedBy = "productsInPost")
     List<Post> postsWithProduct;
 
