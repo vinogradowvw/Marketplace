@@ -20,12 +20,7 @@ public class Post implements EntityWithId<Long> {
 
     private String description;
 
-    @ManyToMany(targetEntity = Product.class)
-    @JoinTable(
-            name = "post_product",
-            joinColumns = @JoinColumn(name="id_product"),
-            inverseJoinColumns = @JoinColumn(name="id_post")
-    )
+    @OneToMany(targetEntity = Product.class, mappedBy = "post", fetch = FetchType.LAZY)
     List<Product> productsInPost;
     @ManyToOne
     @JoinColumn(name = "id_user")
@@ -41,7 +36,7 @@ public class Post implements EntityWithId<Long> {
     )
     private List<Tag> tags;
 
-    @ManyToMany(mappedBy = "postsWithImg")
+    @OneToMany(targetEntity = Image.class, mappedBy = "post", fetch = FetchType.LAZY)
     private List<Image> images;
 
     @Override

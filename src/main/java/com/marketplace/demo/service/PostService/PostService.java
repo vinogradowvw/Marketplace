@@ -2,6 +2,8 @@ package com.marketplace.demo.service.PostService;
 
 import java.util.List;
 
+import com.marketplace.demo.service.CrudServiceImpl;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
 
 import com.marketplace.demo.domain.Image;
@@ -18,7 +20,7 @@ import lombok.AllArgsConstructor;
 @Service
 @Transactional
 @AllArgsConstructor
-public class PostService implements PostServiceInterface {
+public class PostService extends CrudServiceImpl<Post, Long> implements PostServiceInterface {
 
     private PostRepository postRepository;
     private ProductRepository productRepository;
@@ -26,97 +28,95 @@ public class PostService implements PostServiceInterface {
 
 
     @Override
-    public Post getPostById(Long id) throws EntityNotFoundException {
-        return postRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("No post with id " + id + " found."));
-    }
+    public void addImageToPost(Long postId, Long imageId) throws IllegalArgumentException {
+        if (postRepository.findById(postId).isPresent()) {
+            Post post = postRepository.findById(postId).get();
 
+            if (imageRepository.findById(imageId).isPresent()) {
+                Image image = imageRepository.findById(imageId).get();
 
-    @Override
-    public Post createPost(Post post) throws IllegalArgumentException {
-        if (post.getDescription().length() <= 300) {
-            return postRepository.save(post);
-        }
-
-        throw new IllegalArgumentException("Description is too long must be less than 300 characters");
-    }
-
-
-    @Override
-    public Post updatePost(Post post) {
-
-        if (postRepository.existsById(post.getID())) {
-            
-            if (post.getDescription().length() <= 300) {
-                return postRepository.save(post);
+                post.getImages().add(image);
+                postRepository.save(post);
+                image.setPost(post);
+                imageRepository.save(image);
+            }
+            else{
+                throw new IllegalArgumentException("Image does not exist");
             }
 
-            throw new IllegalArgumentException("Description is too long must be less than 300 characters");
-
+            return;
         }
-        
-        throw new IllegalArgumentException("Post with this ID does not exists");
-    
-    }
 
+        throw new IllegalArgumentException("Post does not exist");
+    }
 
     @Override
-    public void deletePost(Post post) {
-        if (postRepository.existsById(post.getID())) {
-            postRepository.delete(post);
-        }
+    public void removeImageFromPost(Long postId, Long imageId) throws IllegalArgumentException {
+        if (postRepository.findById(postId).isPresent()) {
+            Post post = postRepository.findById(postId).get();
 
-        throw new IllegalArgumentException("Post with this ID does not exists");
-    }
+            if (imageRepository.findById(imageId).isPresent()) {
+                Image image = imageRepository.findById(imageId).get();
 
-
-    public Post addProductsToPost(Post post, List<Product> products) {
-
-        if (postRepository.existsById(post.getID())) {
-            
-            for (Product product:products){
-                if (!productRepository.existsById(product.getID())) {
-                    throw new IllegalArgumentException("Product with ID " + product.getID() +" does not exists");
-                }
-                else {
-                    product.getPostsWithProduct().add(post);
-                }
+                post.getImages().remove(image);
+                image.setPost(null);
+                imageRepository.save(image);
+                postRepository.save(post);
+            }
+            else{
+                throw new IllegalArgumentException("Image does not exist");
             }
 
-            post.setProductsInPost(products);
-
-            productRepository.saveAll(products);
-
-            return postRepository.save(post);
-            
+            return;
         }
 
-        throw new IllegalArgumentException("Post with this ID does not exists");
-
+        throw new IllegalArgumentException("Post does not exist");
     }
 
+    @Override
+    public void addProductToPost(Long postId, Long productId) throws IllegalArgumentException {
+        if (postRepository.existsById(postId)) {
+            Post post = postRepository.findById(postId).get();
 
-    public Post addPostImages(Post post, List<Image> images) {
-        if (postRepository.existsById(post.getID())) {
-            
-            for (Image image:images){
-                if (!imageRepository.existsById(image.getID())) {
-                    throw new IllegalArgumentException("Image with ID " + image.getID() +" does not exists");
-                }
-                else {
-                    image.getPostsWithImg().add(post);
-                }
+            if (!productRepository.existsById(productId)) {
+                throw new IllegalArgumentException("Product with ID " + productId +" does not exists");
             }
+            else {
+                Product product = productRepository.findById(productId).get();
 
-            post.setImages(images);
-
-            imageRepository.saveAll(images);
-
-            return postRepository.save(post);
-            
+                product.setPost(post);
+                post.getProductsInPost().add(product);
+                productRepository.save(product);
+                postRepository.save(post);
+            }
+            return;
         }
-
         throw new IllegalArgumentException("Post with this ID does not exists");
-
     }
 
+    @Override
+    public void removeProductFromPost(Long postId, Long productId) throws IllegalArgumentException {
+        if (postRepository.existsById(postId)) {
+            Post post = postRepository.findById(postId).get();
+
+            if (!productRepository.existsById(productId)) {
+                throw new IllegalArgumentException("Product with ID " + productId +" does not exists");
+            }
+            else{
+                Product product = productRepository.findById(productId).get();
+
+                product.setPost(null);
+                post.getProductsInPost().remove(product);
+                productRepository.save(product);
+                postRepository.save(post);
+            }
+            return;
+        }
+        throw new IllegalArgumentException("Post with this ID does not exists");
+    }
+
+    @Override
+    protected CrudRepository<Post, Long> getRepository() {
+        return postRepository;
+    }
 }

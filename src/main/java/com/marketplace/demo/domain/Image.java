@@ -21,21 +21,9 @@ public class Image implements EntityWithId<Long> {
     @NotBlank(message="Path can not be empty")
     private String path;
 
-    @ManyToMany(targetEntity = Product.class)
-    @JoinTable(
-            name = "product_image",
-            joinColumns = @JoinColumn(name="id_product"),
-            inverseJoinColumns = @JoinColumn(name="id_image")
-    )
-    List<Product> productsWithImg;
-
-    @ManyToMany(targetEntity = Post.class)
-    @JoinTable(
-            name = "post_image",
-            joinColumns = @JoinColumn(name="id_image"),
-            inverseJoinColumns = @JoinColumn(name="id_post")
-    )
-    private List<Post> postsWithImg;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_post")
+    private Post post;
 
     @Override
     public Long getID() {
