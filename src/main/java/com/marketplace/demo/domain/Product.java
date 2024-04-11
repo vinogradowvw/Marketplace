@@ -6,8 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-
 @Entity
 @Getter
 @Setter
@@ -27,7 +25,6 @@ public class Product implements EntityWithId<Long> {
 
     @NotBlank(message = "Name can not be empty")
     private String name;
-
     private String description;
 
     @Override

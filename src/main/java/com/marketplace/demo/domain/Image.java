@@ -1,7 +1,5 @@
 package com.marketplace.demo.domain;
 
-import java.util.List;
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;

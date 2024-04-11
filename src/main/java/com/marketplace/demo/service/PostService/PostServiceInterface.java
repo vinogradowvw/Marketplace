@@ -1,11 +1,8 @@
 package com.marketplace.demo.service.PostService;
 
-import com.marketplace.demo.domain.Image;
 import com.marketplace.demo.domain.Post;
-import com.marketplace.demo.domain.Product;
 
 import com.marketplace.demo.service.CrudService;
-import jakarta.persistence.EntityNotFoundException;
 
 public interface PostServiceInterface extends CrudService<Post, Long> {
     public void addImageToPost(Long postId, Long imageId) throws IllegalArgumentException;

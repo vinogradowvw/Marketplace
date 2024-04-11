@@ -8,9 +8,11 @@ import org.springframework.stereotype.Service;
 import com.marketplace.demo.domain.Image;
 import com.marketplace.demo.domain.Post;
 import com.marketplace.demo.domain.Product;
+import com.marketplace.demo.domain.Tag;
 import com.marketplace.demo.persistance.ImageRepository;
 import com.marketplace.demo.persistance.PostRepository;
 import com.marketplace.demo.persistance.ProductRepository;
+import com.marketplace.demo.persistance.TagRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -23,6 +25,7 @@ public class PostService extends CrudServiceImpl<Post, Long> implements PostServ
     private PostRepository postRepository;
     private ProductRepository productRepository;
     private ImageRepository imageRepository;
+    private TagRepository tagRepository;
 
 
     @Override

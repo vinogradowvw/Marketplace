@@ -8,10 +8,8 @@ import org.springframework.stereotype.Service;
 import com.marketplace.demo.domain.Image;
 import com.marketplace.demo.persistance.ImageRepository;
 
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
 
 @Service
 @Transactional
