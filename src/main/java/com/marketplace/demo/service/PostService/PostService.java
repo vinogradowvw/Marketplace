@@ -29,92 +29,117 @@ public class PostService extends CrudServiceImpl<Post, Long> implements PostServ
 
 
     @Override
-    public void addImageToPost(Long postId, Long imageId) throws IllegalArgumentException {
-        if (postRepository.findById(postId).isPresent()) {
-            Post post = postRepository.findById(postId).get();
+    public Post addImageToPost(Post post, Image image) throws IllegalArgumentException {
+        
+        if (postRepository.existsById(post.getID())) {
 
-            if (imageRepository.findById(imageId).isPresent()) {
-                Image image = imageRepository.findById(imageId).get();
-
-                post.getImages().add(image);
-                postRepository.save(post);
+            if (imageRepository.existsById(image.getID())) {
                 image.setPost(post);
                 imageRepository.save(image);
-            }
-            else{
-                throw new IllegalArgumentException("Image does not exist");
+                post.getImages().add(image);
+                return postRepository.save(post);
             }
 
-            return;
+            throw new IllegalArgumentException("Image does not exist");
+
         }
 
         throw new IllegalArgumentException("Post does not exist");
     }
 
     @Override
-    public void removeImageFromPost(Long postId, Long imageId) throws IllegalArgumentException {
-        if (postRepository.findById(postId).isPresent()) {
-            Post post = postRepository.findById(postId).get();
+    public Post removeImageFromPost(Post post, Image image) throws IllegalArgumentException {
+        if (postRepository.existsById(post.getID())) {
 
-            if (imageRepository.findById(imageId).isPresent()) {
-                Image image = imageRepository.findById(imageId).get();
-
+            if (imageRepository.existsById(image.getID())) {
                 post.getImages().remove(image);
                 image.setPost(null);
                 imageRepository.save(image);
-                postRepository.save(post);
+                return postRepository.save(post);
             }
-            else{
-                throw new IllegalArgumentException("Image does not exist");
-            }
-
-            return;
+            
+            throw new IllegalArgumentException("Image does not exist");
+        
         }
 
         throw new IllegalArgumentException("Post does not exist");
     }
 
     @Override
-    public void addProductToPost(Long postId, Long productId) throws IllegalArgumentException {
-        if (postRepository.existsById(postId)) {
-            Post post = postRepository.findById(postId).get();
+    public Post addProductToPost(Post post, Product product) throws IllegalArgumentException {
+        
+        if (postRepository.existsById(post.getID())) {
 
-            if (!productRepository.existsById(productId)) {
-                throw new IllegalArgumentException("Product with ID " + productId +" does not exists");
-            }
-            else {
-                Product product = productRepository.findById(productId).get();
-
+            if (productRepository.existsById(product.getID())) {
                 product.setPost(post);
-                post.getProductsInPost().add(product);
                 productRepository.save(product);
-                postRepository.save(post);
+                post.getProductsInPost().add(product);
+                return postRepository.save(post);
             }
-            return;
+            
+            throw new IllegalArgumentException("Product with ID " + product.getID() + " does not exists");
+
         }
+
         throw new IllegalArgumentException("Post with this ID does not exists");
     }
 
     @Override
-    public void removeProductFromPost(Long postId, Long productId) throws IllegalArgumentException {
-        if (postRepository.existsById(postId)) {
-            Post post = postRepository.findById(postId).get();
+    public Post removeProductFromPost(Post post, Product product) throws IllegalArgumentException {
+        
+        if (postRepository.existsById(post.getID())) {
 
-            if (!productRepository.existsById(productId)) {
-                throw new IllegalArgumentException("Product with ID " + productId +" does not exists");
-            }
-            else{
-                Product product = productRepository.findById(productId).get();
-
+            if (productRepository.existsById(product.getID())) {
                 product.setPost(null);
                 post.getProductsInPost().remove(product);
                 productRepository.save(product);
-                postRepository.save(post);
+                return postRepository.save(post);
             }
-            return;
+
+            throw new IllegalArgumentException("Product with ID " + product.getID() + " does not exists");
+        
         }
+
         throw new IllegalArgumentException("Post with this ID does not exists");
     }
+    
+    @Override
+    public Post addTagToPost(Post post, Tag tag) throws IllegalArgumentException {
+
+        if (postRepository.existsById(post.getID())) {
+
+            if (tagRepository.existsById(tag.getID())) {
+                tag.getPosts().add(post);
+                tagRepository.save(tag);
+                post.getTags().add(tag);
+                return postRepository.save(post);
+            }
+
+            throw new IllegalArgumentException("Tag with ID " + tag.getID() + " does not exists");
+        
+        }
+        throw new IllegalArgumentException("Post with ID " + post.getID() + " does not exists");
+    }
+
+    public Post removeTagFromPost(Post post, Tag tag) throws IllegalArgumentException {
+        
+        if (postRepository.existsById(post.getID())) {
+
+            if (tagRepository.existsById(tag.getID())) {
+                post.getTags().remove(tag);
+                tag.getPosts().remove(post);
+                tagRepository.save(tag);
+                return postRepository.save(post);
+            }
+
+            throw new IllegalArgumentException("Tag with ID " + tag.getID() + " does not exists");
+        
+        }
+        
+        throw new IllegalArgumentException("Post with ID " + post.getID() + " does not exists");
+
+    }
+
 
     @Override
     protected CrudRepository<Post, Long> getRepository() {
