@@ -22,3 +22,4 @@ public class UserService extends CrudServiceImpl<User, Long> implements UserServ
         return userRepository;
     }
 }
+
