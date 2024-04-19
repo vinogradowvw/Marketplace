@@ -31,10 +31,6 @@ import com.marketplace.demo.service.TagService.TagService;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class PostServiceUnitTests {
 	@Autowired
-	ProductService productService;
-	@Autowired
-	ImageService imageService;
-	@Autowired
 	PostService postService;
 	@Autowired
 	TagService tagService;
@@ -55,7 +51,7 @@ class PostServiceUnitTests {
 	Tag tag1;
 	Tag tag2;
 
-	@BeforeAll
+	@BeforeEach
 	public void setUp() {
 		image1 = new Image();
 		image1.setId(1L);
@@ -134,6 +130,9 @@ class PostServiceUnitTests {
 
 	@Test
 	void removeImageFromPost() {
+		post = postService.addImageToPost(post, image1);
+		post = postService.addImageToPost(post, image2);
+
 		post = postService.removeImageFromPost(post, image1);
 
 		Assertions.assertFalse(post.getImages().contains(image1));
@@ -174,6 +173,8 @@ class PostServiceUnitTests {
 
 	@Test
 	void removeProductFromPost() {
+		post = postService.addProductToPost(post, product1);
+		post = postService.addProductToPost(post, product2);
 		
 		post = postService.removeProductFromPost(post, product1);
 
@@ -212,6 +213,8 @@ class PostServiceUnitTests {
 
 	@Test
 	void removeTagFromPost() {
+		post = postService.addTagToPost(post, tag1);
+		post = postService.addTagToPost(post, tag2);
 
 		Assertions.assertTrue(post.getTags().contains(tag1));
 		Assertions.assertTrue(post.getTags().contains(tag2));
