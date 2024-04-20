@@ -1,18 +1,11 @@
 package com.marketplace.demo.service.PostService;
 
 
+import com.marketplace.demo.domain.*;
+import com.marketplace.demo.persistance.*;
 import com.marketplace.demo.service.CrudServiceImpl;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
-
-import com.marketplace.demo.domain.Image;
-import com.marketplace.demo.domain.Post;
-import com.marketplace.demo.domain.Product;
-import com.marketplace.demo.domain.Tag;
-import com.marketplace.demo.persistance.ImageRepository;
-import com.marketplace.demo.persistance.PostRepository;
-import com.marketplace.demo.persistance.ProductRepository;
-import com.marketplace.demo.persistance.TagRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -26,6 +19,7 @@ public class PostService extends CrudServiceImpl<Post, Long> implements PostServ
     private ProductRepository productRepository;
     private ImageRepository imageRepository;
     private TagRepository tagRepository;
+    private UserRepository userRepository;
 
 
     @Override
@@ -138,6 +132,41 @@ public class PostService extends CrudServiceImpl<Post, Long> implements PostServ
         
         throw new IllegalArgumentException("Post with ID " + post.getID() + " does not exists");
 
+    }
+
+    @Override
+    public Post addUserToPost(Post post, User user) throws IllegalArgumentException {
+        if (postRepository.existsById(post.getID())) {
+
+            if (userRepository.existsById(user.getID())) {
+                user.getPosts().add(post);
+                userRepository.save(user);
+                post.setUser(user);
+                return postRepository.save(post);
+            }
+
+            throw new IllegalArgumentException("User with ID " + user.getID() + " does not exists");
+
+        }
+        throw new IllegalArgumentException("Post with ID " + post.getID() + " does not exists");
+    }
+
+    @Override
+    public Post removeUserToPost(Post post, User user) throws IllegalArgumentException {
+        if (postRepository.existsById(post.getID())) {
+
+            if (userRepository.existsById(user.getID())) {
+                post.setUser(null);
+                user.getPosts().remove(post);
+                userRepository.save(user);
+                return postRepository.save(post);
+            }
+
+            throw new IllegalArgumentException("User with ID " + user.getID() + " does not exists");
+
+        }
+
+        throw new IllegalArgumentException("Post with ID " + post.getID() + " does not exists");
     }
 
 

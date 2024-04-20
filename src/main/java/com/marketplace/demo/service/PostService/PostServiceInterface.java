@@ -1,9 +1,6 @@
 package com.marketplace.demo.service.PostService;
 
-import com.marketplace.demo.domain.Image;
-import com.marketplace.demo.domain.Post;
-import com.marketplace.demo.domain.Product;
-import com.marketplace.demo.domain.Tag;
+import com.marketplace.demo.domain.*;
 import com.marketplace.demo.service.CrudService;
 
 public interface PostServiceInterface extends CrudService<Post, Long> {
@@ -20,4 +17,7 @@ public interface PostServiceInterface extends CrudService<Post, Long> {
 
     public Post removeTagFromPost(Post post, Tag tag) throws IllegalArgumentException;
 
+    public Post addUserToPost(Post post, User user) throws IllegalArgumentException;
+
+    public Post removeUserToPost(Post post, User user) throws IllegalArgumentException;
 }
