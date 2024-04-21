@@ -3,10 +3,9 @@ package com.marketplace.demo.domain;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -14,6 +13,8 @@ import java.util.List;
 @Setter
 @Table(name = "users")
 @NoArgsConstructor
+@Data
+@EqualsAndHashCode(of = { "id" })
 public class User implements EntityWithId<Long>{
 
     public User (
@@ -40,14 +41,28 @@ public class User implements EntityWithId<Long>{
 
     @OneToMany(targetEntity = Likes.class, mappedBy = "author", fetch = FetchType.LAZY)
     private List<Likes> likes;
+
     @OneToMany(targetEntity = Payment.class, mappedBy = "user", fetch = FetchType.LAZY)
     private List<Payment> payments;
+
     @OneToMany(targetEntity = Post.class, mappedBy = "user", fetch = FetchType.LAZY)
     private List<Post> posts;
-    @OneToMany(targetEntity = Subscription.class, mappedBy = "subscriber", fetch = FetchType.LAZY)
-    private List<Subscription> subscribers;
-    @OneToMany(targetEntity = Subscription.class, mappedBy = "user", fetch = FetchType.LAZY)
-    private List<Subscription> subscriptions;
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_subscribers",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "subscriber_id")
+    )
+    private ArrayList<User> subscribers;
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_subscribers",
+            joinColumns = @JoinColumn(name = "subscriber_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private ArrayList<User> subscriptions;
 
     @Override
     public Long getID() {
