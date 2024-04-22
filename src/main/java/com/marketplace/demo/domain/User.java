@@ -39,8 +39,8 @@ public class User implements EntityWithId<Long>{
     @NotBlank(message = "Password can not be empty.")
     private String password;
 
-    @OneToMany(targetEntity = Likes.class, mappedBy = "author", fetch = FetchType.LAZY)
-    private List<Likes> likes;
+    @ManyToMany(mappedBy = "likedUsers")
+    private List<Post> likes;
 
     @OneToMany(targetEntity = Payment.class, mappedBy = "user", fetch = FetchType.LAZY)
     private List<Payment> payments;
@@ -51,16 +51,16 @@ public class User implements EntityWithId<Long>{
     @ManyToMany
     @JoinTable(
             name = "user_subscribers",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "subscriber_id")
+            joinColumns = @JoinColumn(name = "subscriber_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private ArrayList<User> subscribers;
 
     @ManyToMany
     @JoinTable(
             name = "user_subscribers",
-            joinColumns = @JoinColumn(name = "subscriber_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "subscriber_id")
     )
     private ArrayList<User> subscriptions;
 

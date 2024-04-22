@@ -17,7 +17,8 @@ public class Post implements EntityWithId<Long> {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id_post")
     private Long id;
-
+    @NotBlank(message = "Name can not be empty")
+    private String name;
     private String description;
 
     @OneToMany(targetEntity = Product.class, mappedBy = "post", fetch = FetchType.LAZY)
@@ -26,8 +27,13 @@ public class Post implements EntityWithId<Long> {
     @JoinColumn(name = "id_user")
     @NotBlank
     private User user;
-    @OneToMany(targetEntity = Likes.class, mappedBy = "post", fetch = FetchType.LAZY)
-    private List<Likes> likes;
+    @ManyToMany
+    @JoinTable(
+            name = "likes",
+            joinColumns = @JoinColumn(name="id_user"),
+            inverseJoinColumns = @JoinColumn(name="id_post")
+    )
+    private List<User> likedUsers;
     @ManyToMany(targetEntity = Tag.class)
     @JoinTable(
             name = "post_tag",

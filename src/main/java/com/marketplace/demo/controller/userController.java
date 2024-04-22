@@ -2,6 +2,7 @@ package com.marketplace.demo.controller;
 
 import com.marketplace.demo.service.UserService.UserService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 

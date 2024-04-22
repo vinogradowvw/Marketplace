@@ -1,6 +1,10 @@
 package com.marketplace.demo.service.UserService;
 
+import com.marketplace.demo.domain.Payment;
+import com.marketplace.demo.domain.Product;
 import com.marketplace.demo.domain.Subscription;
+import com.marketplace.demo.persistance.PaymentRepository;
+import com.marketplace.demo.persistance.ProductRepository;
 import com.marketplace.demo.persistance.SubscriptionRepository;
 import com.marketplace.demo.service.CrudServiceImpl;
 import lombok.AllArgsConstructor;
@@ -21,6 +25,8 @@ public class UserService extends CrudServiceImpl<User, Long> implements UserServ
 
     private UserRepository userRepository;
     private SubscriptionRepository subscriptionRepository;
+    private ProductRepository productRepository;
+    private PaymentRepository paymentRepository;
 
     @Override
     public User create(User user){
@@ -54,7 +60,7 @@ public class UserService extends CrudServiceImpl<User, Long> implements UserServ
                     subscriptionRepository.save(subscription);
                 }
                 else{
-                    throw new IllegalArgumentException("User with id " + subscriber.getID() + " already exists");
+                    throw new IllegalArgumentException("User with id " + subscriber.getID() + " does not exists");
                 }
             }
 
@@ -80,11 +86,61 @@ public class UserService extends CrudServiceImpl<User, Long> implements UserServ
                     subscriptionRepository.save(subscription);
                 }
                 else{
-                    throw new IllegalArgumentException("User with id " + subscriber.getID() + " already exists");
+                    throw new IllegalArgumentException("User with id " + subscriber.getID() + " does not exists");
                 }
             }
 
             throw new IllegalArgumentException("Subscription with ID " + subscription.getID() + " does not exists");
+
+        }
+
+        throw new IllegalArgumentException("User with ID " + user.getID() + " does not exists");
+    }
+
+    @Override
+    public void addPaymentToUser(User user, Product product, Payment payment) throws IllegalArgumentException {
+        if (userRepository.existsById(user.getID())) {
+
+            if (productRepository.existsById(product.getID())) {
+                if (paymentRepository.existsById(payment.getID())) {
+                    payment.setUser(user);
+                    user.getPayments().add(payment);
+                    product.getPayments().add(payment);
+                    userRepository.save(user);
+                    paymentRepository.save(payment);
+                    productRepository.save(product);
+                }
+                else{
+                    throw new IllegalArgumentException("Payment with id " + payment.getID() + " does not exists");
+                }
+            }
+
+            throw new IllegalArgumentException("Product with ID " + product.getID() + " does not exists");
+
+        }
+
+        throw new IllegalArgumentException("User with ID " + user.getID() + " does not exists");
+    }
+
+    @Override
+    public void removePaymentFromUser(User user, Product product, Payment payment) throws IllegalArgumentException {
+        if (userRepository.existsById(user.getID())) {
+
+            if (productRepository.existsById(product.getID())) {
+                if (paymentRepository.existsById(payment.getID())) {
+                    payment.setUser(null);
+                    user.getPayments().remove(payment);
+                    product.getPayments().remove(payment);
+                    userRepository.save(user);
+                    paymentRepository.save(payment);
+                    productRepository.save(product);
+                }
+                else{
+                    throw new IllegalArgumentException("Payment with id " + payment.getID() + " does not exists");
+                }
+            }
+
+            throw new IllegalArgumentException("Product with ID " + product.getID() + " does not exists");
 
         }
 

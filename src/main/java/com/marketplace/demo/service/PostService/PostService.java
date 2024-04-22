@@ -169,6 +169,28 @@ public class PostService extends CrudServiceImpl<Post, Long> implements PostServ
         throw new IllegalArgumentException("Post with ID " + post.getID() + " does not exists");
     }
 
+    @Override
+    public Post likePost(Post post, User user) throws IllegalArgumentException {
+        if (postRepository.existsById(post.getID())) {
+
+            if (userRepository.existsById(user.getID())) {
+                if (post.getLikedUsers().contains(user)){
+                    user.getLikes().remove(post);
+                    post.getLikedUsers().remove(user);
+                }
+                else{
+                    user.getLikes().add(post);
+                    post.getLikedUsers().add(user);
+                }
+                userRepository.save(user);
+                return postRepository.save(post);
+            }
+
+            throw new IllegalArgumentException("User with ID " + user.getID() + " does not exists");
+
+        }
+        throw new IllegalArgumentException("Post with ID " + post.getID() + " does not exists");
+    }
 
     @Override
     protected CrudRepository<Post, Long> getRepository() {
