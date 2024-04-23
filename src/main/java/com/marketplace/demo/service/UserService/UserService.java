@@ -1,18 +1,11 @@
 package com.marketplace.demo.service.UserService;
 
-import com.marketplace.demo.domain.Payment;
-import com.marketplace.demo.domain.Product;
-import com.marketplace.demo.domain.Subscription;
-import com.marketplace.demo.persistance.PaymentRepository;
-import com.marketplace.demo.persistance.ProductRepository;
-import com.marketplace.demo.persistance.SubscriptionRepository;
+import com.marketplace.demo.domain.*;
+import com.marketplace.demo.persistance.*;
 import com.marketplace.demo.service.CrudServiceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
-
-import com.marketplace.demo.domain.User;
-import com.marketplace.demo.persistance.UserRepository;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +20,7 @@ public class UserService extends CrudServiceImpl<User, Long> implements UserServ
     private SubscriptionRepository subscriptionRepository;
     private ProductRepository productRepository;
     private PaymentRepository paymentRepository;
+    private RoleRepository roleRepository;
 
     @Override
     public User create(User user){
@@ -62,6 +56,8 @@ public class UserService extends CrudServiceImpl<User, Long> implements UserServ
                 else{
                     throw new IllegalArgumentException("User with id " + subscriber.getID() + " does not exists");
                 }
+
+                return;
             }
 
             throw new IllegalArgumentException("Subscription with ID " + subscription.getID() + " does not exists");
@@ -88,6 +84,8 @@ public class UserService extends CrudServiceImpl<User, Long> implements UserServ
                 else{
                     throw new IllegalArgumentException("User with id " + subscriber.getID() + " does not exists");
                 }
+
+                return;
             }
 
             throw new IllegalArgumentException("Subscription with ID " + subscription.getID() + " does not exists");
@@ -113,6 +111,8 @@ public class UserService extends CrudServiceImpl<User, Long> implements UserServ
                 else{
                     throw new IllegalArgumentException("Payment with id " + payment.getID() + " does not exists");
                 }
+
+                return;
             }
 
             throw new IllegalArgumentException("Product with ID " + product.getID() + " does not exists");
@@ -138,9 +138,49 @@ public class UserService extends CrudServiceImpl<User, Long> implements UserServ
                 else{
                     throw new IllegalArgumentException("Payment with id " + payment.getID() + " does not exists");
                 }
+
+                return;
             }
 
             throw new IllegalArgumentException("Product with ID " + product.getID() + " does not exists");
+
+        }
+
+        throw new IllegalArgumentException("User with ID " + user.getID() + " does not exists");
+    }
+
+    @Override
+    public void addRoleToUser(User user, Role role) throws IllegalArgumentException {
+        if (userRepository.existsById(user.getID())) {
+
+            if (roleRepository.existsById(role.getID())) {
+                user.setRole(role);
+                role.getUsers().add(user);
+                userRepository.save(user);
+                roleRepository.save(role);
+                return;
+            }
+
+            throw new IllegalArgumentException("Role with ID " + role.getID() + " does not exists");
+
+        }
+
+        throw new IllegalArgumentException("User with ID " + user.getID() + " does not exists");
+    }
+
+    @Override
+    public void removeRoleFromUser(User user, Role role) throws IllegalArgumentException {
+        if (userRepository.existsById(user.getID())) {
+
+            if (roleRepository.existsById(role.getID())) {
+                user.setRole(null);
+                role.getUsers().remove(user);
+                userRepository.save(user);
+                roleRepository.save(role);
+                return;
+            }
+
+            throw new IllegalArgumentException("Role with ID " + role.getID() + " does not exists");
 
         }
 

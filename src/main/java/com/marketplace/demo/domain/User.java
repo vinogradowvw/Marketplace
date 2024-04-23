@@ -64,6 +64,10 @@ public class User implements EntityWithId<Long>{
     )
     private ArrayList<User> subscriptions;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_role")
+    private Role role;
+
     @Override
     public Long getID() {
         return id;

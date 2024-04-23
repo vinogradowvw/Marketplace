@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import com.marketplace.demo.domain.Product;
 import com.marketplace.demo.persistance.ProductRepository;
 
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
