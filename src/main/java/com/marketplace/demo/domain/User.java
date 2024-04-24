@@ -5,7 +5,6 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -54,7 +53,7 @@ public class User implements EntityWithId<Long>{
             joinColumns = @JoinColumn(name = "subscriber_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    private ArrayList<User> subscribers;
+    private List<User> subscribers;
 
     @ManyToMany
     @JoinTable(
@@ -62,7 +61,7 @@ public class User implements EntityWithId<Long>{
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "subscriber_id")
     )
-    private ArrayList<User> subscriptions;
+    private List<User> subscriptions;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_role")
