@@ -22,7 +22,7 @@ public class Post implements EntityWithId<Long> {
     private String description;
 
     @OneToMany(targetEntity = Product.class, mappedBy = "post", fetch = FetchType.LAZY)
-    List<Product> productsInPost;
+    private List<Product> productsInPost;
     @ManyToOne
     @JoinColumn(name = "id_user")
     @NotBlank

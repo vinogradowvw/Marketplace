@@ -18,7 +18,7 @@ public class Product implements EntityWithId<Long> {
     @Column(name = "id_product")
     private Long id;
     @NotBlank(message = "Price can not be empty")
-    private int price;
+    private Integer price;
     @NotBlank(message = "Name can not be empty")
     private String name;
     private String description;

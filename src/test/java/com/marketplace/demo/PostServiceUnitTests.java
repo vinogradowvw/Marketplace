@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -22,9 +21,7 @@ import com.marketplace.demo.persistance.ImageRepository;
 import com.marketplace.demo.persistance.PostRepository;
 import com.marketplace.demo.persistance.ProductRepository;
 import com.marketplace.demo.persistance.TagRepository;
-import com.marketplace.demo.service.ImageService.ImageService;
 import com.marketplace.demo.service.PostService.PostService;
-import com.marketplace.demo.service.ProductService.ProductService;
 import com.marketplace.demo.service.TagService.TagService;
 
 @SpringBootTest
