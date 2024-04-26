@@ -7,17 +7,16 @@ import org.springframework.stereotype.Component;
 
 @Component
 @AllArgsConstructor
-public class PostDTOConverter implements DTOConverter<Post, PostDTO> {
-
+public class PostDTOConverter implements DTOConverter<PostDTO, Post> {
 
 
     @Override
-    public Post toDTO(PostDTO postDTO) {
+    public PostDTO toDTO(Post post) {
         return null;
     }
 
     @Override
-    public PostDTO toEntity(Post post) {
+    public Post toEntity(PostDTO postDTO) {
         return null;
     }
 }
