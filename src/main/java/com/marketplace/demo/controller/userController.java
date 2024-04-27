@@ -34,13 +34,13 @@ public class userController {
     @GetMapping
     public List<UserDTO> getAllUsers() {
         Iterable<User> users = userService.readAll();
-        List<UserDTO> userDTOS = new ArrayList<>();
+        List<UserDTO> userDTOs = new ArrayList<>();
 
         for (User user : users) {
-            userDTOS.add(userDTOConverter.toDTO(user));
+            userDTOs.add(userDTOConverter.toDTO(user));
         }
 
-        return userDTOS;
+        return userDTOs;
     }
 
     @GetMapping(path = "/{id}")
