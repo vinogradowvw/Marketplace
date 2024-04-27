@@ -24,7 +24,25 @@ public class ProductDTOConverter implements DTOConverter<ProductDTO, Product> {
 
     @Override
     public ProductDTO toDTO(Product product) {
-        return null;
+
+        Long postId = null;
+        
+        Optional<Post> optPost = Optional.ofNullable(product.getPost());
+        if (optPost.isPresent()) {
+            postId = optPost.get().getID();
+        }
+
+        Optional<ArrayList<Payment>> optPayments = Optional.ofNullable(product.getPayments());
+        ArrayList<Long> paymentsIds = new ArrayList<>();
+
+        if (optPayments.isPresent()) {
+            for (Payment payment : optPayments.get()) {
+                paymentsIds.add(payment.getID());
+            }
+        }
+
+        return new ProductDTO(product.getID(), product.getPrice(), product.getName(),
+                                product.getDescription(), postId, paymentsIds);
     }
 
     @Override
