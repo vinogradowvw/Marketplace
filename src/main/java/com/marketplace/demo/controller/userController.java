@@ -6,7 +6,11 @@ import com.marketplace.demo.controller.dto.PostDTO;
 import com.marketplace.demo.controller.dto.RoleDTO;
 import com.marketplace.demo.controller.dto.UserDTO;
 import com.marketplace.demo.domain.*;
+import com.marketplace.demo.service.PaymentService.PaymentService;
 import com.marketplace.demo.service.PostService.PostService;
+import com.marketplace.demo.service.ProductService.ProductService;
+import com.marketplace.demo.service.RoleService.RoleService;
+import com.marketplace.demo.service.SubscriptionService.SubscriptionService;
 import com.marketplace.demo.service.UserService.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
@@ -15,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 import java.sql.Timestamp;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -28,7 +31,10 @@ public class userController {
     private final DTOConverter<PaymentDTO, Payment> paymentDTOConverter;
     private final DTOConverter<RoleDTO, Role> roleDTOConverter;
     private final UserService userService;
+    private final SubscriptionService subscriptionService;
+    private final RoleService roleService;
     private final PostService postService;
+    private final ProductService productService;
 
     @GetMapping
     public List<UserDTO> getAllUsers() {
@@ -86,6 +92,7 @@ public class userController {
     public UserDTO subscribe(@PathVariable("id") Long userId, Long subscriberId){
         Subscription subscription = new Subscription();
         subscription.setTimestamp(new Timestamp(System.currentTimeMillis()));
+        subscriptionService.create(subscription);
 
         User user = userService.readById(userId).get();
         User subscriber = userService.readById(subscriberId).get();
@@ -93,5 +100,78 @@ public class userController {
         userService.addSubscriptionToUsers(user, subscriber, subscription);
 
         return userDTOConverter.toDTO(user);
+    }
+
+    @DeleteMapping(path = "/{userId}/subscription/{subscriberId}")
+    public UserDTO unsubscribe(@PathVariable("userId") Long userId, @PathVariable("subscriberId") Long subscriberId){
+        Subscription subscription = subscriptionService.findByUserIdAndSubscriberId(userId, subscriberId);
+
+        User user = userService.readById(userId).get();
+        User subscriber = userService.readById(subscriberId).get();
+
+        userService.removeSubscriptionToUsers(user, subscriber, subscription);
+        subscriptionService.deleteById(subscription.getID());
+
+        return userDTOConverter.toDTO(user);
+    }
+
+    @PostMapping(path = "/{id}/role")
+    public UserDTO addRole(@PathVariable("id") Long userId, Long roleId){
+        User user = userService.readById(userId).get();
+        Role role = roleService.readById(roleId).get();
+
+        userService.addRoleToUser(user, role);
+
+        return userDTOConverter.toDTO(user);
+    }
+
+    @DeleteMapping(path = "/{id}/role")
+    public UserDTO removeRole(@PathVariable("id") Long userId){
+        User user = userService.readById(userId).get();
+        Role role = user.getRole();
+
+        userService.removeRoleFromUser(user, role);
+
+        return userDTOConverter.toDTO(user);
+    }
+
+    @PutMapping(path = "/{id}")
+    public UserDTO updateUser(@PathVariable ("id") Long id, @RequestBody UserDTO userDTO){
+        User user = userDTOConverter.toEntity(userDTO);
+        user.setId(id);
+
+        userService.update(id, user);
+        return userDTOConverter.toDTO(user);
+    }
+
+    @DeleteMapping(path = "/{id}")
+    public void deleteUser(@PathVariable("id") Long id){
+        User user = userService.readById(id).get();
+        for (User subscriber : user.getSubscribers()){
+            this.unsubscribe(user.getID(), subscriber.getID());
+        }
+
+        for (User sub : user.getSubscriptions()){
+            this.unsubscribe(sub.getID(), user.getID());
+        }
+
+        this.removeRole(user.getID());
+
+        for (Post like : user.getLikes()){
+            postService.likePost(like, user);
+        }
+
+        for (Post post : user.getPosts()){
+            for (Product product : post.getProductsInPost()){
+                productService.deleteById(product.getID());
+            }
+            postService.deleteById(post.getID());
+        }
+
+        for (Payment payment : user.getPayments()){
+            payment.setUser(null);
+        }
+
+        userService.deleteById(user.getID());
     }
 }

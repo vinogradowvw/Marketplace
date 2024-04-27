@@ -8,9 +8,6 @@ public interface UserServiceInterface extends CrudService<User, Long> {
     public void addSubscriptionToUsers(User user, User subscriber, Subscription subscription) throws IllegalArgumentException;
     public void removeSubscriptionToUsers(User user, User subscriber, Subscription subscription) throws IllegalArgumentException;
 
-    public void addPaymentToUser(User user, Product product, Payment payment) throws IllegalArgumentException;
-    public void removePaymentFromUser(User user, Product product, Payment payment) throws IllegalArgumentException;
-
     public void addRoleToUser(User user, Role role) throws IllegalArgumentException;
     public void removeRoleFromUser(User user, Role role) throws IllegalArgumentException;
 }
