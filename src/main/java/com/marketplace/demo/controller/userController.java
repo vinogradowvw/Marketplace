@@ -5,19 +5,17 @@ import com.marketplace.demo.controller.dto.PaymentDTO;
 import com.marketplace.demo.controller.dto.PostDTO;
 import com.marketplace.demo.controller.dto.RoleDTO;
 import com.marketplace.demo.controller.dto.UserDTO;
-import com.marketplace.demo.domain.Payment;
-import com.marketplace.demo.domain.Post;
-import com.marketplace.demo.domain.Role;
-import com.marketplace.demo.domain.User;
+import com.marketplace.demo.domain.*;
+import com.marketplace.demo.service.PostService.PostService;
 import com.marketplace.demo.service.UserService.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.sql.Timestamp;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -30,6 +28,7 @@ public class userController {
     private final DTOConverter<PaymentDTO, Payment> paymentDTOConverter;
     private final DTOConverter<RoleDTO, Role> roleDTOConverter;
     private final UserService userService;
+    private final PostService postService;
 
     @GetMapping
     public List<UserDTO> getAllUsers() {
@@ -48,7 +47,7 @@ public class userController {
         return userDTOConverter.toDTO(userService.readById(id).get());
     }
 
-    @GetMapping(path = "/{id}/liked")
+    @GetMapping(path = "/{id}/likes")
     public List<PostDTO> getLikedPosts(@PathVariable("id")Long id){
         return userService.readById(id).get().getLikes().stream().map(postDTOConverter::toDTO).toList();
     }
@@ -78,5 +77,21 @@ public class userController {
         return roleDTOConverter.toDTO(userService.readById(id).get().getRole());
     }
 
+    @PostMapping(path = "/user")
+    public UserDTO createUser(@RequestBody UserDTO userDTO) {
+        return userDTOConverter.toDTO(userService.create(userDTOConverter.toEntity(userDTO)));
+    }
 
+    @PostMapping(path = "/{id}/subscription")
+    public UserDTO subscribe(@PathVariable("id") Long userId, Long subscriberId){
+        Subscription subscription = new Subscription();
+        subscription.setTimestamp(new Timestamp(System.currentTimeMillis()));
+
+        User user = userService.readById(userId).get();
+        User subscriber = userService.readById(subscriberId).get();
+
+        userService.addSubscriptionToUsers(user, subscriber, subscription);
+
+        return userDTOConverter.toDTO(user);
+    }
 }
