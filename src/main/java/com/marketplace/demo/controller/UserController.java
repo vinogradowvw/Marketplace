@@ -6,7 +6,6 @@ import com.marketplace.demo.controller.dto.PostDTO;
 import com.marketplace.demo.controller.dto.RoleDTO;
 import com.marketplace.demo.controller.dto.UserDTO;
 import com.marketplace.demo.domain.*;
-import com.marketplace.demo.service.PaymentService.PaymentService;
 import com.marketplace.demo.service.PostService.PostService;
 import com.marketplace.demo.service.ProductService.ProductService;
 import com.marketplace.demo.service.RoleService.RoleService;
@@ -20,11 +19,12 @@ import java.sql.Timestamp;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/user", produces = MediaType.APPLICATION_JSON_VALUE)
 @AllArgsConstructor
-public class userController {
+public class UserController {
 
     private final DTOConverter<UserDTO, User> userDTOConverter;
     private final DTOConverter<PostDTO, Post> postDTOConverter;
@@ -138,6 +138,17 @@ public class userController {
     @PutMapping(path = "/{id}")
     public UserDTO updateUser(@PathVariable ("id") Long id, @RequestBody UserDTO userDTO){
         User user = userDTOConverter.toEntity(userDTO);
+        Optional<User> oldUser = userService.readById(id);
+
+        if (oldUser.isPresent()){
+            user.setPosts(oldUser.get().getPosts());
+            user.setSubscriptions(oldUser.get().getSubscriptions());
+            user.setSubscribers(oldUser.get().getSubscribers());
+            user.setLikes(oldUser.get().getLikes());
+            user.setRole(oldUser.get().getRole());
+            user.setPayments(oldUser.get().getPayments());
+        }
+
         user.setId(id);
 
         userService.update(id, user);
