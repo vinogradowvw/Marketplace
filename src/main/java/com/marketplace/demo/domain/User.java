@@ -47,21 +47,11 @@ public class User implements EntityWithId<Long>{
     @OneToMany(targetEntity = Post.class, mappedBy = "user", fetch = FetchType.LAZY)
     private List<Post> posts;
 
-    @ManyToMany
-    @JoinTable(
-            name = "user_subscribers",
-            joinColumns = @JoinColumn(name = "subscriber_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
-    private List<User> subscribers;
+    @OneToMany(targetEntity = Subscription.class, mappedBy = "user", fetch = FetchType.LAZY)
+    private List<Subscription> subscribers;
 
-    @ManyToMany
-    @JoinTable(
-            name = "user_subscribers",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "subscriber_id")
-    )
-    private List<User> subscriptions;
+    @OneToMany(targetEntity = Subscription.class, mappedBy = "subscriber", fetch = FetchType.LAZY)
+    private List<Subscription> subscriptions;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_role")

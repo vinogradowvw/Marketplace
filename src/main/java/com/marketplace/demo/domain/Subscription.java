@@ -19,11 +19,11 @@ public class Subscription implements EntityWithId<Long> {
     private Timestamp timestamp;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="id_subscriber")
+    @JoinColumn(name = "id_subscriber", referencedColumnName = "id_user")
     private User subscriber;
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="id_user")
+    @JoinColumn(name = "id_user", referencedColumnName = "id_user")
     private User user;
 
     @Override

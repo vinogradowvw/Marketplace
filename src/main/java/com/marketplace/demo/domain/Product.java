@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -27,8 +27,8 @@ public class Product implements EntityWithId<Long> {
     @JoinColumn(name = "id_post")
     private Post post;
 
-    @OneToMany(targetEntity = Payment.class, mappedBy = "product", fetch = FetchType.LAZY)
-    private ArrayList<Payment> payments;
+    @ManyToMany(mappedBy = "products")
+    private List<Payment> payments;
 
     @Override
     public Long getID() {

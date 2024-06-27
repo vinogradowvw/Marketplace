@@ -5,6 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.sql.Timestamp;
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -15,13 +18,18 @@ public class Payment implements EntityWithId<Long>{
     @Column(name = "id_payment")
     private Long id;
     private Integer amount;
+    private Timestamp timestamp;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_user")
     User user;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_product")
-    Product product;
+    @ManyToMany
+    @JoinTable(
+            name = "payment_products",
+            joinColumns = @JoinColumn(name="id_product"),
+            inverseJoinColumns = @JoinColumn(name="id_payment")
+    )
+    List<Product> products;
 
     @Override
     public Long getID() {
