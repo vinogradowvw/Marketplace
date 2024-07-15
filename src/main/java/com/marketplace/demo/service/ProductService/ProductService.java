@@ -30,6 +30,7 @@ public class ProductService extends CrudServiceImpl<Product, Long> implements Pr
             if (productRepository.existsById(product.getID())) {
                 if (paymentRepository.existsById(payment.getID())) {
                     payment.setUser(user);
+                    payment.getProducts().add(product);
                     user.getPayments().add(payment);
                     product.getPayments().add(payment);
                     userRepository.save(user);
@@ -57,6 +58,7 @@ public class ProductService extends CrudServiceImpl<Product, Long> implements Pr
             if (productRepository.existsById(product.getID())) {
                 if (paymentRepository.existsById(payment.getID())) {
                     payment.setUser(null);
+                    payment.getProducts().remove(product);
                     user.getPayments().remove(payment);
                     product.getPayments().remove(payment);
                     userRepository.save(user);
