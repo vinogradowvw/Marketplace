@@ -105,7 +105,7 @@ public class UserService extends CrudServiceImpl<User, Long> implements UserServ
         if (userRepository.existsById(user.getID())) {
 
             if (roleRepository.existsById(role.getID())) {
-                user.setRole(role);
+                user.getRoles().add(role);
                 role.getUsers().add(user);
                 userRepository.save(user);
                 roleRepository.save(role);
@@ -124,7 +124,7 @@ public class UserService extends CrudServiceImpl<User, Long> implements UserServ
         if (userRepository.existsById(user.getID())) {
 
             if (roleRepository.existsById(role.getID())) {
-                user.setRole(null);
+                user.getRoles().remove(role);
                 role.getUsers().remove(user);
                 userRepository.save(user);
                 roleRepository.save(role);

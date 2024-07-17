@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -28,7 +29,10 @@ public class Product implements EntityWithId<Long> {
     private Post post;
 
     @ManyToMany(mappedBy = "products")
-    private List<Payment> payments;
+    private List<Order> orders = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "products")
+    private List<Cart> carts = new ArrayList<>();
 
     @Override
     public Long getID() {

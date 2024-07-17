@@ -20,16 +20,8 @@ public class Payment implements EntityWithId<Long>{
     private Integer amount;
     private Timestamp timestamp;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_user")
-    User user;
-    @ManyToMany
-    @JoinTable(
-            name = "payment_products",
-            joinColumns = @JoinColumn(name="id_product"),
-            inverseJoinColumns = @JoinColumn(name="id_payment")
-    )
-    List<Product> products;
+    @OneToOne(mappedBy = "payment")
+    private Order order;
 
     @Override
     public Long getID() {

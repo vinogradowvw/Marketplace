@@ -18,7 +18,12 @@ public class Role implements EntityWithId<Long>{
     private Long id;
     private String name;
 
-    @OneToMany(targetEntity = User.class, mappedBy = "role", fetch = FetchType.LAZY)
+    @ManyToMany
+    @JoinTable(
+            name="roles",
+            joinColumns = @JoinColumn(name="id_user"),
+            inverseJoinColumns = @JoinColumn(name="id_role")
+    )
     private List<User> users;
 
     @Override

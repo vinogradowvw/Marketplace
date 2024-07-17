@@ -41,8 +41,8 @@ public class User implements EntityWithId<Long>{
     @ManyToMany(mappedBy = "likedUsers")
     private List<Post> likes;
 
-    @OneToMany(targetEntity = Payment.class, mappedBy = "user", fetch = FetchType.LAZY)
-    private List<Payment> payments;
+    @OneToMany(targetEntity = Order.class, mappedBy = "user", fetch = FetchType.LAZY)
+    private List<Order> orders;
 
     @OneToMany(targetEntity = Post.class, mappedBy = "user", fetch = FetchType.LAZY)
     private List<Post> posts;
@@ -53,9 +53,11 @@ public class User implements EntityWithId<Long>{
     @OneToMany(targetEntity = Subscription.class, mappedBy = "subscriber", fetch = FetchType.LAZY)
     private List<Subscription> subscriptions;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_role")
-    private Role role;
+    @OneToOne(mappedBy = "user")
+    private Cart cart;
+
+    @ManyToMany(mappedBy = "users")
+    private List<Role> roles;
 
     @Override
     public Long getID() {
