@@ -53,11 +53,14 @@ public class User implements EntityWithId<Long>{
     @OneToMany(targetEntity = Subscription.class, mappedBy = "subscriber", fetch = FetchType.LAZY)
     private List<Subscription> subscriptions;
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(targetEntity = Cart.class, mappedBy = "user")
     private Cart cart;
 
     @ManyToMany(mappedBy = "users")
     private List<Role> roles;
+
+    @OneToMany(targetEntity = Review.class, mappedBy = "author")
+    private List<Review> reviews;
 
     @Override
     public Long getID() {

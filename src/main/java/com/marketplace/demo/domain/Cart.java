@@ -2,6 +2,7 @@ package com.marketplace.demo.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.security.Timestamp;
@@ -11,6 +12,7 @@ import java.util.Map;
 @Entity
 @Setter
 @Getter
+@NoArgsConstructor
 public class Cart implements EntityWithId<Long>{
 
     @Id

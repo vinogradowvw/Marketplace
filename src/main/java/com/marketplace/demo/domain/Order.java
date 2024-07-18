@@ -2,6 +2,7 @@ package com.marketplace.demo.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.sql.Timestamp;
@@ -12,6 +13,7 @@ import java.util.Map;
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
 public class Order implements EntityWithId<Long>{
 
     @Id

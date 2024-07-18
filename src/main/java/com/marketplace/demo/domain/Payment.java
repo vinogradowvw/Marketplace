@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.sql.Timestamp;
-import java.util.List;
 
 @Entity
 @Getter
@@ -20,7 +19,7 @@ public class Payment implements EntityWithId<Long>{
     private Integer amount;
     private Timestamp timestamp;
 
-    @OneToOne(mappedBy = "payment")
+    @OneToOne(targetEntity = Order.class, mappedBy = "payment")
     private Order order;
 
     @Override

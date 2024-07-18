@@ -42,6 +42,9 @@ public class Post implements EntityWithId<Long> {
     )
     private List<Tag> tags;
 
+    @OneToMany(targetEntity = Review.class, mappedBy = "post")
+    private List<Review> reviews;
+
     @OneToMany(targetEntity = Image.class, mappedBy = "post", fetch = FetchType.LAZY)
     private List<Image> images;
 
