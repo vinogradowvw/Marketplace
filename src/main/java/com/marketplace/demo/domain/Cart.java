@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.security.Timestamp;
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,7 +29,7 @@ public class Cart implements EntityWithId<Long>{
     @CollectionTable(name = "cart_products", joinColumns = @JoinColumn(name = "id_cart"))
     @MapKeyJoinColumn(name = "id_product")
     @Column(name = "quantity")
-    private Map<Product, Integer> products = new HashMap<>();
+    private Map<Product, Long> products = new HashMap<>();
 
     @Override
     public Long getID() {

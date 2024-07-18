@@ -16,7 +16,7 @@ public class Payment implements EntityWithId<Long>{
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id_payment")
     private Long id;
-    private Integer amount;
+    private Long amount;
     private Timestamp timestamp;
 
     @OneToOne(targetEntity = Order.class, mappedBy = "payment")

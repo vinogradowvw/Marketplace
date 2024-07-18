@@ -2,6 +2,7 @@ package com.marketplace.demo.service.UserService;
 
 import com.marketplace.demo.domain.*;
 import com.marketplace.demo.persistance.*;
+import com.marketplace.demo.service.CartService.CartService;
 import com.marketplace.demo.service.CrudServiceImpl;
 import com.marketplace.demo.service.SubscriptionService.SubscriptionService;
 import lombok.AllArgsConstructor;
@@ -24,6 +25,7 @@ public class UserService extends CrudServiceImpl<User, Long> implements UserServ
     private UserRepository userRepository;
     private SubscriptionRepository subscriptionRepository;
     private RoleRepository roleRepository;
+    private CartService cartService;
 
     @Override
     public User create(User user){
@@ -38,6 +40,12 @@ public class UserService extends CrudServiceImpl<User, Long> implements UserServ
                 throw new IllegalArgumentException("User with username " + user.getUsername() + " already exists");
             }
         }
+
+        Cart cart = new Cart();
+        user.setCart(cart);
+        cart.setUser(user);
+        cart.setTimestamp(new Timestamp(System.currentTimeMillis()));
+        cartService.create(cart);
 
         return getRepository().save(user);
     }
