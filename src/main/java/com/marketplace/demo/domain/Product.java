@@ -24,8 +24,8 @@ public class Product implements EntityWithId<Long> {
     private String name;
     private String description;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_post")
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_post", referencedColumnName = "id_post")
     private Post post;
 
     @ManyToMany(mappedBy = "products")

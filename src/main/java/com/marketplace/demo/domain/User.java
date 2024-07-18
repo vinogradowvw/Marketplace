@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -39,28 +40,28 @@ public class User implements EntityWithId<Long>{
     private String password;
 
     @ManyToMany(mappedBy = "likedUsers")
-    private List<Post> likes;
+    private List<Post> likes = new ArrayList<>();
 
     @OneToMany(targetEntity = Order.class, mappedBy = "user", fetch = FetchType.LAZY)
-    private List<Order> orders;
+    private List<Order> orders = new ArrayList<>();
 
     @OneToMany(targetEntity = Post.class, mappedBy = "user", fetch = FetchType.LAZY)
-    private List<Post> posts;
+    private List<Post> posts = new ArrayList<>();
 
     @OneToMany(targetEntity = Subscription.class, mappedBy = "user", fetch = FetchType.LAZY)
-    private List<Subscription> subscribers;
+    private List<Subscription> subscribers = new ArrayList<>();
 
     @OneToMany(targetEntity = Subscription.class, mappedBy = "subscriber", fetch = FetchType.LAZY)
-    private List<Subscription> subscriptions;
+    private List<Subscription> subscriptions = new ArrayList<>();
 
     @OneToOne(targetEntity = Cart.class, mappedBy = "user")
     private Cart cart;
 
     @ManyToMany(mappedBy = "users")
-    private List<Role> roles;
+    private List<Role> roles = new ArrayList<>();
 
     @OneToMany(targetEntity = Review.class, mappedBy = "author")
-    private List<Review> reviews;
+    private List<Review> reviews = new ArrayList<>();
 
     @Override
     public Long getID() {

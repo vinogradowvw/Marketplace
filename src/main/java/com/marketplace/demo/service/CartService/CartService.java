@@ -6,7 +6,6 @@ import com.marketplace.demo.persistance.ProductRepository;
 import com.marketplace.demo.service.CrudServiceImpl;
 import com.marketplace.demo.service.OrderService.OrderService;
 import com.marketplace.demo.service.PaymentService.PaymentService;
-import com.marketplace.demo.service.ProductService.ProductService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
@@ -58,6 +57,7 @@ public class CartService extends CrudServiceImpl<Cart, Long> implements CartServ
             p.getOrders().add(order);
             productRepository.save(p);
         });
+        order.getUser().getOrders().add(order);
 
         Payment payment = new Payment();
         payment.setOrder(order);
@@ -66,6 +66,8 @@ public class CartService extends CrudServiceImpl<Cart, Long> implements CartServ
                 .mapToLong(entry -> entry.getKey().getPrice() * entry.getValue())
                 .sum();
         payment.setAmount(amount);
+
+        order.setPayment(payment);
 
         orderService.create(order);
         paymentService.create(payment);

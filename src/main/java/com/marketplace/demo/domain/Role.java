@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -24,7 +25,7 @@ public class Role implements EntityWithId<Long>{
             joinColumns = @JoinColumn(name="id_user"),
             inverseJoinColumns = @JoinColumn(name="id_role")
     )
-    private List<User> users;
+    private List<User> users = new ArrayList<>();
 
     @Override
     public Long getID() {

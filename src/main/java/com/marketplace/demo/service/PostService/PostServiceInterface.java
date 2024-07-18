@@ -18,4 +18,6 @@ public interface PostServiceInterface extends CrudService<Post, Long> {
     public Post removeUserToPost(Post post, User user) throws IllegalArgumentException;
 
     public Post likePost(Post post, User user) throws IllegalArgumentException;
+
+    public Post addReviewToPost(Post post, Review review, User user) throws IllegalArgumentException;
 }

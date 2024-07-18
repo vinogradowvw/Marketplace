@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -19,7 +20,7 @@ public class Tag implements EntityWithId<Long>{
     String name;
 
     @ManyToMany(mappedBy = "tags")
-    List<Post> posts;
+    List<Post> posts = new ArrayList<>();
 
     @Override
     public Long getID() {
