@@ -8,16 +8,16 @@ Entity = TypeVar("Entity", bound=VectorObject)
 
 class VecRepository(ABC, Generic[Entity]):
 
-    def __init__(self):
+    def __init__(self, entity_type: Type[Entity]):
+        self.__entity_type = entity_type
         self._milvus_client = MilvusClient("http://localhost:19530")
 
     def upsert(self, vector_object: Entity) -> None:
-        result = self._milvus_client.upsert(collection_name=vector_object.collection_name(),
+        self._milvus_client.upsert(collection_name=vector_object.collection_name,
                                             data=vector_object.model_dump())
 
     def find_by_id(self, id: int) -> Entity:
-        print('new line')
-        item = self._milvus_client.get(collection_name=Entity.collection_name(), ids=id)
+        item = self._milvus_client.get(collection_name=self.__entity_type.collection_name, ids=id)
 
         return Type[Entity](id=item[0]["id"], vector=item[0]["vector"])
 
