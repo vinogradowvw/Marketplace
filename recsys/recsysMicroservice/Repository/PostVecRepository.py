@@ -3,4 +3,6 @@ from Domain.PostVec import PostVec
 
 
 class PostVecRepository(VecRepository[PostVec]):
-    pass
+
+    def __init__(self):
+        super().__init__(PostVec)

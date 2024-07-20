@@ -5,6 +5,6 @@ class UserVec(VectorObject):
 
     weight_count: int
 
-    @property
-    def collection_name(self) -> str:
+    @staticmethod
+    def collection_name() -> str:
         return 'user'
