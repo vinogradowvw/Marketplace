@@ -51,6 +51,24 @@ public class UserService extends CrudServiceImpl<User, Long> implements UserServ
     }
 
     @Override
+    public void deleteById(Long id){
+        if (!userRepository.existsById(id)){
+            throw new IllegalArgumentException("User with id " + id + " does not exist");
+        }
+
+        User user = userRepository.findById(id).get();
+        Cart cart = user.getCart();
+
+        for (var p : cart.getProducts().keySet()){
+            p.getCarts().remove(cart);
+        }
+
+        cartService.deleteById(cart.getID());
+
+        userRepository.deleteById(id);
+    }
+
+    @Override
     public void addSubscriptionToUsers(User user, User subscriber) throws IllegalArgumentException {
         if (userRepository.existsById(user.getID())) {
 

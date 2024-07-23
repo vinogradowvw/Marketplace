@@ -4,6 +4,7 @@ package com.marketplace.demo.service.PostService;
 import com.marketplace.demo.domain.*;
 import com.marketplace.demo.persistance.*;
 import com.marketplace.demo.service.CrudServiceImpl;
+import com.marketplace.demo.service.ReviewService.ReviewService;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
 
@@ -23,13 +24,15 @@ public class PostService extends CrudServiceImpl<Post, Long> implements PostServ
     private ImageRepository imageRepository;
     private TagRepository tagRepository;
     private UserRepository userRepository;
+    private ReviewService reviewService;
 
     private boolean checkIfUserBoughtProduct(User user, Product product) {
         boolean flag = false;
 
         for(var order : user.getOrders()){
-            if (order.getProducts().containsKey(product)){
+            if (order.getProducts().containsKey(product)) {
                 flag = true;
+                break;
             }
         }
 
@@ -241,6 +244,36 @@ public class PostService extends CrudServiceImpl<Post, Long> implements PostServ
         post.getReviews().add(review);
 
         reviewRepository.save(review);
+        userRepository.save(user);
+
+        return postRepository.save(post);
+    }
+
+    public Post deleteReviewFromPost(Post post, Review review, User user){
+        if (!userRepository.existsById(user.getID())){
+            throw new IllegalArgumentException("There is not user with id: " + user.getID());
+        }
+
+        if (!postRepository.existsById(post.getID())){
+            throw new IllegalArgumentException("There is not post with id: " + post.getID());
+        }
+
+        if (!reviewRepository.existsById(review.getID())){
+            throw new IllegalArgumentException("There is not review with id: " + review.getID());
+        }
+
+        if (!user.getReviews().contains(review)){
+            throw new IllegalArgumentException("User didn't write this review.");
+        }
+
+        if (!post.getReviews().contains(review)){
+            throw new IllegalArgumentException("Post doesn't contain this review.");
+        }
+
+        user.getReviews().remove(review);
+        post.getReviews().remove(review);
+
+        reviewService.deleteById(review.getID());
         userRepository.save(user);
 
         return postRepository.save(post);
