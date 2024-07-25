@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -18,8 +19,13 @@ public class Role implements EntityWithId<Long>{
     private Long id;
     private String name;
 
-    @OneToMany(targetEntity = User.class, mappedBy = "role", fetch = FetchType.LAZY)
-    private List<User> users;
+    @ManyToMany
+    @JoinTable(
+            name="roles",
+            joinColumns = @JoinColumn(name="id_user"),
+            inverseJoinColumns = @JoinColumn(name="id_role")
+    )
+    private List<User> users = new ArrayList<>();
 
     @Override
     public Long getID() {

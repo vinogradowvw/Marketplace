@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -39,33 +40,28 @@ public class User implements EntityWithId<Long>{
     private String password;
 
     @ManyToMany(mappedBy = "likedUsers")
-    private List<Post> likes;
+    private List<Post> likes = new ArrayList<>();
 
-    @OneToMany(targetEntity = Payment.class, mappedBy = "user", fetch = FetchType.LAZY)
-    private List<Payment> payments;
+    @OneToMany(targetEntity = Order.class, mappedBy = "user", fetch = FetchType.LAZY)
+    private List<Order> orders = new ArrayList<>();
 
     @OneToMany(targetEntity = Post.class, mappedBy = "user", fetch = FetchType.LAZY)
-    private List<Post> posts;
+    private List<Post> posts = new ArrayList<>();
 
-    @ManyToMany
-    @JoinTable(
-            name = "user_subscribers",
-            joinColumns = @JoinColumn(name = "subscriber_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
-    private List<User> subscribers;
+    @OneToMany(targetEntity = Subscription.class, mappedBy = "user", fetch = FetchType.LAZY)
+    private List<Subscription> subscribers = new ArrayList<>();
 
-    @ManyToMany
-    @JoinTable(
-            name = "user_subscribers",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "subscriber_id")
-    )
-    private List<User> subscriptions;
+    @OneToMany(targetEntity = Subscription.class, mappedBy = "subscriber", fetch = FetchType.LAZY)
+    private List<Subscription> subscriptions = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_role")
-    private Role role;
+    @OneToOne(targetEntity = Cart.class, mappedBy = "user")
+    private Cart cart;
+
+    @ManyToMany(mappedBy = "users")
+    private List<Role> roles = new ArrayList<>();
+
+    @OneToMany(targetEntity = Review.class, mappedBy = "author")
+    private List<Review> reviews = new ArrayList<>();
 
     @Override
     public Long getID() {

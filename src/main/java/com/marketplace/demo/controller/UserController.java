@@ -15,8 +15,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.Timestamp;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -70,17 +68,17 @@ public class UserController {
 
     @GetMapping(path = "/{id}/subscribers")
     public List<UserDTO> getSubscribers(@PathVariable("id")Long id){
-        return userService.readById(id).get().getSubscribers().stream().map(userDTOConverter::toDTO).toList();
+        return userService.getSubscribers(userService.readById(id).get()).stream().map(userDTOConverter::toDTO).toList();
     }
 
     @GetMapping(path = "/{id}/subscriptions")
     public List<UserDTO> getSubscriptions(@PathVariable("id")Long id){
-        return userService.readById(id).get().getSubscriptions().stream().map(userDTOConverter::toDTO).toList();
+        return userService.getSubscribedUsers(userService.readById(id).get()).stream().map(userDTOConverter::toDTO).toList();
     }
 
     @GetMapping(path = "/{id}/role")
-    public RoleDTO getRole(@PathVariable("id")Long id){
-        return roleDTOConverter.toDTO(userService.readById(id).get().getRole());
+    public List<RoleDTO> getRoles(@PathVariable("id")Long id){
+        return userService.readById(id).get().getRoles().stream().map(roleDTOConverter::toDTO).toList();
     }
 
     @PostMapping(path = "/user")
@@ -90,14 +88,10 @@ public class UserController {
 
     @PostMapping(path = "/{id}/subscription")
     public UserDTO subscribe(@PathVariable("id") Long userId, Long subscriberId){
-        Subscription subscription = new Subscription();
-        subscription.setTimestamp(new Timestamp(System.currentTimeMillis()));
-        subscriptionService.create(subscription);
-
         User user = userService.readById(userId).get();
         User subscriber = userService.readById(subscriberId).get();
 
-        userService.addSubscriptionToUsers(user, subscriber, subscription);
+        userService.addSubscriptionToUsers(user, subscriber);
 
         return userDTOConverter.toDTO(user);
     }
@@ -110,7 +104,6 @@ public class UserController {
         User subscriber = userService.readById(subscriberId).get();
 
         userService.removeSubscriptionToUsers(user, subscriber, subscription);
-        subscriptionService.deleteById(subscription.getID());
 
         return userDTOConverter.toDTO(user);
     }
@@ -125,10 +118,10 @@ public class UserController {
         return userDTOConverter.toDTO(user);
     }
 
-    @DeleteMapping(path = "/{id}/role")
-    public UserDTO removeRole(@PathVariable("id") Long userId){
+    @DeleteMapping(path = "/{userId}/role/{roleId}")
+    public UserDTO removeRole(@PathVariable("userId") Long userId, @PathVariable("roleId") Long roleId){
         User user = userService.readById(userId).get();
-        Role role = user.getRole();
+        Role role = roleService.readById(roleId).get();
 
         userService.removeRoleFromUser(user, role);
 
@@ -145,7 +138,7 @@ public class UserController {
             user.setSubscriptions(oldUser.get().getSubscriptions());
             user.setSubscribers(oldUser.get().getSubscribers());
             user.setLikes(oldUser.get().getLikes());
-            user.setRole(oldUser.get().getRole());
+            user.setRoles(oldUser.get().getRoles());
             user.setPayments(oldUser.get().getPayments());
         }
 
@@ -158,15 +151,17 @@ public class UserController {
     @DeleteMapping(path = "/{id}")
     public void deleteUser(@PathVariable("id") Long id){
         User user = userService.readById(id).get();
-        for (User subscriber : user.getSubscribers()){
-            this.unsubscribe(user.getID(), subscriber.getID());
+        for (Subscription subscriber : user.getSubscribers()){
+            this.unsubscribe(user.getID(), subscriber.getSubscriber().getID());
         }
 
-        for (User sub : user.getSubscriptions()){
-            this.unsubscribe(sub.getID(), user.getID());
+        for (Subscription sub : user.getSubscriptions()){
+            this.unsubscribe(sub.getUser().getID(), user.getID());
         }
 
-        this.removeRole(user.getID());
+        for (var role : user.getRoles()){
+            this.removeRole(user.getID(), role.getID());
+        }
 
         for (Post like : user.getLikes()){
             postService.likePost(like, user);

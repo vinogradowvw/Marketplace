@@ -35,6 +35,10 @@ public class SubscriptionService extends CrudServiceImpl<Subscription, Long> imp
         return subscriptionRepository.findByUserIdAndSubscriberId(userId, subscriberId);
     }
 
+    public boolean existsByUserIdAndSubscriberId(Long userId, Long subscriberId) {
+        return existsByUserIdAndSubscriberId(userId, subscriberId);
+    }
+
     @Override
     protected CrudRepository<Subscription, Long> getRepository() {
         return subscriptionRepository;

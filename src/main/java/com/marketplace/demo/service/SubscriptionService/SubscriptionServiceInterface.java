@@ -11,4 +11,6 @@ public interface SubscriptionServiceInterface extends CrudService<Subscription, 
     public List<Subscription> findBySubscriberId(Long subscriberId);
 
     public Subscription findByUserIdAndSubscriberId(Long userId, Long subscriberId);
+
+    public boolean existsByUserIdAndSubscriberId(Long userId, Long subscriberId);
 }
