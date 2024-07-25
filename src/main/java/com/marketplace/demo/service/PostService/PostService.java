@@ -169,7 +169,7 @@ public class PostService extends CrudServiceImpl<Post, Long> implements PostServ
     }
 
     @Override
-    public Post removeUserToPost(Post post, User user) throws IllegalArgumentException {
+    public Post removeUserFromPost(Post post, User user) throws IllegalArgumentException {
         if (postRepository.existsById(post.getID())) {
 
             if (userRepository.existsById(user.getID())) {
