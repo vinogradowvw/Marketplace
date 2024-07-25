@@ -1,16 +1,15 @@
 package com.marketplace.demo.controller.converter;
 
 import com.marketplace.demo.controller.dto.ProductDTO;
-import com.marketplace.demo.domain.Payment;
-import com.marketplace.demo.domain.Post;
-import com.marketplace.demo.domain.Product;
+import com.marketplace.demo.domain.*;
+import com.marketplace.demo.service.CartService.CartService;
+import com.marketplace.demo.service.OrderService.OrderService;
 import com.marketplace.demo.service.PaymentService.PaymentService;
 import com.marketplace.demo.service.PostService.PostService;
 
 import lombok.AllArgsConstructor;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Component;
@@ -19,30 +18,27 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 public class ProductDTOConverter implements DTOConverter<ProductDTO, Product> {
 
-    public final PaymentService paymentService;
+    public final OrderService orderService;
+    public final CartService cartService;
     public final PostService postService;
 
     @Override
     public ProductDTO toDTO(Product product) {
 
-        Long postId = null;
-        
-        Optional<Post> optPost = Optional.ofNullable(product.getPost());
-        if (optPost.isPresent()) {
-            postId = optPost.get().getID();
+        Long postId = Optional.ofNullable(product.getPost()).map(Post::getID).orElse(null);
+
+        ArrayList<Long> ordersId = new ArrayList<>();
+        for (Order order : product.getOrders()) {
+            ordersId.add(order.getID());
         }
 
-        Optional<ArrayList<Payment>> optPayments = Optional.ofNullable(product.getPayments());
-        ArrayList<Long> paymentsIds = new ArrayList<>();
-
-        if (optPayments.isPresent()) {
-            for (Payment payment : optPayments.get()) {
-                paymentsIds.add(payment.getID());
-            }
+        ArrayList<Long> cartIds = new ArrayList<>();
+        for (Cart cart : product.getCarts()) {
+            cartIds.add(cart.getID());
         }
 
         return new ProductDTO(product.getID(), product.getPrice(), product.getName(),
-                                product.getDescription(), postId, paymentsIds);
+                              product.getDescription(), postId, ordersId, cartIds);
     }
 
     @Override
@@ -52,35 +48,27 @@ public class ProductDTOConverter implements DTOConverter<ProductDTO, Product> {
         product.setId(productDTO.id());
         product.setName(productDTO.name());
         product.setPrice(productDTO.price());
-        
-        Optional<String> optDescription = Optional.ofNullable(productDTO.description());
-        if (optDescription.isPresent()) {
-            product.setDescription(optDescription.get());
+        product.setDescription(productDTO.description());
+
+        Post post = postService.readById(productDTO.post()).orElse(null);
+        product.setPost(post);
+
+        ArrayList<Order> orders = new ArrayList<>();
+        for (Long orderId : productDTO.orders()) {
+           Order order = orderService.readById(orderId).orElse(null);
+
+           orders.add(order);
         }
+        product.setOrders(orders);
 
-        Optional<Long> postId = Optional.ofNullable(productDTO.post());
-        if (postId.isPresent()) {
-            Optional<Post> post = Optional.empty();
-            post = postService.readById(postId.get());
-            if (post.isPresent()) {
-                product.setPost(post.get());
-            }
+        ArrayList<Cart> carts = new ArrayList<>();
+        for (Long cartId : productDTO.carts()) {
+            Cart cart = cartService.readById(cartId).orElse(null);
+
+            carts.add(cart);
         }
+        product.setCarts(carts);
 
-        Optional<List<Long>> optPaymentsIds = Optional.ofNullable(productDTO.payments());
-        ArrayList<Payment> payments = new ArrayList<>();
-        if (optPaymentsIds.isPresent()) {
-            for (Long paymentId : optPaymentsIds.get()) {
-                Optional<Payment> payment =  Optional.empty();
-                payment = paymentService.readById(paymentId);
-                if (payment.isPresent()) {
-                    payments.add(payment.get());
-                }
-            }
-        }
-
-        product.setPayments(payments);
-
-        return null;
+        return product;
     }
 }

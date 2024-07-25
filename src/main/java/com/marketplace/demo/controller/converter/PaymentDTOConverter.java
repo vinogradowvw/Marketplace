@@ -1,11 +1,9 @@
 package com.marketplace.demo.controller.converter;
 
 import com.marketplace.demo.controller.dto.PaymentDTO;
+import com.marketplace.demo.domain.Order;
 import com.marketplace.demo.domain.Payment;
-import com.marketplace.demo.domain.Product;
-import com.marketplace.demo.domain.User;
-import com.marketplace.demo.persistance.ProductRepository;
-import com.marketplace.demo.persistance.UserRepository;
+import com.marketplace.demo.service.OrderService.OrderService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -15,27 +13,13 @@ import java.util.Optional;
 @AllArgsConstructor
 public class PaymentDTOConverter implements DTOConverter<PaymentDTO, Payment> {
 
-    private final UserRepository userRepository;
-    private final ProductRepository productRepository;
+    private final OrderService orderService;
 
     @Override
     public PaymentDTO toDTO(Payment payment) {
-        Optional<User> optUser = Optional.ofNullable(payment.getUser());
-        Optional<Product> optProduct = Optional.ofNullable(payment.getProduct());
+        Long orderId = Optional.ofNullable(payment.getOrder()).map(Order::getID).orElse(null);
 
-        if (optUser.isPresent() && optProduct.isPresent()) {
-            return new PaymentDTO(payment.getID(), payment.getAmount(), payment.getUser().getID(), payment.getProduct().getID());
-        }
-        else if (optUser.isPresent()) {
-            return new PaymentDTO(payment.getID(), payment.getAmount(), payment.getUser().getID(), null);
-        }
-        else if (optProduct.isPresent()) {
-            return new PaymentDTO(payment.getID(), payment.getAmount(), null, payment.getProduct().getID());
-        }
-        else{
-            return new PaymentDTO(payment.getID(), payment.getAmount(), null, null);
-        }
-
+        return new PaymentDTO(payment.getID(), payment.getAmount(), payment.getTimestamp(), orderId);
     }
 
     @Override
@@ -44,37 +28,10 @@ public class PaymentDTOConverter implements DTOConverter<PaymentDTO, Payment> {
 
         payment.setId(paymentDTO.id());
         payment.setAmount(paymentDTO.amount());
+        payment.setTimestamp(paymentDTO.timestamp());
 
-        Optional<Long> optUserId = Optional.ofNullable(paymentDTO.userId());
-        Optional<Long> optProductId = Optional.ofNullable(paymentDTO.productId());
-
-        Optional<User> optUser = Optional.empty();
-        Optional<Product> optProduct = Optional.empty();
-
-        if (optUserId.isPresent()) {
-            optUser = userRepository.findById(optUserId.get());
-        }
-
-        if (optProductId.isPresent()) {
-            optProduct = productRepository.findById(optProductId.get());
-        }
-
-        if (optUser.isPresent() && optProduct.isPresent()) {
-            payment.setUser(optUser.get());
-            payment.setProduct(optProduct.get());
-        }
-        else if (optUser.isPresent()) {
-            payment.setUser(optUser.get());
-            payment.setProduct(null);
-        }
-        else if (optProduct.isPresent()) {
-            payment.setUser(null);
-            payment.setProduct(optProduct.get());
-        }
-        else{
-            payment.setUser(null);
-            payment.setProduct(null);
-        }
+        Order order = orderService.readById(paymentDTO.orderId()).orElse(null);
+        payment.setOrder(order);
 
         return payment;
     }

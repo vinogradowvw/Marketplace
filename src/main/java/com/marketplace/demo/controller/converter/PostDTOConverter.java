@@ -1,13 +1,10 @@
 package com.marketplace.demo.controller.converter;
 
 import com.marketplace.demo.controller.dto.PostDTO;
-import com.marketplace.demo.domain.Image;
-import com.marketplace.demo.domain.Post;
-import com.marketplace.demo.domain.Product;
-import com.marketplace.demo.domain.Tag;
-import com.marketplace.demo.domain.User;
+import com.marketplace.demo.domain.*;
 import com.marketplace.demo.service.ImageService.ImageService;
 import com.marketplace.demo.service.ProductService.ProductService;
+import com.marketplace.demo.service.ReviewService.ReviewService;
 import com.marketplace.demo.service.TagService.TagService;
 import com.marketplace.demo.service.UserService.UserService;
 
@@ -27,18 +24,13 @@ public class PostDTOConverter implements DTOConverter<PostDTO, Post> {
     private final TagService tagService;
     private final ImageService imageService;
     private final ProductService productService;
+    private final ReviewService reviewService;
 
 
     @Override
     public PostDTO toDTO(Post post) {
 
-        Optional<List<Product>> optProductsInPost = Optional.ofNullable(post.getProductsInPost());
-        ArrayList<Long> productInPostIds = new ArrayList<>();
-        if (optProductsInPost.isPresent()) {
-            for (Product productInPost : optProductsInPost.get()) {
-                productInPostIds.add(productInPost.getID());
-            }
-        }
+        Long productId = Optional.ofNullable(post.getProduct()).map(Product::getID).orElse(null);
 
         Optional<List<User>> optLikedUsers = Optional.ofNullable(post.getLikedUsers());
         ArrayList<Long> likedUserIds = new ArrayList<>();
@@ -50,17 +42,13 @@ public class PostDTOConverter implements DTOConverter<PostDTO, Post> {
 
         Optional<List<Tag>> optTags = Optional.ofNullable(post.getTags());
         ArrayList<Long> tagIds = new ArrayList<>();
-        if (optLikedUsers.isPresent()) {
+        if (optTags.isPresent()) {
             for (Tag tag : optTags.get()) {
                 tagIds.add(tag.getID());
             }
         }
 
-        Optional<User> optUser = Optional.ofNullable(post.getUser());
-        Long userId = null;
-        if (optUser.isPresent()) {
-            userId = optUser.get().getID();
-        }
+        Long userId = Optional.ofNullable(post.getUser()).map(User::getID).orElse(null);
 
         Optional<List<Image>> optImages = Optional.ofNullable(post.getImages());
         ArrayList<Long> imageIds = new ArrayList<>();
@@ -70,8 +58,16 @@ public class PostDTOConverter implements DTOConverter<PostDTO, Post> {
             }
         }
 
+        Optional<List<Review>> reviewsOpt = Optional.ofNullable(post.getReviews());
+        ArrayList<Long> reviewIds = new ArrayList<>();
+        if (reviewsOpt.isPresent()) {
+            for (Review review : reviewsOpt.get()){
+                reviewIds.add(review.getID());
+            }
+        }
+
         return new PostDTO(post.getID(), post.getName(), post.getDescription(), 
-                            productInPostIds, userId, likedUserIds, tagIds, imageIds);
+                            productId, userId, likedUserIds, tagIds, imageIds, reviewIds);
     }
 
     @Override
@@ -81,89 +77,47 @@ public class PostDTOConverter implements DTOConverter<PostDTO, Post> {
         
         post.setId(postDTO.id());
         post.setName(postDTO.name());
+        post.setDescription(postDTO.description());
 
-        Optional<String> optDescription = Optional.ofNullable(postDTO.description());
-        if (optDescription.isPresent()) {
-            post.setDescription(optDescription.get());
-        }
+        Product product = productService.readById(postDTO.product()).orElse(null);
+        post.setProduct(product);
 
-        Optional<List<Long>> optProductIds = Optional.ofNullable(postDTO.product());
-        List<Product> products = new ArrayList<>();
+        User user = userService.readById(postDTO.user()).orElse(null);
+        post.setUser(user);
 
-        if (optProductIds.isPresent()) {
-            for (Long productId : optProductIds.get()) {
-                Optional<Product> product = Optional.empty();
-                product = productService.readById(productId);
-                if (product.isPresent()) {
-                    products.add(product.get());
-                }
-            }
-        }
-
-        post.setProductsInPost(products);
-
-
-        Optional<Long> optUserId = Optional.ofNullable(postDTO.user());
-        Optional<User> user  = Optional.empty();
-
-        if (optUserId.isPresent()) {
-            user = userService.readById(optUserId.get());
-        }
-        
-        if (user.isPresent()) {
-            post.setUser(user.get());
-        }
-        else {
-            post.setUser(null);
-        }
-
-        Optional<List<Long>> optLikedUserIds = Optional.ofNullable(postDTO.likedUsers());
         List<User> likedUsers = new ArrayList<>();
+        for (Long userId : postDTO.likedUsers()) {
+            User likedUser = userService.readById(userId).orElse(null);
 
-        if (optLikedUserIds.isPresent()){
-            for (Long userId : optLikedUserIds.get()) {
-                Optional<User> likedUser = Optional.empty();
-                likedUser = userService.readById(userId);
-                if (likedUser.isPresent()) {
-                    likedUsers.add(likedUser.get());
-                }
-            }
+            likedUsers.add(likedUser);
         }
-
         post.setLikedUsers(likedUsers);
 
 
-        Optional<List<Long>> optTagIds = Optional.ofNullable(postDTO.tags());
         List<Tag> tags = new ArrayList<>();
+        for (Long tagId : postDTO.tags()) {
+            Tag tag = tagService.readById(tagId).orElse(null);
 
-        if (optTagIds.isPresent()) {
-            for (Long tagId : optTagIds.get()) {
-                Optional<Tag> tag = Optional.empty();
-                tag = tagService.readById(tagId);
-                if (tag.isPresent()) {
-                    tags.add(tag.get());
-                }
-            }
+            tags.add(tag);
         }
-
         post.setTags(tags);
 
 
-        Optional<List<Long>> optImageIds = Optional.ofNullable(postDTO.images());
         List<Image> images = new ArrayList<>();
+        for (Long imageId : postDTO.images()) {
+            Image image = imageService.readById(imageId).orElse(null);
 
-        if (optImageIds.isPresent()) {
-            for (Long imageId : optImageIds.get()) {
-
-                Optional<Image> image = Optional.empty();
-                image = imageService.readById(imageId);
-                if (image.isPresent()) {
-                    images.add(image.get());
-                }
-            }
+            images.add(image);
         }
-
         post.setImages(images);
+
+        List<Review> reviews = new ArrayList<>();
+        for (Long reviewId : postDTO.reviews()) {
+            Review review = reviewService.readById(reviewId).orElse(null);
+
+            reviews.add(review);
+        }
+        post.setReviews(reviews);
 
         return post;
     }

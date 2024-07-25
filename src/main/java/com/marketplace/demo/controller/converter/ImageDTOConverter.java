@@ -15,18 +15,12 @@ public class ImageDTOConverter implements DTOConverter<ImageDTO, Image> {
 
     private final PostService postService;
 
-
     @Override
     public ImageDTO toDTO(Image image) {
 
-        Optional<Post> optionalPost = Optional.ofNullable(image.getPost());
+        Long postId = Optional.ofNullable(image.getPost()).map(Post::getID).orElse(null);
 
-        if (optionalPost.isPresent()) {
-            return new ImageDTO(image.getID(), image.getPath(), image.getPost().getID());
-        }
-        else{
-            return new ImageDTO(image.getID(), image.getPath(), null);
-        }
+        return new ImageDTO(image.getID(), image.getPath(), postId);
     }
 
     @Override

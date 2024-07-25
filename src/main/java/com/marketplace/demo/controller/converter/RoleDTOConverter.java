@@ -19,8 +19,8 @@ public class RoleDTOConverter implements DTOConverter<RoleDTO, Role> {
 
     @Override
     public RoleDTO toDTO(Role role) {
-        List<Long> users = new ArrayList<>();
 
+        List<Long> users = new ArrayList<>();
         Optional<List<User>> optUsers = Optional.ofNullable(role.getUsers());
         if (optUsers.isPresent()) {
             for (User user : optUsers.get()) {
@@ -38,15 +38,11 @@ public class RoleDTOConverter implements DTOConverter<RoleDTO, Role> {
         role.setName(roleDTO.name());
 
         List<User> users = new ArrayList<>();
-
-        Optional<List<Long>> optUsers = Optional.ofNullable(roleDTO.users());
-        if (optUsers.isPresent()) {
-            for (Long id : optUsers.get()) {
-                users.add(userService.readById(id).get());
-            }
+        for (Long id : roleDTO.users()) {
+            users.add(userService.readById(id).orElse(null));
         }
-
         role.setUsers(users);
+
         return role;
     }
 }
