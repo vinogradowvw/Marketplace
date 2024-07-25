@@ -87,7 +87,7 @@ public class PostDTOConverter implements DTOConverter<PostDTO, Post> {
             post.setDescription(optDescription.get());
         }
 
-        Optional<List<Long>> optProductIds = Optional.ofNullable(postDTO.productsInPost());
+        Optional<List<Long>> optProductIds = Optional.ofNullable(postDTO.product());
         List<Product> products = new ArrayList<>();
 
         if (optProductIds.isPresent()) {

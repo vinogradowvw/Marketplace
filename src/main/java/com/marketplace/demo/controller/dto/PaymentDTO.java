@@ -1,3 +1,5 @@
 package com.marketplace.demo.controller.dto;
 
-public record PaymentDTO (Long id, Integer amount, Long userId, Long productId) { }
+import java.sql.Timestamp;
+
+public record PaymentDTO (Long id, Long amount, Timestamp timestamp, Long orderId) { }

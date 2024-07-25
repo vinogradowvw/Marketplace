@@ -249,7 +249,7 @@ public class PostService extends CrudServiceImpl<Post, Long> implements PostServ
         return postRepository.save(post);
     }
 
-    public Post deleteReviewFromPost(Post post, Review review, User user){
+    public Post deleteReviewFromPost(Post post, Review review, User user) throws IllegalArgumentException{
         if (!userRepository.existsById(user.getID())){
             throw new IllegalArgumentException("There is not user with id: " + user.getID());
         }
@@ -277,6 +277,14 @@ public class PostService extends CrudServiceImpl<Post, Long> implements PostServ
         userRepository.save(user);
 
         return postRepository.save(post);
+    }
+
+    public double getAVGPostRating(Post post) throws IllegalArgumentException{
+        if (!postRepository.existsById(post.getID())){
+            throw new IllegalArgumentException("There is not post with id: " + post.getID());
+        }
+
+        return postRepository.getAVGRatingById(post.getID());
     }
 
     @Override
