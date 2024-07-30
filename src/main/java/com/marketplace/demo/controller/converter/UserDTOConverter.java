@@ -24,7 +24,6 @@ public class UserDTOConverter implements DTOConverter<UserDTO, User> {
     private final ReviewService reviewService;
     private final CartService cartService;
     private final RoleService roleService;
-    private final UserRepository userRepository;
     private final SubscriptionRepository subscriptionRepository;
 
     @Override
