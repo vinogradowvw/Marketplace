@@ -287,6 +287,14 @@ public class PostService extends CrudServiceImpl<Post, Long> implements PostServ
         return postRepository.getAVGRatingById(post.getID());
     }
 
+    public Long getPostViews(Post post) throws IllegalArgumentException{
+        if (!postRepository.existsById(post.getID())){
+            throw new IllegalArgumentException("There is not post with id: " + post.getID());
+        }
+
+        return post.getViews();
+    }
+
     @Override
     protected CrudRepository<Post, Long> getRepository() {
         return postRepository;

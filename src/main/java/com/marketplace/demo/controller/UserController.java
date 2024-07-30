@@ -81,7 +81,7 @@ public class UserController {
         return userService.readById(id).get().getRoles().stream().map(roleDTOConverter::toDTO).toList();
     }
 
-    @PostMapping(path = "/user")
+    @PostMapping
     public UserDTO createUser(@RequestBody UserDTO userDTO) {
         return userDTOConverter.toDTO(userService.create(userDTOConverter.toEntity(userDTO)));
     }

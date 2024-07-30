@@ -66,7 +66,7 @@ public class PostDTOConverter implements DTOConverter<PostDTO, Post> {
             }
         }
 
-        return new PostDTO(post.getID(), post.getName(), post.getDescription(), 
+        return new PostDTO(post.getID(), post.getName(), post.getDescription(), post.getViews(),
                             productId, userId, likedUserIds, tagIds, imageIds, reviewIds);
     }
 
@@ -78,6 +78,7 @@ public class PostDTOConverter implements DTOConverter<PostDTO, Post> {
         post.setId(postDTO.id());
         post.setName(postDTO.name());
         post.setDescription(postDTO.description());
+        post.setViews(postDTO.views());
 
         Product product = productService.readById(postDTO.product()).orElse(null);
         post.setProduct(product);

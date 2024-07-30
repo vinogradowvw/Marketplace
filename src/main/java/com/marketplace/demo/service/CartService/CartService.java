@@ -44,7 +44,57 @@ public class CartService extends CrudServiceImpl<Cart, Long> implements CartServ
     }
 
     @Override
-    public Cart createOrder(Cart cart) {
+    public Cart deleteProduct(Cart cart, Product product, Long quantity) {
+        if (!cartRepository.existsById(cart.getID())){
+            throw new IllegalArgumentException("There is no cart with id: " + cart.getID());
+        }
+
+        if (!productRepository.existsById(product.getID())){
+            throw new IllegalArgumentException("There is no product with id: " + product.getID());
+        }
+
+        if (!cart.getProducts().containsKey(product)){
+            throw new IllegalArgumentException("There is no product with id: " + product.getID() + " in the cart.");
+        }
+
+        if (cart.getProducts().get(product).compareTo(quantity) < 0){
+            throw new IllegalArgumentException("There are fewer products with id: " + product.getID() + " in the cart.");
+        }
+
+        if (cart.getProducts().get(product).equals(quantity)){
+            cart.getProducts().remove(product);
+
+            product.getCarts().remove(cart);
+            productRepository.save(product);
+        }
+        else{
+            cart.getProducts().put(product, cart.getProducts().get(product) - quantity);
+        }
+
+        return cartRepository.save(cart);
+    }
+
+    @Override
+    public Cart clearCart(Cart cart) {
+        if (!cartRepository.existsById(cart.getID())){
+            throw new IllegalArgumentException("There is no cart with id: " + cart.getID());
+        }
+
+        cart.getProducts().forEach((p, q) -> {
+            p.getCarts().remove(cart);
+            productRepository.save(p);
+        });
+        cart.getProducts().clear();
+
+        return cartRepository.save(cart);
+    }
+
+    @Override
+    public Order createOrder(Cart cart) {
+        if (cart.getProducts().isEmpty()){
+            throw new IllegalArgumentException("There is no products in cart with id: " + cart.getID());
+        }
+
         cart.getProducts().keySet().forEach(p -> p.getCarts().remove(cart));
 
         Order order = new Order();
@@ -69,12 +119,13 @@ public class CartService extends CrudServiceImpl<Cart, Long> implements CartServ
 
         order.setPayment(payment);
 
-        orderService.create(order);
         paymentService.create(payment);
 
         cart.getProducts().clear();
         cart.setTimestamp(new Timestamp(System.currentTimeMillis()));
-        return cartRepository.save(cart);
+        cartRepository.save(cart);
+
+        return orderService.create(order);
     }
 
     @Override
