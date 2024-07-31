@@ -5,13 +5,10 @@ from abc import ABC, abstractmethod
 
 class VectorObject(BaseModel, ABC):
     id: int
-    vector: Optional[List[float]]
-
-    def __init__(self, id, vector: Optional[List[float]] = None):
-        super().__init__()
-        self.id = id
-        if not vector:
-            self.vector = vector
+    tfidf_descr_vector: Optional[List[float]]
+    image_vector: Optional[List[float]]
+    tags_vector: Optional[List[float]]
+    bert_descr_vector: Optional[List[float]]
 
     @staticmethod
     @abstractmethod

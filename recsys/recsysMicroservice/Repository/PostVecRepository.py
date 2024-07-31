@@ -1,5 +1,5 @@
-from VecRepository import VecRepository
-from Domain.PostVec import PostVec
+from .VecRepository import VecRepository
+from ..Domain.PostVec import PostVec
 
 
 class PostVecRepository(VecRepository[PostVec]):

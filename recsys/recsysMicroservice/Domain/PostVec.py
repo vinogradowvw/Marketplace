@@ -1,4 +1,4 @@
-from VectorObject import VectorObject
+from .VectorObject import VectorObject
 
 
 class PostVec(VectorObject):

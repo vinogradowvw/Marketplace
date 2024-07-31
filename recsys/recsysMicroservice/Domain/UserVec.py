@@ -1,4 +1,4 @@
-from VectorObject import VectorObject
+from .VectorObject import VectorObject
 
 
 class UserVec(VectorObject):
@@ -8,3 +8,6 @@ class UserVec(VectorObject):
     @staticmethod
     def collection_name() -> str:
         return 'user'
+
+    def __init__(self, **data):
+        super().__init__(**data)

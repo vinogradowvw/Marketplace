@@ -15,10 +15,10 @@ class TextVectorizer:
 
         self.__nlp = self.__create_nlp()
 
-        with open('../../Models/TfidfVectorizer.pkl', 'rb') as file:
+        with open('../Models/TfidfVectorizer.pkl', 'rb') as file:
             self.__TfidfVectorizer = pickle.load(file)
 
-        with open('../../Models/CountVectorizer.pkl', 'rb') as file:
+        with open('../Models/CountVectorizer.pkl', 'rb') as file:
             self.__CountVectorizer = pickle.load(file)
 
         self.__bert_tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
@@ -50,7 +50,6 @@ class TextVectorizer:
 
         nlp.add_pipe('detect_stopwords', last=True)
         nlp.add_pipe('add_preprocessed_text', last=True)
-        nlp.add_pipe("language_detector")
 
         return nlp
 
