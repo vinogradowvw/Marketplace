@@ -56,10 +56,10 @@ public class UserController {
         return userService.readById(id).get().getLikes().stream().map(postDTOConverter::toDTO).toList();
     }
 
-    @GetMapping(path = "/{id}/payments")
-    public List<PaymentDTO> getPayments(@PathVariable("id")Long id){
-        return userService.readById(id).get().getPayments().stream().map(paymentDTOConverter::toDTO).toList();
-    }
+    // @GetMapping(path = "/{id}/payments")
+    // public List<PaymentDTO> getPayments(@PathVariable("id")Long id){
+    //     return userService.readById(id).get().getPayments().stream().map(paymentDTOConverter::toDTO).toList();
+    // }
 
     @GetMapping(path = "/{id}/posts")
     public List<PostDTO> getPosts(@PathVariable("id")Long id){
@@ -139,7 +139,7 @@ public class UserController {
             user.setSubscribers(oldUser.get().getSubscribers());
             user.setLikes(oldUser.get().getLikes());
             user.setRoles(oldUser.get().getRoles());
-            user.setPayments(oldUser.get().getPayments());
+            // user.setPayments(oldUser.get().getPayments());
         }
 
         user.setId(id);
@@ -148,36 +148,36 @@ public class UserController {
         return userDTOConverter.toDTO(user);
     }
 
-    @DeleteMapping(path = "/{id}")
-    public void deleteUser(@PathVariable("id") Long id){
-        User user = userService.readById(id).get();
-        for (Subscription subscriber : user.getSubscribers()){
-            this.unsubscribe(user.getID(), subscriber.getSubscriber().getID());
-        }
-
-        for (Subscription sub : user.getSubscriptions()){
-            this.unsubscribe(sub.getUser().getID(), user.getID());
-        }
-
-        for (var role : user.getRoles()){
-            this.removeRole(user.getID(), role.getID());
-        }
-
-        for (Post like : user.getLikes()){
-            postService.likePost(like, user);
-        }
-
-        for (Post post : user.getPosts()){
-            for (Product product : post.getProductsInPost()){
-                productService.deleteById(product.getID());
-            }
-            postService.deleteById(post.getID());
-        }
-
-        for (Payment payment : user.getPayments()){
-            payment.setUser(null);
-        }
-
-        userService.deleteById(user.getID());
-    }
+    // @DeleteMapping(path = "/{id}")
+    // public void deleteUser(@PathVariable("id") Long id){
+    //     User user = userService.readById(id).get();
+    //     for (Subscription subscriber : user.getSubscribers()){
+    //         this.unsubscribe(user.getID(), subscriber.getSubscriber().getID());
+    //     }
+    //
+    //     for (Subscription sub : user.getSubscriptions()){
+    //         this.unsubscribe(sub.getUser().getID(), user.getID());
+    //     }
+    //
+    //     for (var role : user.getRoles()){
+    //         this.removeRole(user.getID(), role.getID());
+    //     }
+    //
+    //     for (Post like : user.getLikes()){
+    //         postService.likePost(like, user);
+    //     }
+    //
+    //     for (Post post : user.getPosts()){
+    //         for (Product product : post.getProductsInPost()){
+    //             productService.deleteById(product.getID());
+    //         }
+    //         postService.deleteById(post.getID());
+    //     }
+    //
+    //     for (Payment payment : user.getPayments()){
+    //         payment.setUser(null);
+    //     }
+    //
+    //     userService.deleteById(user.getID());
+    // }
 }

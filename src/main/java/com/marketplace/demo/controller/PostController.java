@@ -72,7 +72,7 @@ public class PostController {
         if (oldPost.isPresent()) {
             post.setImages(oldPost.get().getImages());
             post.setLikedUsers(oldPost.get().getLikedUsers());
-            post.setProductsInPost(oldPost.get().getProductsInPost());
+            // post.setProductsInPost(oldPost.get().getProductsInPost());
             post.setTags(oldPost.get().getTags());
             post.setUser(oldPost.get().getUser());
         }
@@ -91,7 +91,6 @@ public class PostController {
         if (oldPost.isPresent()) {
             post.setImages(oldPost.get().getImages());
             post.setLikedUsers(oldPost.get().getLikedUsers());
-            post.setProductsInPost(oldPost.get().getProductsInPost());
             post.setTags(oldPost.get().getTags());
             post.setUser(oldPost.get().getUser());
         }
@@ -157,7 +156,7 @@ public class PostController {
     }
 
     @DeleteMapping(path = "/{id}")
-    public void likePost(@PathVariable("id") Long id) {
+    public void deletePost(@PathVariable("id") Long id) {
 
         Optional<Post> post = postService.readById(id);
         
@@ -174,9 +173,7 @@ public class PostController {
                 imageService.deleteById(image.getID());
             }
 
-            for (Product product : post.get().getProductsInPost()) {
-                productService.deleteById(product.getID());
-            }
+            productService.deleteById(post.get().getProduct().getID());
         }
         
         postService.deleteById(id);

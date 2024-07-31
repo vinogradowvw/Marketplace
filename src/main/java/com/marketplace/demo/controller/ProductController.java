@@ -58,12 +58,12 @@ public class ProductController {
     }
 
     @PutMapping(path = "/{id}")
-    public ProductDTO updatProduct(@PathVariable("id") Long id, @RequestBody ProductDTO productDTO) {
+    public ProductDTO updateProduct(@PathVariable("id") Long id, @RequestBody ProductDTO productDTO) {
         Optional<Product> oldProduct = productService.readById(id);
         Product product = productConverter.toEntity(productDTO);
 
         if (oldProduct.isPresent()) {
-            product.setPayments(oldProduct.get().getPayments());
+            // product.setPayments(oldProduct.get().getPayments());
             product.setPost(oldProduct.get().getPost());
         }
         
@@ -74,28 +74,28 @@ public class ProductController {
         
     }
 
-    @PostMapping(path = "/{id}/payment")
-    public ProductDTO addPayment(@PathVariable("id") Long productId, @RequestParam Long userId, @RequestParam Long paymentId) {
-        Product product = productService.readById(productId).get();
-        Payment payment = paymentService.readById(paymentId).get();
-        User user = userService.readById(userId).get();
+    // @PostMapping(path = "/{id}/payment")
+    // public ProductDTO addPayment(@PathVariable("id") Long productId, @RequestParam Long userId, @RequestParam Long paymentId) {
+    //     Product product = productService.readById(productId).get();
+    //     Payment payment = paymentService.readById(paymentId).get();
+    //     User user = userService.readById(userId).get();
+    //
+    //     productService.addPayment(user, product, payment);
+    //     product = productService.readById(productId).get();
+    //
+    //     return productConverter.toDTO(product);
+    // }
 
-        productService.addPayment(user, product, payment);
-        product = productService.readById(productId).get();
-
-        return productConverter.toDTO(product);
-    }
-
-    @PostMapping(path = "/{id}/payment")
-    public ProductDTO removePayment(@PathVariable("id") Long productId, @RequestParam Long userId, @RequestParam Long paymentId) {
-        Product product = productService.readById(productId).get();
-        Payment payment = paymentService.readById(paymentId).get();
-        User user = userService.readById(userId).get();
-
-        productService.removePayment(user, product, payment);
-        product = productService.readById(productId).get();
-
-        return productConverter.toDTO(product);
-    }
+    // @PostMapping(path = "/{id}/payment")
+    // public ProductDTO removePayment(@PathVariable("id") Long productId, @RequestParam Long userId, @RequestParam Long paymentId) {
+    //     Product product = productService.readById(productId).get();
+    //     Payment payment = paymentService.readById(paymentId).get();
+    //     User user = userService.readById(userId).get();
+    //
+    //     productService.removePayment(user, product, payment);
+    //     product = productService.readById(productId).get();
+    //
+    //     return productConverter.toDTO(product);
+    // }
 
 }
