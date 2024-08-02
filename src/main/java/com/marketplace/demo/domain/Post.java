@@ -27,7 +27,6 @@ public class Post implements EntityWithId<Long> {
     private Product product;
     @ManyToOne
     @JoinColumn(name = "id_user")
-    @NotBlank
     private User user;
     @ManyToMany
     @JoinTable(
