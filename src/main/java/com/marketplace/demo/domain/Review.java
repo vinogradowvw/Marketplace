@@ -28,11 +28,11 @@ public class Review implements EntityWithId<Long>{
     private Integer rating;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_user")
+    @JoinColumn(name = "id_user", referencedColumnName = "id_user")
     private User author;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_post")
+    @JoinColumn(name = "id_post", referencedColumnName = "id_post")
     private Post post;
 
     @Override

@@ -20,7 +20,7 @@ public class Image implements EntityWithId<Long> {
     private String path;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_post")
+    @JoinColumn(name = "id_post", referencedColumnName = "id_post")
     private Post post;
 
     @Override

@@ -6,8 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -24,14 +24,11 @@ public class Order implements EntityWithId<Long>{
     @Column(name = "state")
     private State state;
 
-    @ElementCollection
-    @CollectionTable(name = "order_products", joinColumns = @JoinColumn(name = "id_order"))
-    @MapKeyJoinColumn(name = "id_product")
-    @Column(name = "quantity")
-    private Map<Product, Long> products = new HashMap<>();
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderProduct> products = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_user")
+    @JoinColumn(name = "id_user", referencedColumnName = "id_user")
     private User user;
 
     @OneToOne(cascade = CascadeType.ALL)

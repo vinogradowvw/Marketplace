@@ -6,7 +6,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Entity
@@ -25,11 +27,8 @@ public class Cart implements EntityWithId<Long>{
     @JoinColumn(name = "id_user", referencedColumnName = "id_user")
     private User user;
 
-    @ElementCollection
-    @CollectionTable(name = "cart_products", joinColumns = @JoinColumn(name = "id_cart"))
-    @MapKeyJoinColumn(name = "id_product")
-    @Column(name = "quantity")
-    private Map<Product, Long> products = new HashMap<>();
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CartProduct> products = new ArrayList<>();
 
     @Override
     public Long getID() {

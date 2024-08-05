@@ -26,9 +26,9 @@ public class Post implements EntityWithId<Long> {
     @OneToOne(targetEntity = Product.class, mappedBy = "post")
     private Product product;
     @ManyToOne
-    @JoinColumn(name = "id_user")
+    @JoinColumn(name = "id_user", referencedColumnName = "id_user")
     private User user;
-    @ManyToMany
+    @ManyToMany(targetEntity = User.class)
     @JoinTable(
             name = "likes",
             joinColumns = @JoinColumn(name="id_user"),

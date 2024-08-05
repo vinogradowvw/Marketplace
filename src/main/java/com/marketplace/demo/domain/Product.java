@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -28,14 +29,27 @@ public class Product implements EntityWithId<Long> {
     @JoinColumn(name = "id_post", referencedColumnName = "id_post")
     private Post post;
 
-    @ManyToMany(mappedBy = "products")
+    @OneToMany(mappedBy = "product")
     private List<Order> orders = new ArrayList<>();
 
-    @ManyToMany(mappedBy = "products")
+    @OneToMany(mappedBy = "product")
     private List<Cart> carts = new ArrayList<>();
 
     @Override
     public Long getID() {
         return id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Product product = (Product) o;
+        return Objects.equals(id, product.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
