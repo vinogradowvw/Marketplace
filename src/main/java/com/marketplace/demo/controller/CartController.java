@@ -51,7 +51,7 @@ public class CartController {
 
         Cart cart = cartService.readById(id).get();
 
-        cart.getProducts().forEach((p, q) -> productDTOLongMap.put(productDTOConverter.toDTO(p), q));
+        cart.getProducts().forEach(p -> productDTOLongMap.put(productDTOConverter.toDTO(p.getProduct()), p.getQuantity()));
 
         return productDTOLongMap;
     }

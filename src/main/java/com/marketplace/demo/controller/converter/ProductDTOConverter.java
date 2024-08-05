@@ -2,6 +2,8 @@ package com.marketplace.demo.controller.converter;
 
 import com.marketplace.demo.controller.dto.ProductDTO;
 import com.marketplace.demo.domain.*;
+import com.marketplace.demo.persistance.CartProductRepository;
+import com.marketplace.demo.persistance.OrderProductRepository;
 import com.marketplace.demo.service.CartService.CartService;
 import com.marketplace.demo.service.OrderService.OrderService;
 import com.marketplace.demo.service.PaymentService.PaymentService;
@@ -18,9 +20,9 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 public class ProductDTOConverter implements DTOConverter<ProductDTO, Product> {
 
-    public final OrderService orderService;
-    public final CartService cartService;
-    public final PostService postService;
+    private final PostService postService;
+    private OrderProductRepository orderProductRepository;
+    private CartProductRepository cartProductRepository;
 
     @Override
     public ProductDTO toDTO(Product product) {
@@ -28,13 +30,13 @@ public class ProductDTOConverter implements DTOConverter<ProductDTO, Product> {
         Long postId = Optional.ofNullable(product.getPost()).map(Post::getID).orElse(null);
 
         ArrayList<Long> ordersId = new ArrayList<>();
-        for (Order order : product.getOrders()) {
-            ordersId.add(order.getID());
+        for (OrderProduct order : product.getOrders()) {
+            ordersId.add(order.getOrder().getID());
         }
 
         ArrayList<Long> cartIds = new ArrayList<>();
-        for (Cart cart : product.getCarts()) {
-            cartIds.add(cart.getID());
+        for (CartProduct cart : product.getCarts()) {
+            cartIds.add(cart.getCart().getID());
         }
 
         return new ProductDTO(product.getID(), product.getPrice(), product.getName(),
@@ -53,17 +55,21 @@ public class ProductDTOConverter implements DTOConverter<ProductDTO, Product> {
         Post post = postService.readById(productDTO.post()).orElse(null);
         product.setPost(post);
 
-        ArrayList<Order> orders = new ArrayList<>();
+        ArrayList<OrderProduct> orders = new ArrayList<>();
         for (Long orderId : productDTO.orders()) {
-           Order order = orderService.readById(orderId).orElse(null);
+            OrderProduct.OrderProductId orderProductId = new OrderProduct.OrderProductId(orderId, product.getID());
+
+           OrderProduct order = orderProductRepository.findById(orderProductId).orElse(null);
 
            orders.add(order);
         }
         product.setOrders(orders);
 
-        ArrayList<Cart> carts = new ArrayList<>();
+        ArrayList<CartProduct> carts = new ArrayList<>();
         for (Long cartId : productDTO.carts()) {
-            Cart cart = cartService.readById(cartId).orElse(null);
+            CartProduct.CartProductId cartProductId = new CartProduct.CartProductId(cartId, product.getID());
+
+            CartProduct cart = cartProductRepository.findById(cartProductId).orElse(null);
 
             carts.add(cart);
         }

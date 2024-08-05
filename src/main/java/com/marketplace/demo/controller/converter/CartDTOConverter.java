@@ -2,16 +2,17 @@ package com.marketplace.demo.controller.converter;
 
 import com.marketplace.demo.controller.dto.CartDTO;
 import com.marketplace.demo.domain.Cart;
+import com.marketplace.demo.domain.CartProduct;
 import com.marketplace.demo.domain.Product;
 import com.marketplace.demo.domain.User;
+import com.marketplace.demo.persistance.CartProductRepository;
+import com.marketplace.demo.persistance.CartRepository;
 import com.marketplace.demo.service.ProductService.ProductService;
 import com.marketplace.demo.service.UserService.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Component
 @AllArgsConstructor
@@ -19,11 +20,12 @@ public class CartDTOConverter implements DTOConverter<CartDTO, Cart> {
 
     private UserService userService;
     private ProductService productService;
+    private CartProductRepository cartProductRepository;
 
     @Override
     public CartDTO toDTO(Cart cart) {
         Map<Long, Long> products = new HashMap<>();
-        cart.getProducts().keySet().forEach(p -> products.put(p.getID(), cart.getProducts().get(p)));
+        cart.getProducts().forEach(p -> products.put(p.getProduct().getID(), p.getQuantity()));
 
         Optional<User> userOpt = Optional.ofNullable(cart.getUser());
         Long userId = null;
@@ -48,7 +50,7 @@ public class CartDTOConverter implements DTOConverter<CartDTO, Cart> {
         }
         cart.setUser(user);
 
-        Map<Product, Long> products = new HashMap<>();
+        List<CartProduct> products = new ArrayList<>();
         for (Long pId : cartDTO.products().keySet()) {
             Optional<Product> productOpt = productService.readById(pId);
 
@@ -57,7 +59,12 @@ public class CartDTOConverter implements DTOConverter<CartDTO, Cart> {
                 product = productOpt.get();
             }
 
-            products.put(product, cart.getProducts().get(product));
+            if (cartProductRepository.existsByCartAndProduct(cart, product)){
+                CartProduct.CartProductId cartProductId = new CartProduct.CartProductId(cart.getID(), pId);
+                CartProduct cartProduct = cartProductRepository.findById(cartProductId).get();
+
+                products.add(cartProduct);
+            }
         }
         cart.setProducts(products);
 

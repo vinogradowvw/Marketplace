@@ -16,7 +16,7 @@ import java.util.Objects;
 public class OrderProduct {
 
     @EmbeddedId
-    private CartProductId id = new CartProductId();
+    private OrderProductId id = new OrderProductId();
 
     @MapsId("orderId")
     @ManyToOne
@@ -34,14 +34,14 @@ public class OrderProduct {
     @Embeddable
     @Getter
     @Setter
-    public static class CartProductId implements Serializable {
+    public static class OrderProductId implements Serializable {
 
         private Long orderId;
         private Long productId;
 
-        public CartProductId() {}
+        public OrderProductId() {}
 
-        public CartProductId(Long orderId, Long productId) {
+        public OrderProductId(Long orderId, Long productId) {
             this.orderId = orderId;
             this.productId = productId;
         }
@@ -50,7 +50,7 @@ public class OrderProduct {
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            CartProductId that = (CartProductId) o;
+            OrderProductId that = (OrderProductId) o;
             return Objects.equals(orderId, that.orderId) &&
                     Objects.equals(productId, that.productId);
         }

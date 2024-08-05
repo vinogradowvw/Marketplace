@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,14 +23,19 @@ import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping(value = "/image", produces = MediaType.APPLICATION_JSON_VALUE)
-@AllArgsConstructor
 public class ImageController {
 
     @Value("${images.path}")
+    @Setter
     private String imagesPath;
 
     public ImageDTOConverter imageDTOConverter;
     public ImageService imageService;
+
+    ImageController(ImageService imageService, ImageDTOConverter imageDTOConverter) {
+        this.imageService = imageService;
+        this.imageDTOConverter = imageDTOConverter;
+    }
 
     // @GetMapping("/{id}")
     // public Image

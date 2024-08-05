@@ -20,7 +20,7 @@ public class Review implements EntityWithId<Long>{
     private Long id;
     @NotBlank
     private String title;
-    @NotBlank
+    //@NotBlank
     private String description;
     @Min(1)
     @Max(5)

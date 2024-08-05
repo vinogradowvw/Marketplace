@@ -1,10 +1,8 @@
 package com.marketplace.demo.service.CartService;
 
 import com.marketplace.demo.domain.*;
-import com.marketplace.demo.persistance.CartRepository;
-import com.marketplace.demo.persistance.ProductRepository;
+import com.marketplace.demo.persistance.*;
 import com.marketplace.demo.service.CrudServiceImpl;
-import com.marketplace.demo.service.OrderService.OrderService;
 import com.marketplace.demo.service.PaymentService.PaymentService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.repository.CrudRepository;
@@ -12,7 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
-
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Transactional
@@ -20,7 +19,9 @@ import java.sql.Timestamp;
 public class CartService extends CrudServiceImpl<Cart, Long> implements CartServiceInterface{
 
     private CartRepository cartRepository;
-    private OrderService orderService;
+    private CartProductRepository cartProductRepository;
+    private OrderProductRepository orderProductRepository;
+    private OrderRepository orderRepository;
     private PaymentService paymentService;
     private ProductRepository productRepository;
 
@@ -34,10 +35,28 @@ public class CartService extends CrudServiceImpl<Cart, Long> implements CartServ
             throw new IllegalArgumentException("There is no product with id: " + product.getID());
         }
 
-        cart.getProducts().put(product, quantity);
+        if (cartProductRepository.existsByCartAndProduct(cart, product)){
+            CartProduct.CartProductId cartProductId = new CartProduct.CartProductId(cart.getID(), product.getID());
+            CartProduct cartProduct = cartProductRepository.findById(cartProductId).get();
+
+            cartProduct.setQuantity(quantity);
+            cartProductRepository.save(cartProduct);
+
+            return cartRepository.save(cart);
+        }
+
+        CartProduct.CartProductId cartProductId = new CartProduct.CartProductId(cart.getID(), product.getID());
+        CartProduct cartProduct = new CartProduct();
+        cartProduct.setId(cartProductId);
+        cartProduct.setCart(cart);
+        cartProduct.setProduct(product);
+        cartProduct.setQuantity(quantity);
+        cartProductRepository.save(cartProduct);
+
+        cart.getProducts().add(cartProduct);
         cart.setTimestamp(new Timestamp(System.currentTimeMillis()));
 
-        product.getCarts().add(cart);
+        product.getCarts().add(cartProduct);
         productRepository.save(product);
 
         return cartRepository.save(cart);
@@ -53,22 +72,27 @@ public class CartService extends CrudServiceImpl<Cart, Long> implements CartServ
             throw new IllegalArgumentException("There is no product with id: " + product.getID());
         }
 
-        if (!cart.getProducts().containsKey(product)){
+        if (cartProductRepository.existsByCartAndProduct(cart, product)){
             throw new IllegalArgumentException("There is no product with id: " + product.getID() + " in the cart.");
         }
 
-        if (cart.getProducts().get(product).compareTo(quantity) < 0){
+        CartProduct.CartProductId cartProductId = new CartProduct.CartProductId(cart.getID(), product.getID());
+        CartProduct cartProduct = cartProductRepository.findById(cartProductId).get();
+        Long productQuantity = cartProduct.getQuantity();
+        if (productQuantity.compareTo(quantity) < 0){
             throw new IllegalArgumentException("There are fewer products with id: " + product.getID() + " in the cart.");
         }
 
-        if (cart.getProducts().get(product).equals(quantity)){
-            cart.getProducts().remove(product);
+        if (productQuantity.equals(quantity)){
+            cart.getProducts().remove(cartProduct);
 
-            product.getCarts().remove(cart);
+            product.getCarts().remove(cartProduct);
+            cartProductRepository.delete(cartProduct);
             productRepository.save(product);
         }
         else{
-            cart.getProducts().put(product, cart.getProducts().get(product) - quantity);
+            cartProduct.setQuantity(productQuantity - quantity);
+            cartProductRepository.save(cartProduct);
         }
 
         return cartRepository.save(cart);
@@ -80,52 +104,81 @@ public class CartService extends CrudServiceImpl<Cart, Long> implements CartServ
             throw new IllegalArgumentException("There is no cart with id: " + cart.getID());
         }
 
-        cart.getProducts().forEach((p, q) -> {
-            p.getCarts().remove(cart);
-            productRepository.save(p);
+        cart.getProducts().forEach(p -> {
+            Product product = p.getProduct();
+            product.getCarts().remove(p);
+            productRepository.save(product);
+
+            cartProductRepository.delete(p);
         });
+
         cart.getProducts().clear();
+        cart.setTimestamp(new Timestamp(System.currentTimeMillis()));
 
         return cartRepository.save(cart);
     }
 
     @Override
+    public List<Product> getProducts(Cart cart) {
+        if (!cartRepository.existsById(cart.getID())){
+            throw new IllegalArgumentException("There is no cart with id: " + cart.getID());
+        }
+
+        List<Product> products = new ArrayList<>();
+
+        cart.getProducts().forEach(p -> products.add(p.getProduct()));
+
+        return products;
+    }
+
+    @Override
     public Order createOrder(Cart cart) {
+        if (!cartRepository.existsById(cart.getID())){
+            throw new IllegalArgumentException("There is no cart with id: " + cart.getID());
+        }
+
         if (cart.getProducts().isEmpty()){
             throw new IllegalArgumentException("There is no products in cart with id: " + cart.getID());
         }
-
-        cart.getProducts().keySet().forEach(p -> p.getCarts().remove(cart));
 
         Order order = new Order();
         order.setUser(cart.getUser());
         order.setTimestamp(new Timestamp(System.currentTimeMillis()));
         order.setState(State.NOT_PAID);
-        order.setProducts(cart.getProducts());
 
-        order.getProducts().forEach((p, q) -> {
-            p.getOrders().add(order);
-            productRepository.save(p);
+        Order savedOrder = orderRepository.save(order);
+
+        cart.getProducts().forEach(p -> {
+            Product product = p.getProduct();
+            Long quantity = p.getQuantity();
+
+            OrderProduct.OrderProductId orderProductId = new OrderProduct.OrderProductId(savedOrder.getID(), product.getID());
+            OrderProduct orderProduct = new OrderProduct();
+            orderProduct.setId(orderProductId);
+            orderProduct.setProduct(product);
+            orderProduct.setQuantity(quantity);
+            orderProduct.setOrder(savedOrder);
+            orderProductRepository.save(orderProduct);
+
+            product.getOrders().add(orderProduct);
+            productRepository.save(product);
         });
-        order.getUser().getOrders().add(order);
+        savedOrder.getUser().getOrders().add(order);
 
         Payment payment = new Payment();
-        payment.setOrder(order);
-        Long amount = cart.getProducts().entrySet()
-                .stream()
-                .mapToLong(entry -> entry.getKey().getPrice() * entry.getValue())
+        payment.setOrder(savedOrder);
+        Long amount = cart.getProducts().stream()
+                .mapToLong(entry -> entry.getProduct().getPrice() * entry.getQuantity())
                 .sum();
         payment.setAmount(amount);
 
-        order.setPayment(payment);
+        savedOrder.setPayment(payment);
 
         paymentService.create(payment);
 
-        cart.getProducts().clear();
-        cart.setTimestamp(new Timestamp(System.currentTimeMillis()));
-        cartRepository.save(cart);
+        this.clearCart(cart);
 
-        return orderService.create(order);
+        return orderRepository.save(savedOrder);
     }
 
     @Override

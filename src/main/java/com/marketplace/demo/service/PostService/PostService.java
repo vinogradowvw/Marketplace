@@ -20,6 +20,7 @@ public class PostService extends CrudServiceImpl<Post, Long> implements PostServ
 
     private ReviewRepository reviewRepository;
     private PostRepository postRepository;
+    private OrderProductRepository orderProductRepository;
     private ProductRepository productRepository;
     private ImageRepository imageRepository;
     private TagRepository tagRepository;
@@ -30,7 +31,7 @@ public class PostService extends CrudServiceImpl<Post, Long> implements PostServ
         boolean flag = false;
 
         for(var order : user.getOrders()){
-            if (order.getProducts().containsKey(product)) {
+            if (orderProductRepository.existsByOrderAndProduct(order, product)) {
                 flag = true;
                 break;
             }

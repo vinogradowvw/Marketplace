@@ -19,9 +19,9 @@ public class Product implements EntityWithId<Long> {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id_product")
     private Long id;
-    @NotBlank(message = "Price can not be empty")
+    //@NotBlank(message = "Price can not be empty")
     private Integer price;
-    @NotBlank(message = "Name can not be empty")
+    //@NotBlank(message = "Name can not be empty")
     private String name;
     private String description;
 
@@ -30,10 +30,10 @@ public class Product implements EntityWithId<Long> {
     private Post post;
 
     @OneToMany(mappedBy = "product")
-    private List<Order> orders = new ArrayList<>();
+    private List<OrderProduct> orders = new ArrayList<>();
 
     @OneToMany(mappedBy = "product")
-    private List<Cart> carts = new ArrayList<>();
+    private List<CartProduct> carts = new ArrayList<>();
 
     @Override
     public Long getID() {

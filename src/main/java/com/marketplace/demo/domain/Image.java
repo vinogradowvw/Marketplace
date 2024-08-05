@@ -16,7 +16,7 @@ public class Image implements EntityWithId<Long> {
     @Column(name = "id_image")
     private Long id;
 
-    @NotBlank(message="Path can not be empty")
+    //@NotBlank(message="Path can not be empty")
     private String path;
 
     @ManyToOne(fetch = FetchType.LAZY)

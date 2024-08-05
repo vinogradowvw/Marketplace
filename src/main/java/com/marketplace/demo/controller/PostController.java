@@ -72,25 +72,6 @@ public class PostController {
         if (oldPost.isPresent()) {
             post.setImages(oldPost.get().getImages());
             post.setLikedUsers(oldPost.get().getLikedUsers());
-            // post.setProductsInPost(oldPost.get().getProductsInPost());
-            post.setTags(oldPost.get().getTags());
-            post.setUser(oldPost.get().getUser());
-        }
-
-        post.setId(id);
-        postService.update(id, post);
-
-        return postConverter.toDTO(post);
-    }
-
-    @PutMapping(path = "/{id}")
-    public PostDTO addImage(@PathVariable("id") Long id, @RequestBody PostDTO postDTO) {
-        Post post = postConverter.toEntity(postDTO);
-        Optional<Post> oldPost = postService.readById(id);
-
-        if (oldPost.isPresent()) {
-            post.setImages(oldPost.get().getImages());
-            post.setLikedUsers(oldPost.get().getLikedUsers());
             post.setTags(oldPost.get().getTags());
             post.setUser(oldPost.get().getUser());
         }
@@ -113,7 +94,7 @@ public class PostController {
         return postConverter.toDTO(post);
     }
 
-    @PostMapping(path = "/{id}/images")
+    @PostMapping(path = "/{id}/product")
     public PostDTO addProductToPost(@PathVariable("id") Long postId, @RequestParam Long productId) {
         Post post = postService.addProductToPost(postService.readById(postId).get(), productService.readById(productId).get());
         return postConverter.toDTO(post);

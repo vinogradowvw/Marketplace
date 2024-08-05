@@ -57,12 +57,9 @@ public class UserService extends CrudServiceImpl<User, Long> implements UserServ
         }
 
         User user = userRepository.findById(id).get();
+
         Cart cart = user.getCart();
-
-        for (var p : cart.getProducts().keySet()){
-            p.getCarts().remove(cart);
-        }
-
+        cartService.clearCart(cart);
         cartService.deleteById(cart.getID());
 
         userRepository.deleteById(id);

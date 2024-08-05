@@ -28,25 +28,25 @@ import com.marketplace.demo.service.TagService.TagService;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class PostServiceUnitTests {
 	@Autowired
-	PostService postService;
+	private PostService postService;
 	@Autowired
-	TagService tagService;
+	private TagService tagService;
 	@MockBean
-	PostRepository postRepository;
+	private PostRepository postRepository;
 	@MockBean
-	ImageRepository imageRepository;
+	private ImageRepository imageRepository;
 	@MockBean
-	ProductRepository productRepository;
+	private ProductRepository productRepository;
 	@MockBean
-	TagRepository tagRepository;
+	private TagRepository tagRepository;
 
-	Post post;
-	Product product1;
-	Product product2;
-	Image image1;
-	Image image2;
-	Tag tag1;
-	Tag tag2;
+	private Post post;
+	private Product product1;
+	private Product product2;
+	private Image image1;
+	private Image image2;
+	private Tag tag1;
+	private Tag tag2;
 
 	@BeforeEach
 	public void setUp() {
@@ -113,7 +113,7 @@ class PostServiceUnitTests {
 		Assertions.assertTrue(post.getImages().contains(image1));
 		Assertions.assertTrue(post.getImages().contains(image2));
 
-        	Assertions.assertEquals(image1.getPost(), post);
+		Assertions.assertEquals(image1.getPost(), post);
 		Assertions.assertEquals(image2.getPost(), post);
 
 		Assertions.assertEquals(2, post.getImages().size());
