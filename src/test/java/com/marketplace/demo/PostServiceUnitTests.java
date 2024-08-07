@@ -52,12 +52,14 @@ class PostServiceUnitTests {
 	public void setUp() {
 		image1 = new Image();
 		image1.setId(1L);
-		image1.setPath("/test/path/1");
+		image1.setName("/test/path/1");
+		image1.setExtension("jpg");
 		image1.setPost(null);
 
 		image2 = new Image();
 		image1.setId(2L);
-		image2.setPath("/test/path/2");
+		image2.setName("/test/path/2");
+		image2.setExtension("png");
 		image2.setPost(null);
 
 		tag1 = new Tag();
