@@ -13,8 +13,6 @@ import java.util.List;
 @Setter
 @Table(name = "users")
 @NoArgsConstructor
-@Data
-@EqualsAndHashCode(of = { "id" })
 public class User implements EntityWithId<Long>{
 
     public User (
