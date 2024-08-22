@@ -163,7 +163,7 @@ public class CartService extends CrudServiceImpl<Cart, Long> implements CartServ
             product.getOrders().add(orderProduct);
             productRepository.save(product);
         });
-        savedOrder.getUser().getOrders().add(order);
+        savedOrder.getUser().getOrders().add(savedOrder);
 
         Payment payment = new Payment();
         payment.setOrder(savedOrder);
