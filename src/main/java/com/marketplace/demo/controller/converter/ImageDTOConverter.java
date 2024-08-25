@@ -20,7 +20,7 @@ public class ImageDTOConverter implements DTOConverter<ImageDTO, Image> {
 
         Long postId = Optional.ofNullable(image.getPost()).map(Post::getID).orElse(null);
 
-        return new ImageDTO(image.getID(), image.getPath(), postId);
+        return new ImageDTO(image.getID(), image.getName(), image.getExtension(), postId);
     }
 
     @Override
@@ -28,7 +28,8 @@ public class ImageDTOConverter implements DTOConverter<ImageDTO, Image> {
         Image image = new Image();
 
         image.setId(imageDTO.id());
-        image.setPath(imageDTO.path());
+        image.setName(imageDTO.name());
+        image.setExtension(imageDTO.extension());
 
         Optional<Long> optPostId = Optional.ofNullable(imageDTO.postId());
         Optional<Post> optPost = Optional.empty();
