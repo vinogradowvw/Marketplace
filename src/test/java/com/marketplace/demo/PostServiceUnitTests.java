@@ -22,15 +22,13 @@ import com.marketplace.demo.persistance.PostRepository;
 import com.marketplace.demo.persistance.ProductRepository;
 import com.marketplace.demo.persistance.TagRepository;
 import com.marketplace.demo.service.PostService.PostService;
-import com.marketplace.demo.service.TagService.TagService;
+
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class PostServiceUnitTests {
 	@Autowired
 	private PostService postService;
-	@Autowired
-	private TagService tagService;
 	@MockBean
 	private PostRepository postRepository;
 	@MockBean
