@@ -3,6 +3,7 @@ package com.marketplace.demo;
 
 import java.util.List;
 
+import com.marketplace.demo.domain.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,14 +13,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import com.marketplace.demo.domain.User;
-import com.marketplace.demo.domain.Subscription;
-import com.marketplace.demo.domain.Role;
 import com.marketplace.demo.persistance.UserRepository;
 import com.marketplace.demo.persistance.CartRepository;
 import com.marketplace.demo.persistance.RoleRepository;
 import com.marketplace.demo.persistance.SubscriptionRepository;
 import com.marketplace.demo.service.UserService.UserService;
+
+import static org.mockito.ArgumentMatchers.any;
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -43,67 +43,68 @@ class UserServiceUnitTests {
 
 	@BeforeEach
 	void setRules() {
-		Mockito.when(userRepository.save(user)).thenReturn(user);
+		Mockito.when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 		Mockito.when(userRepository.existsById(user.getID())).thenReturn(true);
-		Mockito.when(userRepository.save(subscriber)).thenReturn(subscriber);
 		Mockito.when(userRepository.existsById(subscriber.getID())).thenReturn(true);
-		Mockito.when(cartRepository.save(user.getCart())).thenReturn(user.getCart());
-		Mockito.when(subscriptionRepository.existsByUserIdAndSubscriberId(user.getID(), subscriber.getID())).thenReturn(true);
+		Mockito.when(cartRepository.save(any(Cart.class))).thenAnswer(invocation -> invocation.getArgument(0));
 		Mockito.when(roleRepository.existsById(role.getID())).thenReturn(true);
 	}
 
 	@BeforeEach
 	public void setUp() {
 		user = new User();
+		user.setId(1L);
+
 		role = new Role();
+
+		subscriber = new User();
+		subscriber.setId(2L);
+	}
+
+	private boolean checkSubscriptions(User user, User subscriber) {
+		
+		int counter = 0;
+
+		for (Subscription subscription : subscriber.getSubscriptions()) {
+			if (subscription.getUser() == user) {
+				counter++;
+			}
+		}
+
+		return counter == 1;
+	}
+
+	private boolean checkSubscribers(User user, User subscriber) {
+		
+		int counter = 0;
+
+		for (Subscription subscription : user.getSubscribers()) {
+			if (subscription.getSubscriber() == subscriber) {
+				counter++;
+			}
+		}
+
+		return counter == 1;
 	}
 
 	@Test
 	public void create() {
+		Mockito.when(userRepository.existsById(user.getID())).thenReturn(false);
 
-
-		this.user = userService.create(user);
+		user = userService.create(user);
 
 		Mockito.verify(cartRepository, Mockito.atLeastOnce()).save(user.getCart());
 		Mockito.verify(userRepository, Mockito.atLeastOnce()).save(user);
 	}
 
-	private Boolean checkSubscriobtions(User user, User subscriber) {
-		
-		int counter = 0;
-		Boolean result = false;
-
-		for (Subscription subscribtion : subscriber.getSubscriptions()) {
-			if (subscribtion.getUser() == user) {
-				result = true;
-				counter++;
-			}
-		}
-
-		return (counter == 1) && result;
-	}
-
-	private Boolean checkSubscribers(User user, User subscriber) {
-		
-		int counter = 0;
-		Boolean result = false;
-
-		for (Subscription subscribtion : user.getSubscribers()) {
-			if (subscribtion.getSubscriber() == subscriber) {
-				result = true;
-				counter++;
-			}
-		}
-
-		return (counter == 1) && result;
-	}
-
 	@Test
-	public void addSubscribtionToUser() {
+	public void addSubscriptionToUser() {
+
+		Mockito.when(subscriptionRepository.existsByUserIdAndSubscriberId(user.getID(), subscriber.getID())).thenReturn(false);
 
 		userService.addSubscriptionToUsers(user, subscriber);
 
-		Assertions.assertTrue(checkSubscriobtions(user, subscriber));
+		Assertions.assertTrue(checkSubscriptions(user, subscriber));
 		Assertions.assertTrue(checkSubscribers(user, subscriber));
 		Mockito.verify(userRepository, Mockito.atLeastOnce()).save(user);
 		Mockito.verify(userRepository, Mockito.atLeastOnce()).save(subscriber);
@@ -134,7 +135,7 @@ class UserServiceUnitTests {
 		List<User> subscribedUsers = userService.getSubscribedUsers(user);
 
 		for (User sub : subscribedUsers) {
-			Assertions.assertTrue(checkSubscriobtions(user, sub));
+			Assertions.assertTrue(checkSubscriptions(user, sub));
 		}
 	}
 
