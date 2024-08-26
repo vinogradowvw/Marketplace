@@ -4,10 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.marketplace.demo.controller.converter.PaymentDTOConverter;
 import com.marketplace.demo.controller.dto.PaymentDTO;
@@ -25,7 +22,7 @@ public class PaymentController {
     private PaymentDTOConverter paymentConverter;
 
     @GetMapping
-    public List<PaymentDTO> getAllPayements() {
+    public List<PaymentDTO> getAllPayments() {
         Iterable<Payment> payments = paymentService.readAll();
         List<PaymentDTO> paymentDTOs = new ArrayList<>();
 
@@ -41,6 +38,9 @@ public class PaymentController {
         return paymentConverter.toDTO(paymentService.readById(id).get());
     }
 
-    // To Do: хз че еще тут писать хз как оно работать будет и че надо будет
+    @DeleteMapping(path = "/{id}")
+    public void deletePaymentById(@PathVariable("id") Long id) {
+        paymentService.deleteById(id);
+    }
 
 }

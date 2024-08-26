@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.marketplace.demo.domain.*;
+import com.marketplace.demo.service.ReviewService.ReviewService;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,11 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.marketplace.demo.domain.Image;
-import com.marketplace.demo.domain.Post;
-import com.marketplace.demo.domain.Product;
-import com.marketplace.demo.domain.Tag;
-import com.marketplace.demo.domain.User;
 import com.marketplace.demo.controller.converter.DTOConverter;
 import com.marketplace.demo.controller.dto.PostDTO;
 import com.marketplace.demo.service.ImageService.ImageService;
@@ -41,6 +38,7 @@ public class PostController {
     private ProductService productService;
     private UserService userService;
     private TagService tagService;
+    private ReviewService reviewService;
 
     @GetMapping
     public List<PostDTO> getAllPosts() {
@@ -69,17 +67,10 @@ public class PostController {
         Post post = postConverter.toEntity(postDTO);
         Optional<Post> oldPost = postService.readById(id);
 
-        if (oldPost.isPresent()) {
-            post.setImages(oldPost.get().getImages());
-            post.setLikedUsers(oldPost.get().getLikedUsers());
-            post.setTags(oldPost.get().getTags());
-            post.setUser(oldPost.get().getUser());
-        }
+        oldPost.ifPresent(value -> value.setName(post.getName()));
 
-        post.setId(id);
-        postService.update(id, post);
-
-        return postConverter.toDTO(post);
+        postService.update(id, oldPost.get());
+        return postConverter.toDTO(oldPost.get());
     }
 
     @PostMapping(path = "/{id}/image")
@@ -90,7 +81,7 @@ public class PostController {
 
     @DeleteMapping(path = "/{postId}/image/{imageId}")
     public PostDTO removeImageFromPost(@PathVariable("postId") Long postId, @PathVariable("imageId") Long imageId) {
-        Post post = postService.addImageToPost(postService.readById(postId).get(), imageService.readById(imageId).get());
+        Post post = postService.removeImageFromPost(postService.readById(postId).get(), imageService.readById(imageId).get());
         return postConverter.toDTO(post);
     }
 
@@ -136,6 +127,33 @@ public class PostController {
         return postConverter.toDTO(post);
     }
 
+    @PostMapping(path = "/{postId}/review")
+    public PostDTO addReviewToPost(@PathVariable("postId") Long postId, @RequestParam Long reviewId, @RequestParam Long userId) {
+        Post post = postService.addReviewToPost(postService.readById(postId).get(), reviewService.readById(reviewId).get(), userService.readById(userId).get());
+        return postConverter.toDTO(post);
+    }
+
+    @DeleteMapping(path = "/{postId}/review/{reviewId}")
+    public PostDTO removeReviewFromPost(@PathVariable("postId") Long postId, @PathVariable("reviewId") Long reviewId, @RequestParam Long userId) {
+        Post post = postService.deleteReviewFromPost(postService.readById(postId).get(), reviewService.readById(reviewId).get(), userService.readById(userId).get());
+        return postConverter.toDTO(post);
+    }
+
+    @GetMapping(path = "/{id}/rating")
+    public double getAVGPostRating(@PathVariable("id") Long id){
+        return postService.getAVGPostRating(postService.readById(id).get());
+    }
+
+    @GetMapping(path = "/{id}/views")
+    public double getPostViews(@PathVariable("id") Long id){
+        return postService.getPostViews(postService.readById(id).get());
+    }
+
+    @PostMapping(path = "/{id]/views")
+    public void addView(@PathVariable("id") Long id, @RequestParam Long userId){
+        postService.addView(postService.readById(id).get(), userService.readById(userId).get());
+    }
+
     @DeleteMapping(path = "/{id}")
     public void deletePost(@PathVariable("id") Long id) {
 
@@ -153,6 +171,15 @@ public class PostController {
             for (Image image : post.get().getImages()) {
                 imageService.deleteById(image.getID());
             }
+
+            for (Review review : post.get().getReviews()){
+                User author = review.getAuthor();
+                author.getReviews().remove(review);
+
+                reviewService.deleteById(review.getID());
+            }
+
+            post.get().getUser().getPosts().remove(post.get());
 
             productService.deleteById(post.get().getProduct().getID());
         }

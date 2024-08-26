@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.Optional;
 
 import com.marketplace.demo.config.MinIOComponent;
+import com.marketplace.demo.service.PostService.PostService;
 import org.springframework.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,14 +30,17 @@ public class ImageController {
     private String bucketName;
 
     private ImageDTOConverter imageDTOConverter;
+    private PostService postService;
     private ImageService imageService;
     private MinIOComponent minIOComponent;
 
     @Autowired
-    ImageController(ImageService imageService, ImageDTOConverter imageDTOConverter, MinIOComponent minIOComponent) {
+    ImageController(ImageService imageService, ImageDTOConverter imageDTOConverter,
+                    MinIOComponent minIOComponent, PostService postService) {
         this.imageService = imageService;
         this.imageDTOConverter = imageDTOConverter;
         this.minIOComponent = minIOComponent;
+        this.postService = postService;
     }
 
     @PostMapping
@@ -89,6 +93,7 @@ public class ImageController {
     public void deleteImage(@PathVariable("id") Long id){
         Optional<Image> image = imageService.readById(id);
 
+        image.ifPresent(value -> postService.removeImageFromPost(value.getPost(), value));
         image.ifPresent(value -> imageService.deleteById(value.getID()));
     }
 }
