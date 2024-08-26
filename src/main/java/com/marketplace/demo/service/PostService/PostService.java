@@ -4,23 +4,40 @@ package com.marketplace.demo.service.PostService;
 import com.marketplace.demo.domain.*;
 import com.marketplace.demo.persistance.*;
 import com.marketplace.demo.service.CrudServiceImpl;
+import com.marketplace.demo.service.ReviewService.ReviewService;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
+import java.util.Optional;
+
 @Service
 @Transactional
 @AllArgsConstructor
 public class PostService extends CrudServiceImpl<Post, Long> implements PostServiceInterface {
 
+    private ReviewRepository reviewRepository;
     private PostRepository postRepository;
     private ProductRepository productRepository;
     private ImageRepository imageRepository;
     private TagRepository tagRepository;
     private UserRepository userRepository;
+    private ReviewService reviewService;
 
+    private boolean checkIfUserBoughtProduct(User user, Product product) {
+        boolean flag = false;
+
+        for(var order : user.getOrders()){
+            if (order.getProducts().containsKey(product)) {
+                flag = true;
+                break;
+            }
+        }
+
+        return flag;
+    }
 
     @Override
     public Post addImageToPost(Post post, Image image) throws IllegalArgumentException {
@@ -67,7 +84,7 @@ public class PostService extends CrudServiceImpl<Post, Long> implements PostServ
             if (productRepository.existsById(product.getID())) {
                 product.setPost(post);
                 productRepository.save(product);
-                post.getProductsInPost().add(product);
+                post.setProduct(product);
                 return postRepository.save(post);
             }
             
@@ -85,7 +102,7 @@ public class PostService extends CrudServiceImpl<Post, Long> implements PostServ
 
             if (productRepository.existsById(product.getID())) {
                 product.setPost(null);
-                post.getProductsInPost().remove(product);
+                post.setProduct(null);
                 productRepository.save(product);
                 return postRepository.save(post);
             }
@@ -190,6 +207,76 @@ public class PostService extends CrudServiceImpl<Post, Long> implements PostServ
 
         }
         throw new IllegalArgumentException("Post with ID " + post.getID() + " does not exists");
+    }
+
+    @Override
+    public Post addReviewToPost(Post post, Review review, User user) throws IllegalArgumentException {
+
+        if (!userRepository.existsById(user.getID())){
+            throw new IllegalArgumentException("There is not user with id: " + user.getID());
+        }
+
+        if (!postRepository.existsById(post.getID())){
+            throw new IllegalArgumentException("There is not post with id: " + post.getID());
+        }
+
+        if (!reviewRepository.existsById(review.getID())){
+            throw new IllegalArgumentException("There is not review with id: " + review.getID());
+        }
+
+        Optional<Product> productOpt = Optional.ofNullable(post.getProduct());
+        if (productOpt.isEmpty()){
+            throw new IllegalArgumentException("There is no product in the post with id " + post.getID());
+        }
+
+        if (!productRepository.existsById(productOpt.get().getID())){
+            throw new IllegalArgumentException("There is not product with id: " + productOpt.get().getID());
+        }
+
+
+        if(!checkIfUserBoughtProduct(user, post.getProduct())){
+            throw new IllegalArgumentException("User didn't buy a product to write a review.");
+        }
+
+        review.setAuthor(user);
+        review.setPost(post);
+        user.getReviews().add(review);
+        post.getReviews().add(review);
+
+        reviewRepository.save(review);
+        userRepository.save(user);
+
+        return postRepository.save(post);
+    }
+
+    public Post deleteReviewFromPost(Post post, Review review, User user){
+        if (!userRepository.existsById(user.getID())){
+            throw new IllegalArgumentException("There is not user with id: " + user.getID());
+        }
+
+        if (!postRepository.existsById(post.getID())){
+            throw new IllegalArgumentException("There is not post with id: " + post.getID());
+        }
+
+        if (!reviewRepository.existsById(review.getID())){
+            throw new IllegalArgumentException("There is not review with id: " + review.getID());
+        }
+
+        if (!user.getReviews().contains(review)){
+            throw new IllegalArgumentException("User didn't write this review.");
+        }
+
+        if (!post.getReviews().contains(review)){
+            throw new IllegalArgumentException("Post doesn't contain this review.");
+        }
+
+        user.getReviews().remove(review);
+        post.getReviews().remove(review);
+
+        reviewService.deleteById(review.getID());
+        userRepository.save(user);
+
+        return postRepository.save(post);
     }
 
     @Override
