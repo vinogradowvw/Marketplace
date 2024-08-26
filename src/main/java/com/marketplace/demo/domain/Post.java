@@ -20,7 +20,6 @@ public class Post implements EntityWithId<Long> {
     private Long id;
     //@NotBlank(message = "Name can not be empty")
     private String name;
-    private String description;
     private Long views = 0L;
 
     @OneToOne(targetEntity = Product.class, mappedBy = "post")

@@ -19,13 +19,13 @@ import lombok.AllArgsConstructor;
 @RestController
 @AllArgsConstructor
 @RequestMapping(value = "/subscribtion", produces = MediaType.APPLICATION_JSON_VALUE)
-public class SubscribtionController {
+public class SubscriptionController {
 
     private SubscriptionDTOConverter subscriptionConverter;
     private SubscriptionService subscriptionService;
 
     @GetMapping(path = "/user/{id}")
-    public List<SubscriptionDTO> getAllSubscribtionsForUser(@PathVariable("id") Long id) {
+    public List<SubscriptionDTO> getAllSubscriptionsForUser(@PathVariable("id") Long id) {
         List<SubscriptionDTO> subscriptionDTOs = new ArrayList<>();
         List<Subscription> subscriptions = subscriptionService.findByUserId(id);
 
@@ -37,7 +37,7 @@ public class SubscribtionController {
     }
 
     @GetMapping(path = "/subscriber/{id}")
-    public List<SubscriptionDTO> getAllSubscribtionsForSubscriber(@PathVariable("id") Long id) {
+    public List<SubscriptionDTO> getAllSubscriptionsForSubscriber(@PathVariable("id") Long id) {
         List<SubscriptionDTO> subscriptionDTOs = new ArrayList<>();
         List<Subscription> subscriptions = subscriptionService.findBySubscriberId(id);
 

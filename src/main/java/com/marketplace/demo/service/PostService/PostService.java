@@ -296,6 +296,20 @@ public class PostService extends CrudServiceImpl<Post, Long> implements PostServ
         return post.getViews();
     }
 
+    public void addView(Post post, User user){
+        if (!postRepository.existsById(post.getID())){
+            throw new IllegalArgumentException("There is not post with id: " + post.getID());
+        }
+
+        if (!userRepository.existsById(user.getID())){
+            throw new IllegalArgumentException("There is not user with id: " + post.getID());
+        }
+
+        if (!post.getUser().getID().equals(user.getID())){
+            post.setViews(post.getViews() + 1);
+        }
+    }
+
     @Override
     protected CrudRepository<Post, Long> getRepository() {
         return postRepository;

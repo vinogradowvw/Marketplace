@@ -1,14 +1,8 @@
 package com.marketplace.demo.controller;
 
+import com.marketplace.demo.domain.Post;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.marketplace.demo.controller.dto.ProductDTO;
 import com.marketplace.demo.domain.Payment;
@@ -32,8 +26,7 @@ public class ProductController {
 
     private ProductService productService;
     private ProductDTOConverter productConverter;
-    private PaymentService paymentService;
-    private UserService userService;
+    private PostController postController;
 
     @GetMapping
     public List<ProductDTO> getAllProducts() {
@@ -62,40 +55,22 @@ public class ProductController {
         Optional<Product> oldProduct = productService.readById(id);
         Product product = productConverter.toEntity(productDTO);
 
-        if (oldProduct.isPresent()) {
-            // product.setPayments(oldProduct.get().getPayments());
-            product.setPost(oldProduct.get().getPost());
+        if (oldProduct.isPresent()){
+            oldProduct.get().setName(product.getName());
+            oldProduct.get().setDescription(product.getDescription());
+            oldProduct.get().setPrice(product.getPrice());
         }
-        
-        product.setId(id);
 
-        productService.update(id, product);
-        return productConverter.toDTO(product);
-        
+        productService.update(id, oldProduct.get());
+        return productConverter.toDTO(oldProduct.get());
     }
 
-    // @PostMapping(path = "/{id}/payment")
-    // public ProductDTO addPayment(@PathVariable("id") Long productId, @RequestParam Long userId, @RequestParam Long paymentId) {
-    //     Product product = productService.readById(productId).get();
-    //     Payment payment = paymentService.readById(paymentId).get();
-    //     User user = userService.readById(userId).get();
-    //
-    //     productService.addPayment(user, product, payment);
-    //     product = productService.readById(productId).get();
-    //
-    //     return productConverter.toDTO(product);
-    // }
+    @DeleteMapping(path = "/{id}")
+    public void deleteProduct(@PathVariable("id") Long id) {
+        Product product = productService.readById(id).get();
+        Post post = product.getPost();
 
-    // @PostMapping(path = "/{id}/payment")
-    // public ProductDTO removePayment(@PathVariable("id") Long productId, @RequestParam Long userId, @RequestParam Long paymentId) {
-    //     Product product = productService.readById(productId).get();
-    //     Payment payment = paymentService.readById(paymentId).get();
-    //     User user = userService.readById(userId).get();
-    //
-    //     productService.removePayment(user, product, payment);
-    //     product = productService.readById(productId).get();
-    //
-    //     return productConverter.toDTO(product);
-    // }
+        postController.deletePost(post.getID());
+    }
 
 }
