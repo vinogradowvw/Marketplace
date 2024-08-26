@@ -1,14 +1,13 @@
 package com.marketplace.demo.controller.converter;
 
 import com.marketplace.demo.controller.dto.UserDTO;
-import com.marketplace.demo.domain.Payment;
-import com.marketplace.demo.domain.Post;
-import com.marketplace.demo.domain.Role;
-import com.marketplace.demo.domain.User;
-import com.marketplace.demo.persistance.PaymentRepository;
-import com.marketplace.demo.persistance.PostRepository;
-import com.marketplace.demo.persistance.RoleRepository;
-import com.marketplace.demo.persistance.UserRepository;
+import com.marketplace.demo.domain.*;
+import com.marketplace.demo.persistance.*;
+import com.marketplace.demo.service.CartService.CartService;
+import com.marketplace.demo.service.OrderService.OrderService;
+import com.marketplace.demo.service.PostService.PostService;
+import com.marketplace.demo.service.ReviewService.ReviewService;
+import com.marketplace.demo.service.RoleService.RoleService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -20,26 +19,32 @@ import java.util.Optional;
 @AllArgsConstructor
 public class UserDTOConverter implements DTOConverter<UserDTO, User> {
 
-    private final PostRepository postRepository;
-    private final PaymentRepository paymentRepository;
-    private final RoleRepository roleRepository;
-    private final UserRepository userRepository;
+    private final PostService postService;
+    private final OrderService orderService;
+    private final ReviewService reviewService;
+    private final CartService cartService;
+    private final RoleService roleService;
+    private final SubscriptionRepository subscriptionRepository;
 
     @Override
     public UserDTO toDTO(User user) {
         List<Long> postIds = new ArrayList<>();
-        List<Long> paymentIds = new ArrayList<>();
+        List<Long> orderIds = new ArrayList<>();
         List<Long> likeIds = new ArrayList<>();
-        List<Long> subscribeIds = new ArrayList<>();
+        List<Long> subscriberIds = new ArrayList<>();
         List<Long> subscriptionIds = new ArrayList<>();
-        Long roleId = null;
+        List<Long> roleIds = new ArrayList<>();
+        List<Long> reviewIds = new ArrayList<>();
+
+        Long cartId = Optional.ofNullable(user.getCart()).map(Cart::getID).orElse(null);
 
         Optional<List<Post>> likes = Optional.ofNullable(user.getLikes());
         Optional<List<Post>> posts = Optional.ofNullable(user.getPosts());
-        Optional<List<Payment>> payments = Optional.ofNullable(user.getPayments());
-        Optional<List<User>> subscribers = Optional.ofNullable(user.getSubscribers());
-        Optional<List<User>> subscriptions = Optional.ofNullable(user.getSubscriptions());
-        Optional<Role> optRole = Optional.ofNullable(user.getRole());
+        Optional<List<Order>> orders = Optional.ofNullable(user.getOrders());
+        Optional<List<Subscription>> subscribers = Optional.ofNullable(user.getSubscribers());
+        Optional<List<Subscription>> subscriptions = Optional.ofNullable(user.getSubscriptions());
+        Optional<List<Role>> roles = Optional.ofNullable(user.getRoles());
+        Optional<List<Review>> reviews = Optional.ofNullable(user.getReviews());
 
         if (likes.isPresent()){
             for (Post post : likes.get()) {
@@ -53,32 +58,40 @@ public class UserDTOConverter implements DTOConverter<UserDTO, User> {
             }
         }
 
-        if (payments.isPresent()){
-            for (Payment payment : payments.get()) {
-                paymentIds.add(payment.getID());
+        if (orders.isPresent()){
+            for (Order order : orders.get()) {
+                orderIds.add(order.getID());
             }
         }
 
         if (subscribers.isPresent()){
-            for (User userSubscriber : subscribers.get()) {
-                subscribeIds.add(userSubscriber.getID());
+            for (Subscription subs : subscribers.get()) {
+                subscriberIds.add(subs.getSubscriber().getID());
             }
         }
 
         if (subscriptions.isPresent()){
-            for (User userSubscription : subscriptions.get()) {
-                subscriptionIds.add(userSubscription.getID());
+            for (Subscription s : subscriptions.get()) {
+                subscriptionIds.add(s.getUser().getID());
             }
         }
 
-        if (optRole.isPresent()){
-            roleId = optRole.get().getID();
+        if (roles.isPresent()){
+            for (Role role : roles.get()) {
+                roleIds.add(role.getID());
+            }
+        }
+
+        if (reviews.isPresent()){
+            for (Review review : reviews.get()) {
+                reviewIds.add(review.getID());
+            }
         }
 
 
-        return new UserDTO(user.getID(), user.getUsername(), user.getPassword(),
-                user.getEmail(), likeIds, paymentIds, postIds,
-                subscribeIds, subscriptionIds, roleId);
+        return new UserDTO(user.getID(), user.getUsername(), user.getEmail(),
+                user.getPassword(), likeIds, orderIds, postIds,
+                subscriberIds, subscriptionIds, cartId, roleIds, reviewIds);
     }
 
     @Override
@@ -90,72 +103,66 @@ public class UserDTOConverter implements DTOConverter<UserDTO, User> {
         user.setPassword(userDTO.password());
         user.setEmail(userDTO.email());
 
-        Optional<List<Long>> likeIds = Optional.ofNullable(userDTO.likes());
-        Optional<List<Long>> postIds = Optional.ofNullable(userDTO.posts());
-        Optional<List<Long>> paymentIds = Optional.ofNullable(userDTO.payments());
-        Optional<List<Long>> subscribeIds = Optional.ofNullable(userDTO.subscribers());
-        Optional<List<Long>> subscriptionIds = Optional.ofNullable(userDTO.subscriptions());
-        Optional<Long> optRole = Optional.ofNullable(userDTO.roleId());
-
         List<Post> posts = new ArrayList<>();
-        List<Payment> payments = new ArrayList<>();
+        List<Order> orders = new ArrayList<>();
         List<Post> likes = new ArrayList<>();
-        List<User> subscribers = new ArrayList<>();
-        List<User> subscriptions = new ArrayList<>();
-        Role role = null;
+        List<Subscription> subscribers = new ArrayList<>();
+        List<Subscription> subscriptions = new ArrayList<>();
+        List<Role> roles = new ArrayList<>();
+        List<Review> reviews = new ArrayList<>();
 
-        if (likeIds.isPresent()){
-            for (Long likeId : likeIds.get()) {
-                if (postRepository.existsById(likeId)) {
-                    likes.add(postRepository.findById(likeId).get());
-                }
-            }
+        Cart cart = cartService.readById(userDTO.cart()).orElse(null);
+
+        for (Long likeId : userDTO.likes()) {
+            Post post = postService.readById(likeId).orElse(null);
+
+            likes.add(post);
         }
 
-        if (postIds.isPresent()){
-            for (Long postId : postIds.get()) {
-                if (postRepository.existsById(postId)) {
-                    posts.add(postRepository.findById(postId).get());
-                }
-            }
+        for (Long postId : userDTO.posts()) {
+            Post post = postService.readById(postId).orElse(null);
+
+            posts.add(post);
         }
 
-        if (paymentIds.isPresent()){
-            for (Long paymentId : paymentIds.get()) {
-                if (paymentRepository.existsById(paymentId)) {
-                    payments.add(paymentRepository.findById(paymentId).get());
-                }
-            }
+        for (Long orderId : userDTO.orders()) {
+            Order order = orderService.readById(orderId).orElse(null);
+
+            orders.add(order);
         }
 
-        if (subscribeIds.isPresent()){
-            for (Long subscribeId : subscribeIds.get()) {
-                if (userRepository.existsById(subscribeId)){
-                    subscribers.add(userRepository.findById(subscribeId).get());
-                }
-            }
+        for (Long subscriberId : userDTO.subscribers()) {
+            Subscription sub = subscriptionRepository.findByUserIdAndSubscriberId(userDTO.id(), subscriberId);
+
+            subscribers.add(sub);
         }
 
-        if (subscriptionIds.isPresent()){
-            for (Long subscriptionId : subscriptionIds.get()) {
-                if (userRepository.existsById(subscriptionId)){
-                    subscriptions.add(userRepository.findById(subscriptionId).get());
-                }
-            }
+        for (Long subscriptionId : userDTO.subscriptions()) {
+            Subscription sub = subscriptionRepository.findByUserIdAndSubscriberId(subscriptionId, userDTO.id());
+
+            subscriptions.add(sub);
         }
 
-        if (optRole.isPresent()){
-            if (roleRepository.existsById(optRole.get())){
-                role = roleRepository.findById(optRole.get()).get();
-            }
+        for (Long roleId : userDTO.roles()) {
+            Role role = roleService.readById(roleId).orElse(null);
+
+            roles.add(role);
         }
 
-        user.setRole(role);
+        for (Long reviewId : userDTO.reviews()) {
+            Review review = reviewService.readById(reviewId).orElse(null);
+
+            reviews.add(review);
+        }
+
         user.setLikes(likes);
-        user.setPayments(payments);
         user.setPosts(posts);
+        user.setOrders(orders);
         user.setSubscribers(subscribers);
         user.setSubscriptions(subscriptions);
+        user.setCart(cart);
+        user.setRoles(roles);
+        user.setReviews(reviews);
 
         return user;
     }

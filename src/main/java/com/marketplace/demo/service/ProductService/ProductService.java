@@ -1,9 +1,5 @@
 package com.marketplace.demo.service.ProductService;
 
-import com.marketplace.demo.domain.Payment;
-import com.marketplace.demo.domain.User;
-import com.marketplace.demo.persistance.PaymentRepository;
-import com.marketplace.demo.persistance.UserRepository;
 import com.marketplace.demo.service.CrudServiceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.data.repository.CrudRepository;

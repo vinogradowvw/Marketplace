@@ -22,42 +22,42 @@ import com.marketplace.demo.persistance.PostRepository;
 import com.marketplace.demo.persistance.ProductRepository;
 import com.marketplace.demo.persistance.TagRepository;
 import com.marketplace.demo.service.PostService.PostService;
-import com.marketplace.demo.service.TagService.TagService;
+
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class PostServiceUnitTests {
 	@Autowired
-	PostService postService;
-	@Autowired
-	TagService tagService;
+	private PostService postService;
 	@MockBean
-	PostRepository postRepository;
+	private PostRepository postRepository;
 	@MockBean
-	ImageRepository imageRepository;
+	private ImageRepository imageRepository;
 	@MockBean
-	ProductRepository productRepository;
+	private ProductRepository productRepository;
 	@MockBean
-	TagRepository tagRepository;
+	private TagRepository tagRepository;
 
-	Post post;
-	Product product1;
-	Product product2;
-	Image image1;
-	Image image2;
-	Tag tag1;
-	Tag tag2;
+	private Post post;
+	private Product product1;
+	private Product product2;
+	private Image image1;
+	private Image image2;
+	private Tag tag1;
+	private Tag tag2;
 
 	@BeforeEach
 	public void setUp() {
 		image1 = new Image();
 		image1.setId(1L);
-		image1.setPath("/test/path/1");
+		image1.setName("/test/path/1");
+		image1.setExtension("jpg");
 		image1.setPost(null);
 
 		image2 = new Image();
 		image1.setId(2L);
-		image2.setPath("/test/path/2");
+		image2.setName("/test/path/2");
+		image2.setExtension("png");
 		image2.setPost(null);
 
 		tag1 = new Tag();
@@ -74,7 +74,6 @@ class PostServiceUnitTests {
 		post.setId(1L);
 		post.setDescription("testDescr");
 		post.setImages(new ArrayList<>());
-		post.setProductsInPost(new ArrayList<>());
 		post.setTags(new ArrayList<>());
 
 		product1 = new Product();
@@ -114,13 +113,13 @@ class PostServiceUnitTests {
 		Assertions.assertTrue(post.getImages().contains(image1));
 		Assertions.assertTrue(post.getImages().contains(image2));
 
-        Assertions.assertEquals(image1.getPost(), post);
+		Assertions.assertEquals(image1.getPost(), post);
 		Assertions.assertEquals(image2.getPost(), post);
 
 		Assertions.assertEquals(2, post.getImages().size());
 
 		Mockito.verify(postRepository, Mockito.atLeastOnce()).save(post);
-        Mockito.verify(imageRepository, Mockito.atLeastOnce()).save(image1);
+        	Mockito.verify(imageRepository, Mockito.atLeastOnce()).save(image1);
 		Mockito.verify(imageRepository, Mockito.atLeastOnce()).save(image2);
 
 	}
@@ -141,54 +140,15 @@ class PostServiceUnitTests {
 		Assertions.assertFalse(post.getImages().contains(image2));
 		Assertions.assertEquals(post.getImages(), new ArrayList<>());
 
-        Assertions.assertEquals(image1.getPost(), null);
+		Assertions.assertEquals(image1.getPost(), null);
 		Assertions.assertEquals(image2.getPost(), null);
 
 		Mockito.verify(postRepository, Mockito.atLeastOnce()).save(post);
-        Mockito.verify(imageRepository, Mockito.atLeastOnce()).save(image1);
+		Mockito.verify(imageRepository, Mockito.atLeastOnce()).save(image1);
 		Mockito.verify(imageRepository, Mockito.atLeastOnce()).save(image2);
 
 	}
 	
-	@Test
-	void addProductToPost() {
-		post = postService.addProductToPost(post, product1);
-		post = postService.addProductToPost(post, product2);
-
-		Assertions.assertTrue(post.getProductsInPost().contains(product1));
-		Assertions.assertTrue(post.getProductsInPost().contains(product2));
-
-        Assertions.assertEquals(product1.getPost(), post);
-		Assertions.assertEquals(product2.getPost(), post);
-
-		Assertions.assertEquals(2, post.getProductsInPost().size());
-
-		Mockito.verify(postRepository, Mockito.atLeastOnce()).save(post);
-        Mockito.verify(productRepository, Mockito.atLeastOnce()).save(product1);
-		Mockito.verify(productRepository, Mockito.atLeastOnce()).save(product2);
-	}
-
-	@Test
-	void removeProductFromPost() {
-		post = postService.addProductToPost(post, product1);
-		post = postService.addProductToPost(post, product2);
-		
-		post = postService.removeProductFromPost(post, product1);
-
-		Assertions.assertTrue(post.getProductsInPost().contains(product2));
-
-		post = postService.removeProductFromPost(post, product2);
-
-        Assertions.assertEquals(product1.getPost(), null);
-		Assertions.assertEquals(product2.getPost(), null);
-		Assertions.assertEquals(post.getProductsInPost(), new ArrayList<>());
-
-		Assertions.assertEquals(0, post.getProductsInPost().size());
-
-		Mockito.verify(postRepository, Mockito.atLeastOnce()).save(post);
-        Mockito.verify(productRepository, Mockito.atLeastOnce()).save(product1);
-		Mockito.verify(productRepository, Mockito.atLeastOnce()).save(product2);
-	}
 
 	@Test
 	void addTagToPost() {
@@ -198,13 +158,13 @@ class PostServiceUnitTests {
 		Assertions.assertTrue(post.getTags().contains(tag1));
 		Assertions.assertTrue(post.getTags().contains(tag2));
 
-        Assertions.assertTrue(tag1.getPosts().contains(post));
+        	Assertions.assertTrue(tag1.getPosts().contains(post));
 		Assertions.assertTrue(tag2.getPosts().contains(post));
 
 		Assertions.assertEquals(2, post.getTags().size());
 
 		Mockito.verify(postRepository, Mockito.atLeastOnce()).save(post);
-        Mockito.verify(tagRepository, Mockito.atLeastOnce()).save(tag1);
+        	Mockito.verify(tagRepository, Mockito.atLeastOnce()).save(tag1);
 		Mockito.verify(tagRepository, Mockito.atLeastOnce()).save(tag2);
 	}
 
@@ -225,13 +185,12 @@ class PostServiceUnitTests {
 		
 		postService.removeTagFromPost(post, tag2);
 
-        Assertions.assertEquals(tag1.getPosts(), new ArrayList<>());
+        	Assertions.assertEquals(tag1.getPosts(), new ArrayList<>());
 		Assertions.assertEquals(tag2.getPosts(), new ArrayList<>());
 		Assertions.assertEquals(post.getTags(), new ArrayList<>());
-		Assertions.assertEquals(0, post.getProductsInPost().size());
 
 		Mockito.verify(postRepository, Mockito.atLeastOnce()).save(post);
-        Mockito.verify(tagRepository, Mockito.atLeastOnce()).save(tag1);
+        	Mockito.verify(tagRepository, Mockito.atLeastOnce()).save(tag1);
 		Mockito.verify(tagRepository, Mockito.atLeastOnce()).save(tag2);
 	
 	}

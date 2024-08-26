@@ -20,6 +20,7 @@ public class PostService extends CrudServiceImpl<Post, Long> implements PostServ
 
     private ReviewRepository reviewRepository;
     private PostRepository postRepository;
+    private OrderProductRepository orderProductRepository;
     private ProductRepository productRepository;
     private ImageRepository imageRepository;
     private TagRepository tagRepository;
@@ -30,7 +31,7 @@ public class PostService extends CrudServiceImpl<Post, Long> implements PostServ
         boolean flag = false;
 
         for(var order : user.getOrders()){
-            if (order.getProducts().containsKey(product)) {
+            if (orderProductRepository.existsByOrderAndProduct(order, product)) {
                 flag = true;
                 break;
             }
@@ -249,7 +250,7 @@ public class PostService extends CrudServiceImpl<Post, Long> implements PostServ
         return postRepository.save(post);
     }
 
-    public Post deleteReviewFromPost(Post post, Review review, User user){
+    public Post deleteReviewFromPost(Post post, Review review, User user) throws IllegalArgumentException{
         if (!userRepository.existsById(user.getID())){
             throw new IllegalArgumentException("There is not user with id: " + user.getID());
         }
@@ -277,6 +278,22 @@ public class PostService extends CrudServiceImpl<Post, Long> implements PostServ
         userRepository.save(user);
 
         return postRepository.save(post);
+    }
+
+    public double getAVGPostRating(Post post) throws IllegalArgumentException{
+        if (!postRepository.existsById(post.getID())){
+            throw new IllegalArgumentException("There is not post with id: " + post.getID());
+        }
+
+        return postRepository.getAVGRatingById(post.getID());
+    }
+
+    public Long getPostViews(Post post) throws IllegalArgumentException{
+        if (!postRepository.existsById(post.getID())){
+            throw new IllegalArgumentException("There is not post with id: " + post.getID());
+        }
+
+        return post.getViews();
     }
 
     @Override

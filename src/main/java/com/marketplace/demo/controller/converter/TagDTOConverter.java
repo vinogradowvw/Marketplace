@@ -19,10 +19,9 @@ public class TagDTOConverter implements DTOConverter<TagDTO, Tag> {
 
     @Override
     public TagDTO toDTO(Tag tag) {
+
         List<Long> postsId = new ArrayList<>();
-
         Optional<List<Post>> optPosts = Optional.ofNullable(tag.getPosts());
-
         if (optPosts.isPresent()) {
             for (Post post : tag.getPosts()){
                 postsId.add(post.getID());
@@ -39,16 +38,10 @@ public class TagDTOConverter implements DTOConverter<TagDTO, Tag> {
         tag.setName(tagDTO.name());
 
         List<Post> posts = new ArrayList<>();
-
-        Optional<List<Long>> postList = Optional.ofNullable(tagDTO.posts());
-
-        if (postList.isPresent()){
-            for (Long id : postList.get()){
-                Optional<Post> optPost = postService.readById(id);
-                optPost.ifPresent(posts::add);
-            }
+        for (Long id : tagDTO.posts()){
+            Optional<Post> optPost = postService.readById(id);
+            optPost.ifPresent(posts::add);
         }
-
         tag.setPosts(posts);
 
         return tag;

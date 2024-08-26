@@ -1,7 +1,6 @@
 package com.marketplace.demo.domain;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,11 +15,12 @@ public class Image implements EntityWithId<Long> {
     @Column(name = "id_image")
     private Long id;
 
-    @NotBlank(message="Path can not be empty")
-    private String path;
+    //@NotBlank(message="Path can not be empty")
+    private String name;
+    private String extension;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_post")
+    @JoinColumn(name = "id_post", referencedColumnName = "id_post")
     private Post post;
 
     @Override

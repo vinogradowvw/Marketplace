@@ -18,17 +18,17 @@ public class Post implements EntityWithId<Long> {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id_post")
     private Long id;
-    @NotBlank(message = "Name can not be empty")
+    //@NotBlank(message = "Name can not be empty")
     private String name;
     private String description;
+    private Long views = 0L;
 
     @OneToOne(targetEntity = Product.class, mappedBy = "post")
     private Product product;
     @ManyToOne
-    @JoinColumn(name = "id_user")
-    @NotBlank
+    @JoinColumn(name = "id_user", referencedColumnName = "id_user")
     private User user;
-    @ManyToMany
+    @ManyToMany(targetEntity = User.class)
     @JoinTable(
             name = "likes",
             joinColumns = @JoinColumn(name="id_user"),

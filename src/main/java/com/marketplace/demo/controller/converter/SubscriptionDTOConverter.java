@@ -17,21 +17,11 @@ public class SubscriptionDTOConverter implements DTOConverter<SubscriptionDTO, S
 
     @Override
     public SubscriptionDTO toDTO(Subscription subscription) {
-        Optional<User> optUser = Optional.ofNullable(subscription.getUser());
-        Optional<User> optSubscriber = Optional.ofNullable(subscription.getSubscriber());
 
-        if (optUser.isPresent() && optSubscriber.isPresent()) {
-            return new SubscriptionDTO(subscription.getID(), subscription.getTimestamp(), optSubscriber.get().getID(), optUser.get().getID());
-        }
-        else if (optUser.isPresent()) {
-            return new SubscriptionDTO(subscription.getID(), subscription.getTimestamp(), null, optUser.get().getID());
-        }
-        else if (optSubscriber.isPresent()) {
-            return new SubscriptionDTO(subscription.getID(), subscription.getTimestamp(), optSubscriber.get().getID(), null);
-        }
-        else{
-            return new SubscriptionDTO(subscription.getID(), subscription.getTimestamp(), null, null);
-        }
+        Long userId = Optional.ofNullable(subscription.getUser()).map(User::getID).orElse(null);
+        Long subId = Optional.ofNullable(subscription.getSubscriber()).map(User::getID).orElse(null);
+
+        return new SubscriptionDTO(subscription.getID(), subscription.getTimestamp(), subId, userId);
     }
 
     @Override
@@ -40,36 +30,11 @@ public class SubscriptionDTOConverter implements DTOConverter<SubscriptionDTO, S
         subscription.setId(subscriptionDTO.id());
         subscription.setTimestamp(subscriptionDTO.timestamp());
 
-        Optional<Long> optUserId = Optional.ofNullable(subscriptionDTO.user());
-        Optional<Long> optSubscriberId = Optional.ofNullable(subscriptionDTO.subscriber());
+        User user = userService.readById(subscriptionDTO.user()).orElse(null);
+        User sub = userService.readById(subscriptionDTO.subscriber()).orElse(null);
 
-        Optional<User> user = Optional.empty();
-        Optional<User> subscriber = Optional.empty();
-
-        if (optUserId.isPresent()){
-            user = userService.readById(optUserId.get());
-        }
-
-        if (optSubscriberId.isPresent()){
-            subscriber = userService.readById(optSubscriberId.get());
-        }
-
-        if (user.isPresent() && subscriber.isPresent()){
-            subscription.setUser(user.get());
-            subscription.setSubscriber(subscriber.get());
-        }
-        else if (subscriber.isPresent()){
-            subscription.setSubscriber(subscriber.get());
-            subscription.setUser(null);
-        }
-        else if (user.isPresent()){
-            subscription.setUser(user.get());
-            subscription.setSubscriber(null);
-        }
-        else{
-            subscription.setSubscriber(null);
-            subscription.setUser(null);
-        }
+        subscription.setUser(user);
+        subscription.setSubscriber(sub);
 
         return subscription;
     }

@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -18,9 +19,9 @@ public class Product implements EntityWithId<Long> {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id_product")
     private Long id;
-    @NotBlank(message = "Price can not be empty")
+    //@NotBlank(message = "Price can not be empty")
     private Integer price;
-    @NotBlank(message = "Name can not be empty")
+    //@NotBlank(message = "Name can not be empty")
     private String name;
     private String description;
 
@@ -28,14 +29,27 @@ public class Product implements EntityWithId<Long> {
     @JoinColumn(name = "id_post", referencedColumnName = "id_post")
     private Post post;
 
-    @ManyToMany(mappedBy = "products")
-    private List<Order> orders = new ArrayList<>();
+    @OneToMany(mappedBy = "product")
+    private List<OrderProduct> orders = new ArrayList<>();
 
-    @ManyToMany(mappedBy = "products")
-    private List<Cart> carts = new ArrayList<>();
+    @OneToMany(mappedBy = "product")
+    private List<CartProduct> carts = new ArrayList<>();
 
     @Override
     public Long getID() {
         return id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Product product = (Product) o;
+        return Objects.equals(id, product.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
