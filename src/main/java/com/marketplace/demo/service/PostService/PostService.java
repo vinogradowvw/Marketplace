@@ -4,6 +4,7 @@ package com.marketplace.demo.service.PostService;
 import com.marketplace.demo.domain.*;
 import com.marketplace.demo.persistance.*;
 import com.marketplace.demo.service.CrudServiceImpl;
+import com.marketplace.demo.service.ImageService.ImageService;
 import com.marketplace.demo.service.ReviewService.ReviewService;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,10 @@ import java.util.Optional;
 @AllArgsConstructor
 public class PostService extends CrudServiceImpl<Post, Long> implements PostServiceInterface {
 
+    private CartRepository cartRepository;
+    private CartProductRepository cartProductRepository;
+    private OrderRepository orderRepository;
+    private ImageService imageService;
     private ReviewRepository reviewRepository;
     private PostRepository postRepository;
     private OrderProductRepository orderProductRepository;
@@ -308,6 +313,57 @@ public class PostService extends CrudServiceImpl<Post, Long> implements PostServ
         if (!post.getUser().getID().equals(user.getID())){
             post.setViews(post.getViews() + 1);
         }
+    }
+
+    @Override
+    public void deleteById(Long id) throws IllegalArgumentException {
+        if (!postRepository.existsById(id)){
+            throw new IllegalArgumentException("There is not post with id: " + id);
+        }
+
+        Post post = postRepository.findById(id).get();
+
+        for (User user : post.getLikedUsers()) {
+            user.getLikes().remove(post);
+            userRepository.save(user);
+        }
+
+        for (Tag tag : post.getTags()) {
+            tag.getPosts().remove(post);
+            tagRepository.save(tag);
+        }
+
+        for (Image image : post.getImages()) {
+            imageService.deleteById(image.getID());
+        }
+
+        for (Review review : post.getReviews()){
+            User author = review.getAuthor();
+            author.getReviews().remove(review);
+            userRepository.save(author);
+
+            reviewRepository.deleteById(review.getID());
+        }
+
+        post.getUser().getPosts().remove(post);
+        userRepository.save(post.getUser());
+
+        Product product = post.getProduct();
+        for (OrderProduct oP : product.getOrders()){
+            oP.getOrder().getProducts().remove(oP);
+            orderRepository.save(oP.getOrder());
+
+            orderProductRepository.deleteById(oP.getId());
+        }
+        for (CartProduct cP : product.getCarts()){
+            cP.getCart().getProducts().remove(cP);
+            cartRepository.save(cP.getCart());
+
+            cartProductRepository.deleteById(cP.getId());
+        }
+        productRepository.deleteById(post.getProduct().getID());
+
+        postRepository.deleteById(post.getID());
     }
 
     @Override

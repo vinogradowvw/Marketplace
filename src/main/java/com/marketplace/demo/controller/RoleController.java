@@ -42,12 +42,6 @@ public class RoleController {
 
     @DeleteMapping(path = "/{id}")
     public void deleteRole(@PathVariable("id") Long id) {
-        Role role = roleService.readById(id).get();
-
-        for (User u : role.getUsers()) {
-            userService.removeRoleFromUser(u, role);
-        }
-
         roleService.deleteById(id);
     }
 }

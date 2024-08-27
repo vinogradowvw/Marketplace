@@ -56,8 +56,8 @@ public class CartController {
         return productDTOLongMap;
     }
 
-    @PostMapping(path = "/{idCart}/product/{idProduct}")
-    public CartDTO addProduct(@PathVariable("idCart") Long idCart, @PathVariable("idProduct") Long idProduct,
+    @PostMapping(path = "/{idCart}/product")
+    public CartDTO addProduct(@PathVariable("idCart") Long idCart, @RequestParam("idProduct") Long idProduct,
                               @RequestParam("quantity") Long quantity) {
 
         Cart cart = cartService.readById(idCart).get();

@@ -53,11 +53,10 @@ public class TagController {
         Tag tag = dtoConverter.toEntity(tagDTO);
         Optional<Tag> oldTag = tagService.readById(id);
 
-        oldTag.ifPresent(value -> tag.setPosts(value.getPosts()));
-        tag.setId(id);
+        oldTag.ifPresent(value -> value.setName(tag.getName()));
 
-        tagService.update(id, tag);
-        return dtoConverter.toDTO(tag);
+        tagService.update(id, oldTag.get());
+        return dtoConverter.toDTO(oldTag.get());
     }
 
     @GetMapping(path = "/{id}/posts")
@@ -76,14 +75,6 @@ public class TagController {
 
     @DeleteMapping(path = "/{id}")
     public void deleteTag(@PathVariable("id") Long id){
-        Optional<Tag> tag = tagService.readById(id);
-
-        if (tag.isPresent()) {
-            for (Post post : tag.get().getPosts()) {
-                postService.removeTagFromPost(post, tag.get());
-            }
-        }
-
         tagService.deleteById(id);
     }
 }
