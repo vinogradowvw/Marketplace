@@ -1,10 +1,13 @@
-from VectorObject import VectorObject
+from .VectorObject import VectorObject
 
 
 class UserVec(VectorObject):
 
     weight_count: int
 
-    @property
-    def collection_name(self) -> str:
+    @staticmethod
+    def collection_name() -> str:
         return 'user'
+
+    def __init__(self, **data):
+        super().__init__(**data)

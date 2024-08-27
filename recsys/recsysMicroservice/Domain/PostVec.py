@@ -1,8 +1,8 @@
-from VectorObject import VectorObject
+from .VectorObject import VectorObject
 
 
 class PostVec(VectorObject):
-    
-    @property
-    def collection_name(self) -> str:
+
+    @staticmethod
+    def collection_name() -> str:
         return 'post'

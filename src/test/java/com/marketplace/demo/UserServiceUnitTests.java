@@ -132,7 +132,7 @@ class UserServiceUnitTests {
 
 	@Test
 	public void getSubscribedUsers() {
-		List<User> subscribedUsers = userService.getSubscribedUsers(user);
+		List<User> subscribedUsers = userService.getSubscription(user);
 
 		for (User sub : subscribedUsers) {
 			Assertions.assertTrue(checkSubscriptions(user, sub));

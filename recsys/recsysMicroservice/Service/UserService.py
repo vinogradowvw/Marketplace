@@ -4,9 +4,9 @@ import numpy as np
 
 from injector import inject
 
-from Domain.UserVec import UserVec
-from Repository.PostVecRepository import PostVecRepository
-from Repository.UserVecRepository import UserVecRepository
+from ..Domain.UserVec import UserVec
+from ..Repository.PostVecRepository import PostVecRepository
+from ..Repository.UserVecRepository import UserVecRepository
 
 
 class UserService:
@@ -18,20 +18,26 @@ class UserService:
 
     def get_recommended_users_by_user_id(self, user_id: int, n: int) -> List[int]:
         user = self.__user_vec_repo.find_by_id(user_id)
-        users = self.__user_vec_repo.find_similar(user.vector, n)
+        users = self.__user_vec_repo.find_similar(user, n)
         user_ids = [user.id for user in users]
         return user_ids
 
     def update_users_vector(self, user_id: int, post_id: int, weight: int):
 
-        post_vector = np.array(self.__post_vec_repo.find_by_id(post_id).vector)
-
+        post = self.__post_vec_repo.find_by_id(post_id)
         old_user = self.__user_vec_repo.find_by_id(user_id)
-        old_user_vector = np.array(old_user.vector)
+        new_user = UserVec(id=user_id, weight_count=old_user.weight_count)
 
-        new_user_vector = (old_user_vector * old_user.weight_count + weight * post_vector) / \
+        for vector in ["bert_descr_vector", "tfidf_descr_vector", "image_vector", "tags_vector"]:
+
+            post_vector = np.array(getattr(post, vector))
+            old_user_vector = np.array(getattr(old_user, vector))
+
+            new_user_vector = (old_user_vector * old_user.weight_count + weight * post_vector) / \
                           (old_user.weight_count + weight)
 
-        new_user = UserVec(id=user_id, vector=new_user_vector.tolist(), weight_count=old_user.weight_count + weight)
+            setattr(new_user, vector, new_user_vector)
+
+        new_user.weight_count = old_user.weight_count + weight
 
         self.__user_vec_repo.upsert(new_user)
