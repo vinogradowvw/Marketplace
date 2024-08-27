@@ -72,7 +72,6 @@ class PostServiceUnitTests {
 
 		post = new Post();
 		post.setId(1L);
-		post.setDescription("testDescr");
 		post.setImages(new ArrayList<>());
 		post.setTags(new ArrayList<>());
 
@@ -119,7 +118,7 @@ class PostServiceUnitTests {
 		Assertions.assertEquals(2, post.getImages().size());
 
 		Mockito.verify(postRepository, Mockito.atLeastOnce()).save(post);
-        	Mockito.verify(imageRepository, Mockito.atLeastOnce()).save(image1);
+		Mockito.verify(imageRepository, Mockito.atLeastOnce()).save(image1);
 		Mockito.verify(imageRepository, Mockito.atLeastOnce()).save(image2);
 
 	}
@@ -158,7 +157,7 @@ class PostServiceUnitTests {
 		Assertions.assertTrue(post.getTags().contains(tag1));
 		Assertions.assertTrue(post.getTags().contains(tag2));
 
-        	Assertions.assertTrue(tag1.getPosts().contains(post));
+		Assertions.assertTrue(tag1.getPosts().contains(post));
 		Assertions.assertTrue(tag2.getPosts().contains(post));
 
 		Assertions.assertEquals(2, post.getTags().size());
@@ -185,7 +184,7 @@ class PostServiceUnitTests {
 		
 		postService.removeTagFromPost(post, tag2);
 
-        	Assertions.assertEquals(tag1.getPosts(), new ArrayList<>());
+		Assertions.assertEquals(tag1.getPosts(), new ArrayList<>());
 		Assertions.assertEquals(tag2.getPosts(), new ArrayList<>());
 		Assertions.assertEquals(post.getTags(), new ArrayList<>());
 

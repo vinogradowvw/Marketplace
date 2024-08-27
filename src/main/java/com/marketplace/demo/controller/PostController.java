@@ -150,7 +150,7 @@ public class PostController {
         return postService.getPostViews(postService.readById(id).get());
     }
 
-    @PostMapping(path = "/{id]/views")
+    @PostMapping(path = "/{id}/views")
     public void addView(@PathVariable("id") Long id, @RequestParam Long userId){
         postService.addView(postService.readById(id).get(), userService.readById(userId).get());
     }
