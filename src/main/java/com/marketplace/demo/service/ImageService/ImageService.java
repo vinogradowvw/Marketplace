@@ -45,8 +45,6 @@ public class ImageService extends CrudServiceImpl<Image, Long> implements ImageS
         }
 
         Image image = imageRepository.findById(id).get();
-
-
         minIOComponent.deleteObject(image.getName());
 
         getRepository().deleteById(id);

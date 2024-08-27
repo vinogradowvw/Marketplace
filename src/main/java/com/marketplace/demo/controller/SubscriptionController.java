@@ -18,7 +18,7 @@ import lombok.AllArgsConstructor;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping(value = "/subscribtion", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/subscription", produces = MediaType.APPLICATION_JSON_VALUE)
 public class SubscriptionController {
 
     private SubscriptionDTOConverter subscriptionConverter;

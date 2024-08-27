@@ -4,6 +4,7 @@ import com.marketplace.demo.domain.*;
 import com.marketplace.demo.persistance.*;
 import com.marketplace.demo.service.CartService.CartService;
 import com.marketplace.demo.service.CrudServiceImpl;
+import com.marketplace.demo.service.ImageService.ImageService;
 import com.marketplace.demo.service.SubscriptionService.SubscriptionService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.repository.CrudRepository;
@@ -21,11 +22,21 @@ import java.util.Optional;
 @AllArgsConstructor
 public class UserService extends CrudServiceImpl<User, Long> implements UserServiceInterface {
 
-    private final SubscriptionService subscriptionService;
+    private ReviewRepository reviewRepository;
+    private SubscriptionService subscriptionService;
+    private PostRepository postRepository;
     private UserRepository userRepository;
     private SubscriptionRepository subscriptionRepository;
     private RoleRepository roleRepository;
     private CartService cartService;
+    private OrderRepository orderRepository;
+    private ProductRepository productRepository;
+    private OrderProductRepository orderProductRepository;
+    private PaymentRepository paymentRepository;
+    private CartRepository cartRepository;
+    private TagRepository tagRepository;
+    private CartProductRepository cartProductRepository;
+    private ImageService imageService;
 
     @Override
     public User create(User user){
@@ -61,6 +72,90 @@ public class UserService extends CrudServiceImpl<User, Long> implements UserServ
         Cart cart = user.getCart();
         cartService.clearCart(cart);
         cartService.deleteById(cart.getID());
+
+        user.getSubscribers().forEach(s -> {
+            s.getSubscriber().getSubscriptions().remove(s);
+            userRepository.save(s.getSubscriber());
+
+            subscriptionRepository.delete(s);
+        });
+
+        user.getSubscriptions().forEach(s -> {
+            s.getUser().getSubscribers().remove(s);
+            userRepository.save(s.getUser());
+
+            subscriptionRepository.delete(s);
+        });
+
+        for (Post likes : user.getLikes()){
+            likes.getLikedUsers().remove(likes.getUser());
+            postRepository.save(likes);
+        }
+
+        for (Order order : user.getOrders()){
+            for (OrderProduct oP : order.getProducts()){
+                oP.getProduct().getOrders().remove(oP);
+                productRepository.save(oP.getProduct());
+
+                orderProductRepository.deleteById(oP.getId());
+            }
+            paymentRepository.deleteById(order.getPayment().getID());
+
+            orderRepository.deleteById(id);
+        }
+
+        for (Post post : user.getPosts()){
+            for (User us : post.getLikedUsers()) {
+                us.getLikes().remove(post);
+                userRepository.save(us);
+            }
+
+            for (Tag tag : post.getTags()) {
+                tag.getPosts().remove(post);
+                tagRepository.save(tag);
+            }
+
+            for (Image image : post.getImages()) {
+                imageService.deleteById(image.getID());
+            }
+
+            for (Review review : post.getReviews()){
+                User author = review.getAuthor();
+                author.getReviews().remove(review);
+                userRepository.save(author);
+
+                reviewRepository.deleteById(review.getID());
+            }
+
+            Product product = post.getProduct();
+            for (OrderProduct oP : product.getOrders()){
+                oP.getOrder().getProducts().remove(oP);
+                orderRepository.save(oP.getOrder());
+
+                orderProductRepository.deleteById(oP.getId());
+            }
+            for (CartProduct cP : product.getCarts()){
+                cP.getCart().getProducts().remove(cP);
+                cartRepository.save(cP.getCart());
+
+                cartProductRepository.deleteById(cP.getId());
+            }
+            productRepository.deleteById(post.getProduct().getID());
+
+            postRepository.deleteById(post.getID());
+        }
+
+        for (Role role : user.getRoles()){
+            role.getUsers().remove(user);
+            roleRepository.save(role);
+        }
+
+        for (Review review : user.getReviews()){
+            review.getPost().getReviews().remove(review);
+            postRepository.save(review.getPost());
+
+            reviewRepository.deleteById(review.getID());
+        }
 
         userRepository.deleteById(id);
     }
@@ -175,7 +270,7 @@ public class UserService extends CrudServiceImpl<User, Long> implements UserServ
         throw new IllegalArgumentException("User with ID " + user.getID() + " does not exists");
     }
 
-    public List<User> getSubscribedUsers(User user){
+    public List<User> getSubscription(User user){
         if (userRepository.existsById(user.getID())){
             List<User> subscribedUsers = new ArrayList<>();
 

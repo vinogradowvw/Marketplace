@@ -1,6 +1,7 @@
 package com.marketplace.demo.controller;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -121,8 +122,8 @@ public class PostController {
         return postConverter.toDTO(post);
     }
 
-    @PostMapping(path = "/{postId}/likeByUser/{userId}")
-    public PostDTO likePost(@PathVariable("postId") Long postId, @PathVariable("userId") Long userId) {
+    @PostMapping(path = "/{postId}/like")
+    public PostDTO likePost(@PathVariable("postId") Long postId, @RequestParam Long userId) {
         Post post = postService.likePost(postService.readById(postId).get(), userService.readById(userId).get());
         return postConverter.toDTO(post);
     }
@@ -145,7 +146,7 @@ public class PostController {
     }
 
     @GetMapping(path = "/{id}/views")
-    public double getPostViews(@PathVariable("id") Long id){
+    public Long getPostViews(@PathVariable("id") Long id){
         return postService.getPostViews(postService.readById(id).get());
     }
 
@@ -156,34 +157,6 @@ public class PostController {
 
     @DeleteMapping(path = "/{id}")
     public void deletePost(@PathVariable("id") Long id) {
-
-        Optional<Post> post = postService.readById(id);
-        
-        if (post.isPresent()) {
-            for (User user : post.get().getLikedUsers()) {
-                postService.likePost(post.get(), user);
-            }
-
-            for (Tag tag : post.get().getTags()) {
-                postService.removeTagFromPost(post.get(), tag);
-            }
-
-            for (Image image : post.get().getImages()) {
-                imageService.deleteById(image.getID());
-            }
-
-            for (Review review : post.get().getReviews()){
-                User author = review.getAuthor();
-                author.getReviews().remove(review);
-
-                reviewService.deleteById(review.getID());
-            }
-
-            post.get().getUser().getPosts().remove(post.get());
-
-            productService.deleteById(post.get().getProduct().getID());
-        }
-        
         postService.deleteById(id);
     }
 
