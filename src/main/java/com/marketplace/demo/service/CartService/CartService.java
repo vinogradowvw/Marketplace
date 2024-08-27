@@ -39,7 +39,7 @@ public class CartService extends CrudServiceImpl<Cart, Long> implements CartServ
             CartProduct.CartProductId cartProductId = new CartProduct.CartProductId(cart.getID(), product.getID());
             CartProduct cartProduct = cartProductRepository.findById(cartProductId).get();
 
-            cartProduct.setQuantity(quantity);
+            cartProduct.setQuantity(quantity + cartProduct.getQuantity());
             cartProductRepository.save(cartProduct);
 
             return cartRepository.save(cart);
@@ -72,7 +72,7 @@ public class CartService extends CrudServiceImpl<Cart, Long> implements CartServ
             throw new IllegalArgumentException("There is no product with id: " + product.getID());
         }
 
-        if (cartProductRepository.existsByCartAndProduct(cart, product)){
+        if (!cartProductRepository.existsByCartAndProduct(cart, product)){
             throw new IllegalArgumentException("There is no product with id: " + product.getID() + " in the cart.");
         }
 
@@ -171,14 +171,14 @@ public class CartService extends CrudServiceImpl<Cart, Long> implements CartServ
                 .mapToLong(entry -> entry.getProduct().getPrice() * entry.getQuantity())
                 .sum();
         payment.setAmount(amount);
+        paymentService.create(payment);
 
         savedOrder.setPayment(payment);
-
-        paymentService.create(payment);
+        orderRepository.save(savedOrder);
 
         this.clearCart(cart);
 
-        return orderRepository.save(savedOrder);
+        return savedOrder;
     }
 
     @Override
