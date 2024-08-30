@@ -42,7 +42,7 @@ public class ReviewController {
         return dtoConverter.toDTO(review);
     }
 
-    @PutMapping
+    @PutMapping(path = "/{id}")
     public ReviewDTO updateReview(@PathVariable("id") Long id, @RequestBody ReviewDTO reviewDTO) {
         Review oldReview = reviewService.readById(id).get();
 
@@ -55,7 +55,7 @@ public class ReviewController {
         return dtoConverter.toDTO(oldReview);
     }
 
-    @DeleteMapping
+    @DeleteMapping(path = "/{id}")
     public void deleteReview(@PathVariable("id") Long id) {
         Review review = reviewService.readById(id).get();
 
