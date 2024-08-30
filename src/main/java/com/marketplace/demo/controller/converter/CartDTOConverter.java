@@ -6,7 +6,6 @@ import com.marketplace.demo.domain.CartProduct;
 import com.marketplace.demo.domain.Product;
 import com.marketplace.demo.domain.User;
 import com.marketplace.demo.persistance.CartProductRepository;
-import com.marketplace.demo.persistance.CartRepository;
 import com.marketplace.demo.service.ProductService.ProductService;
 import com.marketplace.demo.service.UserService.UserService;
 import lombok.AllArgsConstructor;

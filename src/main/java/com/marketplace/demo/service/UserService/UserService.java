@@ -284,6 +284,15 @@ public class UserService extends CrudServiceImpl<User, Long> implements UserServ
         throw new IllegalArgumentException("User with ID " + user.getID() + " does not exists");
     }
 
+    public User findByUsername(String username){
+        Optional<User> user = userRepository.findByUsername(username);
+
+        if (user.isPresent()){
+            return user.get();
+        } else{
+            throw new IllegalArgumentException("User with username " + username + " does not exists");
+        }
+    }
 
     @Override
     protected CrudRepository<User, Long> getRepository() {
