@@ -55,10 +55,18 @@ public class OrderDTOConverter implements DTOConverter<OrderDTO, Order> {
         }
         order.setProducts(products);
 
-        User user = userService.readById(orderDTO.userId()).orElse(null);
+        User user = null;
+        Optional<Long> userId = Optional.ofNullable(orderDTO.userId());
+        if (userId.isPresent()) {
+            user = userService.readById(userId.get()).orElse(null);
+        }
         order.setUser(user);
 
-        Payment payment = paymentService.readById(orderDTO.paymentId()).orElse(null);
+        Payment payment = null;
+        Optional<Long> paymentId = Optional.ofNullable(orderDTO.paymentId());
+        if (paymentId.isPresent()) {
+            payment = paymentService.readById(paymentId.get()).orElse(null);
+        }
         order.setPayment(payment);
 
         return order;

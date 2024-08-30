@@ -35,8 +35,18 @@ public class ReviewDTOConverter implements DTOConverter<ReviewDTO, Review> {
         review.setDescription(reviewDTO.description());
         review.setRating(reviewDTO.rating());
 
-        User user = userService.readById(reviewDTO.author()).orElse(null);
-        Post post = postService.readById(reviewDTO.post()).orElse(null);
+        User user = null;
+        Post post = null;
+
+        Optional<Long> userId = Optional.ofNullable(reviewDTO.author());
+        if (userId.isPresent()) {
+            user = userService.readById(userId.get()).orElse(null);
+        }
+
+        Optional<Long> postId = Optional.ofNullable(reviewDTO.post());
+        if (postId.isPresent()) {
+            post = postService.readById(postId.get()).orElse(null);
+        }
 
         review.setAuthor(user);
         review.setPost(post);

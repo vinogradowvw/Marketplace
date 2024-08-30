@@ -41,11 +41,11 @@ public class CartDTOConverter implements DTOConverter<CartDTO, Cart> {
         cart.setId(cartDTO.id());
         cart.setTimestamp(cartDTO.timestamp());
 
-        Optional<User> userOpt = userService.readById(cartDTO.User());
-        User user = null;
 
-        if (userOpt.isPresent()) {
-            user = userOpt.get();
+        User user = null;
+        Optional<Long> userId = Optional.ofNullable(cartDTO.User());
+        if (userId.isPresent()) {
+            user = userService.readById(userId.get()).orElse(null);
         }
         cart.setUser(user);
 

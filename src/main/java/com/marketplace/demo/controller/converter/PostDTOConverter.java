@@ -79,15 +79,23 @@ public class PostDTOConverter implements DTOConverter<PostDTO, Post> {
         post.setName(postDTO.name());
         post.setViews(postDTO.views());
 
-        Product product = productService.readById(postDTO.product()).orElse(null);
+        Product product = null;
+        Optional<Long> productId = Optional.ofNullable(postDTO.product());
+        if (productId.isPresent()) {
+            product = productService.readById(productId.get()).orElse(null);
+        }
         post.setProduct(product);
 
-        User user = userService.readById(postDTO.user()).orElse(null);
+        User user = null;
+        Optional<Long> userId = Optional.ofNullable(postDTO.user());
+        if (userId.isPresent()) {
+            user = userService.readById(userId.get()).orElse(null);
+        }
         post.setUser(user);
 
         List<User> likedUsers = new ArrayList<>();
-        for (Long userId : postDTO.likedUsers()) {
-            User likedUser = userService.readById(userId).orElse(null);
+        for (Long likedIds : postDTO.likedUsers()) {
+            User likedUser = userService.readById(likedIds).orElse(null);
 
             likedUsers.add(likedUser);
         }

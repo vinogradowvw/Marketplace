@@ -30,7 +30,11 @@ public class PaymentDTOConverter implements DTOConverter<PaymentDTO, Payment> {
         payment.setAmount(paymentDTO.amount());
         payment.setTimestamp(paymentDTO.timestamp());
 
-        Order order = orderService.readById(paymentDTO.orderId()).orElse(null);
+        Order order = null;
+        Optional<Long> orderId = Optional.ofNullable(paymentDTO.orderId());
+        if (orderId.isPresent()) {
+            order = orderService.readById(orderId.get()).orElse(null);
+        }
         payment.setOrder(order);
 
         return payment;
