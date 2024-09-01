@@ -84,7 +84,7 @@ public class ImageController {
 
                 HttpHeaders headers = new HttpHeaders();
                 headers.add(HttpHeaders.CONTENT_TYPE, contentType);
-                headers.add(HttpHeaders.CONTENT_LENGTH, String.valueOf(content.get().available()));
+                headers.add(HttpHeaders.CONTENT_LENGTH, String.valueOf(minIOComponent.getFileSize(image.get().getName())));
 
                 return new ResponseEntity<>(new InputStreamResource(content.get()), headers, HttpStatus.OK);
             }

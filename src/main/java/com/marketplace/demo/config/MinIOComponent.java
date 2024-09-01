@@ -1,9 +1,6 @@
 package com.marketplace.demo.config;
 
-import io.minio.GetObjectArgs;
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
-import io.minio.RemoveObjectArgs;
+import io.minio.*;
 import io.minio.errors.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,6 +44,20 @@ public class MinIOComponent {
                 }
             }
         }
+    }
+
+    public long getFileSize(String name){
+        StatObjectArgs args = StatObjectArgs.builder().bucket(bucketName).object(name).build();
+        try {
+            StatObjectResponse stat = minioClient.statObject(args);
+            return stat.size();
+        } catch (ErrorResponseException | InsufficientDataException | InternalException | InvalidKeyException |
+                 InvalidResponseException | IOException | NoSuchAlgorithmException | ServerException |
+                 XmlParserException e) {
+            e.printStackTrace();
+        }
+
+        return 0L;
     }
 
     public Optional<InputStream> getObject(String objectName) {
