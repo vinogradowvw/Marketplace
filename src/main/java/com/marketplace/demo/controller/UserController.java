@@ -27,7 +27,7 @@ public class UserController {
     private final SubscriptionService subscriptionService;
     private final RoleService roleService;
 
-    @GetMapping//ok
+    @GetMapping
     public List<UserDTO> getAllUsers() {
         Iterable<User> users = userService.readAll();
         List<UserDTO> userDTOs = new ArrayList<>();
@@ -39,42 +39,42 @@ public class UserController {
         return userDTOs;
     }
 
-    @GetMapping(path = "/{id}")//ok
+    @GetMapping(path = "/{id}")
     public UserDTO getUserById(@PathVariable("id")Long id) {
         return userDTOConverter.toDTO(userService.readById(id).get());
     }
 
-    @GetMapping(path = "/{id}/likes")//ok
+    @GetMapping(path = "/{id}/likes")
     public List<PostDTO> getLikedPosts(@PathVariable("id")Long id){
         return userService.readById(id).get().getLikes().stream().map(postDTOConverter::toDTO).toList();
     }
 
-    @GetMapping(path = "/{id}/orders")//ok
+    @GetMapping(path = "/{id}/orders")
     public List<OrderDTO> getPayments(@PathVariable("id")Long id){
         return userService.readById(id).get().getOrders().stream().map(orderDTOConverter::toDTO).toList();
     }
 
-    @GetMapping(path = "/{id}/posts")//ok
+    @GetMapping(path = "/{id}/posts")
     public List<PostDTO> getPosts(@PathVariable("id")Long id){
         return userService.readById(id).get().getPosts().stream().map(postDTOConverter::toDTO).toList();
     }
 
-    @GetMapping(path = "/{id}/subscribers")//ok
+    @GetMapping(path = "/{id}/subscribers")
     public List<UserDTO> getSubscribers(@PathVariable("id")Long id){
         return userService.getSubscribers(userService.readById(id).get()).stream().map(userDTOConverter::toDTO).toList();
     }
 
-    @GetMapping(path = "/{id}/subscriptions")//ok
+    @GetMapping(path = "/{id}/subscriptions")
     public List<UserDTO> getSubscriptions(@PathVariable("id")Long id){
         return userService.getSubscription(userService.readById(id).get()).stream().map(userDTOConverter::toDTO).toList();
     }
 
-    @GetMapping(path = "/{id}/role")//ok
+    @GetMapping(path = "/{id}/role")
     public List<RoleDTO> getRoles(@PathVariable("id")Long id){
         return userService.readById(id).get().getRoles().stream().map(roleDTOConverter::toDTO).toList();
     }
 
-    @PostMapping//ok
+    @PostMapping
     public UserDTO createUser(@RequestBody UserDTO userDTO) {
         return userDTOConverter.toDTO(userService.create(userDTOConverter.toEntity(userDTO)));
     }
@@ -121,7 +121,7 @@ public class UserController {
         return userDTOConverter.toDTO(user);
     }
 
-    @PutMapping(path = "/{id}")//ok
+    @PutMapping(path = "/{id}")
     public UserDTO updateUser(@PathVariable ("id") Long id, @RequestBody UserDTO userDTO){
         User user = userDTOConverter.toEntity(userDTO);
         Optional<User> oldUser = userService.readById(id);
@@ -136,7 +136,7 @@ public class UserController {
         return userDTOConverter.toDTO(oldUser.get());
     }
 
-     @DeleteMapping(path = "/{id}")//ok
+     @DeleteMapping(path = "/{id}")
      public void deleteUser(@PathVariable("id") Long id){
          userService.deleteById(id);
      }

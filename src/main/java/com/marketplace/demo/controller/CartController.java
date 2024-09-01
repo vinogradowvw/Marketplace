@@ -30,7 +30,7 @@ public class CartController {
     private ProductService productService;
     private DTOConverter<OrderDTO, Order> orderDTOConverter;
 
-    @GetMapping//ok
+    @GetMapping
     public List<CartDTO> getAllCarts() {
         Iterable<Cart> carts = cartService.readAll();
         List<CartDTO> cartDTOList = new ArrayList<>();
@@ -40,12 +40,12 @@ public class CartController {
         return cartDTOList;
     }
 
-    @GetMapping(path = "/{id}")//ok
+    @GetMapping(path = "/{id}")
     public CartDTO getCartById(@PathVariable("id") Long id) {
         return cartDTOConverter.toDTO(cartService.readById(id).get());
     }
 
-    @GetMapping(path = "/{id}/products")//ok
+    @GetMapping(path = "/{id}/products")
     public Map<ProductDTO, Long> getProductsInCart(@PathVariable("id") Long id) {
         Map<ProductDTO, Long> productDTOLongMap = new HashMap<>();
 
@@ -56,7 +56,7 @@ public class CartController {
         return productDTOLongMap;
     }
 
-    @PostMapping(path = "/{idCart}/product")//ok
+    @PostMapping(path = "/{idCart}/product")
     public CartDTO addProduct(@PathVariable("idCart") Long idCart, @RequestParam("idProduct") Long idProduct,
                               @RequestParam("quantity") Long quantity) {
 
@@ -66,7 +66,7 @@ public class CartController {
         return cartDTOConverter.toDTO(cartService.addProduct(cart, product, quantity));
     }
 
-    @DeleteMapping(path = "/{idCart}/product/{idProduct}")//ok
+    @DeleteMapping(path = "/{idCart}/product/{idProduct}")
     public CartDTO deleteProduct(@PathVariable("idCart") Long idCart, @PathVariable("idProduct") Long idProduct,
                                  @RequestParam("quantity") Long quantity) {
 

@@ -28,7 +28,7 @@ public class ProductController {
     private ProductDTOConverter productConverter;
     private PostController postController;
 
-    @GetMapping//ok
+    @GetMapping
     public List<ProductDTO> getAllProducts() {
         Iterable<Product> products = productService.readAll();
         List<ProductDTO> productDTOs = new ArrayList<>();
@@ -40,17 +40,17 @@ public class ProductController {
         return productDTOs;
     }
 
-    @GetMapping(path = "/{id}")//ok
+    @GetMapping(path = "/{id}")
     public ProductDTO getProductById(@PathVariable("id") Long id) {
         return productConverter.toDTO(productService.readById(id).get());
     }
 
-    @PostMapping//ok
+    @PostMapping
     public ProductDTO createProduct(@RequestBody ProductDTO productDTO) {
         return productConverter.toDTO(productService.create(productConverter.toEntity(productDTO)));
     }
 
-    @PutMapping(path = "/{id}")//ok
+    @PutMapping(path = "/{id}")
     public ProductDTO updateProduct(@PathVariable("id") Long id, @RequestBody ProductDTO productDTO) {
         Optional<Product> oldProduct = productService.readById(id);
         Product product = productConverter.toEntity(productDTO);
