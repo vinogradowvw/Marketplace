@@ -24,7 +24,7 @@ public class SubscriptionController {
     private SubscriptionDTOConverter subscriptionConverter;
     private SubscriptionService subscriptionService;
 
-    @GetMapping(path = "/user/{id}")
+    @GetMapping(path = "/user/{id}")//ok
     public List<SubscriptionDTO> getAllSubscriptionsForUser(@PathVariable("id") Long id) {
         List<SubscriptionDTO> subscriptionDTOs = new ArrayList<>();
         List<Subscription> subscriptions = subscriptionService.findByUserId(id);
