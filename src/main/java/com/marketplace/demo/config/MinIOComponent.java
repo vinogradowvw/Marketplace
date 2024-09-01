@@ -61,11 +61,12 @@ public class MinIOComponent {
     }
 
     public Optional<InputStream> getObject(String objectName) {
-        try (InputStream stream = minioClient
-                .getObject(GetObjectArgs.builder()
-                        .bucket(bucketName)
-                        .object(objectName)
-                        .build());) {
+        try{
+            InputStream stream = minioClient
+                    .getObject(GetObjectArgs.builder()
+                    .bucket(bucketName)
+                    .object(objectName)
+                    .build());
             return Optional.ofNullable(stream);
         } catch (ErrorResponseException | InsufficientDataException |
                  InternalException | InvalidKeyException | InvalidResponseException |
