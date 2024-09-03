@@ -6,7 +6,6 @@ import com.marketplace.demo.domain.CartProduct;
 import com.marketplace.demo.domain.Product;
 import com.marketplace.demo.domain.User;
 import com.marketplace.demo.persistance.CartProductRepository;
-import com.marketplace.demo.persistance.CartRepository;
 import com.marketplace.demo.service.ProductService.ProductService;
 import com.marketplace.demo.service.UserService.UserService;
 import lombok.AllArgsConstructor;
@@ -42,11 +41,11 @@ public class CartDTOConverter implements DTOConverter<CartDTO, Cart> {
         cart.setId(cartDTO.id());
         cart.setTimestamp(cartDTO.timestamp());
 
-        Optional<User> userOpt = userService.readById(cartDTO.User());
-        User user = null;
 
-        if (userOpt.isPresent()) {
-            user = userOpt.get();
+        User user = null;
+        Optional<Long> userId = Optional.ofNullable(cartDTO.User());
+        if (userId.isPresent()) {
+            user = userService.readById(userId.get()).orElse(null);
         }
         cart.setUser(user);
 

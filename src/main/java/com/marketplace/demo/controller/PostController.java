@@ -59,7 +59,7 @@ public class PostController {
     }
 
     @PostMapping
-    public PostDTO createPost(PostDTO postDTO) {
+    public PostDTO createPost(@RequestBody PostDTO postDTO) {
         return postConverter.toDTO(postService.create(postConverter.toEntity(postDTO)));
     }
 

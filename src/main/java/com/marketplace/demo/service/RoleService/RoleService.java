@@ -10,6 +10,8 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @Transactional
 @AllArgsConstructor
@@ -32,6 +34,10 @@ public class RoleService extends CrudServiceImpl<Role, Long> implements RoleServ
         }
 
         roleRepository.deleteById(id);
+    }
+
+    public Optional<Role> findByName(String name) {
+        return roleRepository.findByName(name);
     }
 
     @Override

@@ -30,8 +30,18 @@ public class SubscriptionDTOConverter implements DTOConverter<SubscriptionDTO, S
         subscription.setId(subscriptionDTO.id());
         subscription.setTimestamp(subscriptionDTO.timestamp());
 
-        User user = userService.readById(subscriptionDTO.user()).orElse(null);
-        User sub = userService.readById(subscriptionDTO.subscriber()).orElse(null);
+        User user = null;
+        User sub = null;
+
+        Optional<Long> userId = Optional.ofNullable(subscriptionDTO.user());
+        if (userId.isPresent()) {
+            user = userService.readById(userId.get()).orElse(null);
+        }
+
+        Optional<Long> subId = Optional.ofNullable(subscriptionDTO.subscriber());
+        if (subId.isPresent()) {
+            sub = userService.readById(subId.get()).orElse(null);
+        }
 
         subscription.setUser(user);
         subscription.setSubscriber(sub);

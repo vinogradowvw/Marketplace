@@ -111,7 +111,14 @@ public class UserDTOConverter implements DTOConverter<UserDTO, User> {
         List<Role> roles = new ArrayList<>();
         List<Review> reviews = new ArrayList<>();
 
-        Cart cart = cartService.readById(userDTO.cart()).orElse(null);
+        Optional<Long> cartOpt = Optional.ofNullable(userDTO.cart());
+        if (cartOpt.isPresent()) {
+            Cart cart = cartService.readById(cartOpt.get()).get();
+            user.setCart(cart);
+        }
+        else {
+            user.setCart(null);
+        }
 
         for (Long likeId : userDTO.likes()) {
             Post post = postService.readById(likeId).orElse(null);
@@ -160,7 +167,6 @@ public class UserDTOConverter implements DTOConverter<UserDTO, User> {
         user.setOrders(orders);
         user.setSubscribers(subscribers);
         user.setSubscriptions(subscriptions);
-        user.setCart(cart);
         user.setRoles(roles);
         user.setReviews(reviews);
 

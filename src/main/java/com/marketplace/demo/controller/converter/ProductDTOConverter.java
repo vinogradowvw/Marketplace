@@ -4,9 +4,6 @@ import com.marketplace.demo.controller.dto.ProductDTO;
 import com.marketplace.demo.domain.*;
 import com.marketplace.demo.persistance.CartProductRepository;
 import com.marketplace.demo.persistance.OrderProductRepository;
-import com.marketplace.demo.service.CartService.CartService;
-import com.marketplace.demo.service.OrderService.OrderService;
-import com.marketplace.demo.service.PaymentService.PaymentService;
 import com.marketplace.demo.service.PostService.PostService;
 
 import lombok.AllArgsConstructor;
@@ -52,7 +49,11 @@ public class ProductDTOConverter implements DTOConverter<ProductDTO, Product> {
         product.setPrice(productDTO.price());
         product.setDescription(productDTO.description());
 
-        Post post = postService.readById(productDTO.post()).orElse(null);
+        Post post = null;
+        Optional<Long> postId = Optional.ofNullable(productDTO.post());
+        if (postId.isPresent()) {
+            post = postService.readById(postId.get()).orElse(null);
+        }
         product.setPost(post);
 
         ArrayList<OrderProduct> orders = new ArrayList<>();

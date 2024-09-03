@@ -44,10 +44,18 @@ public class ImageController {
     }
 
     @PostMapping
-    public ImageDTO uploadImage(@RequestBody ImageDTO imageDTO, @RequestParam("file") MultipartFile file){
-        
+    public ImageDTO createImage(@RequestBody ImageDTO imageDTO){
         Image image = imageDTOConverter.toEntity(imageDTO);
         Image newImage = imageService.create(image);
+
+        return imageDTOConverter.toDTO(newImage);
+    }
+
+
+    @PostMapping(path="/{id}")
+    public ImageDTO uploadImage(@PathVariable("id") Long id, @RequestParam("file") MultipartFile file){
+        
+        Image newImage = imageService.readById(id).get();
 
         try {
             InputStream in = new ByteArrayInputStream(file.getBytes());
@@ -76,7 +84,7 @@ public class ImageController {
 
                 HttpHeaders headers = new HttpHeaders();
                 headers.add(HttpHeaders.CONTENT_TYPE, contentType);
-                headers.add(HttpHeaders.CONTENT_LENGTH, String.valueOf(content.get().available()));
+                headers.add(HttpHeaders.CONTENT_LENGTH, String.valueOf(minIOComponent.getFileSize(image.get().getName())));
 
                 return new ResponseEntity<>(new InputStreamResource(content.get()), headers, HttpStatus.OK);
             }
