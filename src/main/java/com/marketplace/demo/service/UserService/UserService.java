@@ -7,8 +7,8 @@ import com.marketplace.demo.service.CrudServiceImpl;
 import com.marketplace.demo.service.ImageService.ImageService;
 import com.marketplace.demo.service.JWTService;
 import com.marketplace.demo.service.SubscriptionService.SubscriptionService;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -33,6 +33,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserService extends CrudServiceImpl<User, Long> implements UserServiceInterface, UserDetailsService {
 
+    @Value("${bcrypt.rounds}")
+    private int rounds;
+
     private final ReviewRepository reviewRepository;
     private final SubscriptionService subscriptionService;
     private final PostRepository postRepository;
@@ -48,7 +51,7 @@ public class UserService extends CrudServiceImpl<User, Long> implements UserServ
     private final TagRepository tagRepository;
     private final CartProductRepository cartProductRepository;
     private final ImageService imageService;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(12);
+    private final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(rounds);
     private final AuthenticationManager authManager;
     private final JWTService jwtService;
 
