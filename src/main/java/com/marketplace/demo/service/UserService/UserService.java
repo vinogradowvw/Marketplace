@@ -315,7 +315,11 @@ public class UserService extends CrudServiceImpl<User, Long> implements UserServ
                 new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword())
         );
 
-        authentication.isAuthenticated();
+        if (authentication.isAuthenticated()){
+            return jwtService.generateToken(user.getUsername());
+        }
+
+        throw new IllegalArgumentException("Failed authentication.");
     }
 
     @Override

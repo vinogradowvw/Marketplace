@@ -22,8 +22,8 @@ public class MainController {
     }
 
     @PostMapping(path = "/login")
-    public UserDTO login(@RequestBody UserDTO userDTO) {
-        userService.verify(userDTOConverter.toEntity(userDTO));
+    public String login(@RequestBody UserDTO userDTO) {
+        return userService.verify(userDTOConverter.toEntity(userDTO));
     }
 
 }
