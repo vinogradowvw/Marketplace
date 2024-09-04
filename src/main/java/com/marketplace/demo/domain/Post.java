@@ -30,15 +30,15 @@ public class Post implements EntityWithId<Long> {
     @ManyToMany(targetEntity = User.class)
     @JoinTable(
             name = "likes",
-            joinColumns = @JoinColumn(name="id_user"),
-            inverseJoinColumns = @JoinColumn(name="id_post")
+            joinColumns = @JoinColumn(name="id_post"),
+            inverseJoinColumns = @JoinColumn(name="id_user")
     )
     private List<User> likedUsers = new ArrayList<>();
     @ManyToMany(targetEntity = Tag.class)
     @JoinTable(
             name = "post_tag",
-            joinColumns = @JoinColumn(name="id_tag"),
-            inverseJoinColumns = @JoinColumn(name="id_post")
+            joinColumns = @JoinColumn(name="id_post"),
+            inverseJoinColumns = @JoinColumn(name="id_tag")
     )
     private List<Tag> tags = new ArrayList<>();
 
