@@ -22,8 +22,8 @@ public class Role implements EntityWithId<Long>{
     @ManyToMany
     @JoinTable(
             name="roles",
-            joinColumns = @JoinColumn(name="id_user"),
-            inverseJoinColumns = @JoinColumn(name="id_role")
+            joinColumns = @JoinColumn(name="id_role"),
+            inverseJoinColumns = @JoinColumn(name="id_user")
     )
     private List<User> users = new ArrayList<>();
 
