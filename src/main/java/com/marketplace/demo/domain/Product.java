@@ -23,7 +23,6 @@ public class Product implements EntityWithId<Long> {
     private Integer price;
     //@NotBlank(message = "Name can not be empty")
     private String name;
-    private String description;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_post", referencedColumnName = "id_post")

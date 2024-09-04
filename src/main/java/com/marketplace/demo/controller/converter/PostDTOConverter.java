@@ -66,8 +66,8 @@ public class PostDTOConverter implements DTOConverter<PostDTO, Post> {
             }
         }
 
-        return new PostDTO(post.getID(), post.getName(), post.getViews(), productId,
-                userId, likedUserIds, tagIds, imageIds, reviewIds);
+        return new PostDTO(post.getID(), post.getName(), post.getViews(), post.getDescription(),
+                productId, userId, likedUserIds, tagIds, imageIds, reviewIds);
     }
 
     @Override
@@ -78,6 +78,7 @@ public class PostDTOConverter implements DTOConverter<PostDTO, Post> {
         post.setId(postDTO.id());
         post.setName(postDTO.name());
         post.setViews(postDTO.views());
+        post.setDescription(postDTO.description());
 
         Product product = null;
         Optional<Long> productId = Optional.ofNullable(postDTO.product());
