@@ -5,9 +5,19 @@ import com.marketplace.demo.persistance.*;
 import com.marketplace.demo.service.CartService.CartService;
 import com.marketplace.demo.service.CrudServiceImpl;
 import com.marketplace.demo.service.ImageService.ImageService;
+import com.marketplace.demo.service.JWTService;
 import com.marketplace.demo.service.SubscriptionService.SubscriptionService;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -16,27 +26,31 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
-@AllArgsConstructor
-public class UserService extends CrudServiceImpl<User, Long> implements UserServiceInterface {
+@RequiredArgsConstructor
+public class UserService extends CrudServiceImpl<User, Long> implements UserServiceInterface, UserDetailsService {
 
-    private ReviewRepository reviewRepository;
-    private SubscriptionService subscriptionService;
-    private PostRepository postRepository;
-    private UserRepository userRepository;
-    private SubscriptionRepository subscriptionRepository;
-    private RoleRepository roleRepository;
-    private CartService cartService;
-    private OrderRepository orderRepository;
-    private ProductRepository productRepository;
-    private OrderProductRepository orderProductRepository;
-    private PaymentRepository paymentRepository;
-    private CartRepository cartRepository;
-    private TagRepository tagRepository;
-    private CartProductRepository cartProductRepository;
-    private ImageService imageService;
+    private final ReviewRepository reviewRepository;
+    private final SubscriptionService subscriptionService;
+    private final PostRepository postRepository;
+    private final UserRepository userRepository;
+    private final SubscriptionRepository subscriptionRepository;
+    private final RoleRepository roleRepository;
+    private final CartService cartService;
+    private final OrderRepository orderRepository;
+    private final ProductRepository productRepository;
+    private final OrderProductRepository orderProductRepository;
+    private final PaymentRepository paymentRepository;
+    private final CartRepository cartRepository;
+    private final TagRepository tagRepository;
+    private final CartProductRepository cartProductRepository;
+    private final ImageService imageService;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(12);
+    private final AuthenticationManager authManager;
+    private final JWTService jwtService;
 
     @Override
     public User create(User user){
@@ -57,6 +71,8 @@ public class UserService extends CrudServiceImpl<User, Long> implements UserServ
         cart.setUser(user);
         cart.setTimestamp(new Timestamp(System.currentTimeMillis()));
         cartService.create(cart);
+
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
 
         return getRepository().save(user);
     }
@@ -294,9 +310,31 @@ public class UserService extends CrudServiceImpl<User, Long> implements UserServ
         }
     }
 
+    public String verify(User user){
+        Authentication authentication = authManager.authenticate(
+                new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword())
+        );
+
+        authentication.isAuthenticated();
+    }
+
     @Override
     protected CrudRepository<User, Long> getRepository() {
         return userRepository;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(
+                "There is no user with " + username + " username."
+        ));
+
+        return new org.springframework.security.core.userdetails.User(
+                user.getUsername(),
+                user.getPassword(),
+                user.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList())
+        );
     }
 }
 

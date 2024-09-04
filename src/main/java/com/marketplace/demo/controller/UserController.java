@@ -44,6 +44,11 @@ public class UserController {
         return userDTOConverter.toDTO(userService.readById(id).get());
     }
 
+    @GetMapping(path = "/{username}" )
+    public UserDTO getUserByUsername(@PathVariable("username")String username) {
+        return userDTOConverter.toDTO(userService.findByUsername(username));
+    }
+
     @GetMapping(path = "/{id}/likes")
     public List<PostDTO> getLikedPosts(@PathVariable("id")Long id){
         return userService.readById(id).get().getLikes().stream().map(postDTOConverter::toDTO).toList();
@@ -72,11 +77,6 @@ public class UserController {
     @GetMapping(path = "/{id}/role")
     public List<RoleDTO> getRoles(@PathVariable("id")Long id){
         return userService.readById(id).get().getRoles().stream().map(roleDTOConverter::toDTO).toList();
-    }
-
-    @PostMapping
-    public UserDTO createUser(@RequestBody UserDTO userDTO) {
-        return userDTOConverter.toDTO(userService.create(userDTOConverter.toEntity(userDTO)));
     }
 
     @PostMapping(path = "/{id}/subscription")

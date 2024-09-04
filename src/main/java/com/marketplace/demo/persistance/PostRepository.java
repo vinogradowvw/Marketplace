@@ -11,5 +11,5 @@ import org.springframework.stereotype.Repository;
 public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Query(value = "SELECT AVG(r.rating) FROM Post p JOIN p.reviews r WHERE p.id = :id")
-    public Double getAVGRatingById(@Param("id") Long id);
+    Double getAVGRatingById(@Param("id") Long id);
 }
