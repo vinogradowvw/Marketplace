@@ -74,18 +74,17 @@ class PostServiceUnitTests {
 		post.setId(1L);
 		post.setImages(new ArrayList<>());
 		post.setTags(new ArrayList<>());
+		post.setDescription("testDescr");
 
 		product1 = new Product();
 		product1.setId(1L);
 		product1.setName("testName");
-		product1.setDescription("testDescr");
 		product1.setPost(null);
 		product1.setPrice(100000);
 
 		product2 = new Product();
 		product2.setId(2L);
 		product2.setName("testName");
-		product2.setDescription("testDescr");
 		product2.setPost(null);
 		product2.setPrice(100000);
 	}
