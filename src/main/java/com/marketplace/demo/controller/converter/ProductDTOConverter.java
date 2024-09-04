@@ -37,7 +37,7 @@ public class ProductDTOConverter implements DTOConverter<ProductDTO, Product> {
         }
 
         return new ProductDTO(product.getID(), product.getPrice(), product.getName(),
-                              product.getDescription(), postId, ordersId, cartIds);
+                postId, ordersId, cartIds);
     }
 
     @Override
@@ -47,7 +47,6 @@ public class ProductDTOConverter implements DTOConverter<ProductDTO, Product> {
         product.setId(productDTO.id());
         product.setName(productDTO.name());
         product.setPrice(productDTO.price());
-        product.setDescription(productDTO.description());
 
         Post post = null;
         Optional<Long> postId = Optional.ofNullable(productDTO.post());
