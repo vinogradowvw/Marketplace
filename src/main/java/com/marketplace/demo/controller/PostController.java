@@ -68,7 +68,10 @@ public class PostController {
         Post post = postConverter.toEntity(postDTO);
         Optional<Post> oldPost = postService.readById(id);
 
-        oldPost.ifPresent(value -> value.setName(post.getName()));
+        oldPost.ifPresent(value -> {
+            value.setName(post.getName());
+            value.setDescription(post.getDescription());
+        });
 
         postService.update(id, oldPost.get());
         return postConverter.toDTO(oldPost.get());

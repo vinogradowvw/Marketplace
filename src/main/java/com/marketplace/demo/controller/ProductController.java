@@ -57,7 +57,6 @@ public class ProductController {
 
         if (oldProduct.isPresent()){
             oldProduct.get().setName(product.getName());
-            oldProduct.get().setDescription(product.getDescription());
             oldProduct.get().setPrice(product.getPrice());
         }
 
