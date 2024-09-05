@@ -3,6 +3,7 @@ package com.marketplace.demo.config;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,7 +24,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final UserDetailsService userDetailsService;
+    private final ApplicationContext applicationContext;
     private final JwtFilter jwtFilter;
 
     @Value("${bcrypt.rounds}")
@@ -49,8 +50,10 @@ public class SecurityConfig {
 
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
 
+        UserDetailsService detailsService = applicationContext.getBean(UserDetailsService.class);
+
         authProvider.setPasswordEncoder(new BCryptPasswordEncoder(rounds));
-        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setUserDetailsService(detailsService);
 
         return authProvider;
     }
