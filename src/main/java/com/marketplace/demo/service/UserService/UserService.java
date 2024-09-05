@@ -52,7 +52,6 @@ public class UserService extends CrudServiceImpl<User, Long> implements UserServ
     private final CartProductRepository cartProductRepository;
     private final ImageService imageService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(rounds);
-    private final AuthenticationManager authManager;
     private final JWTService jwtService;
 
     @Override
@@ -313,7 +312,7 @@ public class UserService extends CrudServiceImpl<User, Long> implements UserServ
         }
     }
 
-    public String verify(User user){
+    public String verify(User user, AuthenticationManager authManager){
         Authentication authentication = authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword())
         );
