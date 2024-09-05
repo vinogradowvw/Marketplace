@@ -8,6 +8,7 @@ import com.marketplace.demo.service.ImageService.ImageService;
 import com.marketplace.demo.service.JWTService;
 import com.marketplace.demo.service.SubscriptionService.SubscriptionService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,11 +31,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
-@RequiredArgsConstructor
 public class UserService extends CrudServiceImpl<User, Long> implements UserServiceInterface, UserDetailsService {
-
-    @Value("${bcrypt.rounds}")
-    private int rounds;
 
     private final ReviewRepository reviewRepository;
     private final SubscriptionService subscriptionService;
@@ -51,8 +48,35 @@ public class UserService extends CrudServiceImpl<User, Long> implements UserServ
     private final TagRepository tagRepository;
     private final CartProductRepository cartProductRepository;
     private final ImageService imageService;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(rounds);
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JWTService jwtService;
+
+    @Autowired
+    public UserService(ReviewRepository reviewRepository, SubscriptionService subscriptionService, @Value("${bcrypt.rounds}") int rounds,
+                       PostRepository postRepository, UserRepository userRepository, SubscriptionRepository subscriptionRepository,
+                       RoleRepository roleRepository, CartService cartService, OrderRepository orderRepository, ProductRepository productRepository,
+                       OrderProductRepository orderProductRepository, PaymentRepository paymentRepository, CartRepository cartRepository,
+                       TagRepository tagRepository, CartProductRepository cartProductRepository, ImageService imageService, JWTService jwtService) {
+        this.reviewRepository = reviewRepository;
+        this.subscriptionService = subscriptionService;
+        this.postRepository = postRepository;
+        this.userRepository = userRepository;
+        this.subscriptionRepository = subscriptionRepository;
+        this.roleRepository = roleRepository;
+        this.cartService = cartService;
+        this.orderRepository = orderRepository;
+        this.productRepository = productRepository;
+        this.orderProductRepository = orderProductRepository;
+        this.paymentRepository = paymentRepository;
+        this.cartRepository = cartRepository;
+        this.tagRepository = tagRepository;
+        this.cartProductRepository = cartProductRepository;
+        this.imageService = imageService;
+        this.jwtService = jwtService;
+        this.bCryptPasswordEncoder = new BCryptPasswordEncoder(rounds);
+    }
+
+
 
     @Override
     public User create(User user){
