@@ -73,7 +73,6 @@ public class UserService extends CrudServiceImpl<User, Long> implements UserServ
         this.cartProductRepository = cartProductRepository;
         this.imageService = imageService;
         this.jwtService = jwtService;
-        System.out.println(rounds);
         this.bCryptPasswordEncoder = new BCryptPasswordEncoder(rounds);
     }
 
