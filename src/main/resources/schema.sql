@@ -1,6 +1,10 @@
 DROP SCHEMA public CASCADE;
 CREATE SCHEMA public;
 
+DROP SEQUENCE IF EXISTS users_seq;
+DROP SEQUENCE IF EXISTS cart_seq;
+DROP SEQUENCE IF EXISTS role_seq;
+
 CREATE SEQUENCE IF NOT EXISTS cart_seq start with 1 increment by 50;
 CREATE SEQUENCE IF NOT EXISTS image_seq start with 1 increment by 50;
 CREATE SEQUENCE IF NOT EXISTS orders_seq start with 1 increment by 50;
@@ -13,22 +17,22 @@ CREATE SEQUENCE IF NOT EXISTS subscription_seq start with 1 increment by 50;
 CREATE SEQUENCE IF NOT EXISTS tag_seq start with 1 increment by 50;
 CREATE SEQUENCE IF NOT EXISTS users_seq start with 1 increment by 50;
 
-create table cart (id_cart bigint not null, id_user bigint unique, timestamp timestamp(6), primary key (id_cart));
-create table cart_product (id_cart bigint not null, id_product bigint not null, quantity bigint, primary key (id_cart, id_product));
-create table image (id_image bigint not null, id_post bigint, extension varchar(255), name varchar(255), primary key (id_image));
-create table likes (id_post bigint not null, id_user bigint not null);
-create table order_product (id_order bigint not null, id_product bigint not null, quantity bigint, primary key (id_order, id_product));
-create table orders (id_order bigint not null, id_payment bigint unique, id_user bigint, timestamp timestamp(6), state varchar(255) check (state in ('NOT_PAID','PROCESSING','SHIPPED','DELIVERED','CANCELLED','RETURNED')), primary key (id_order));
-create table payment (amount bigint, id_payment bigint not null, timestamp timestamp(6), primary key (id_payment));
-create table post (id_post bigint not null, id_user bigint, views bigint, name varchar(255), primary key (id_post));
-create table post_tag (id_post bigint not null, id_tag bigint not null);
-create table product (price integer, id_post bigint unique, id_product bigint not null, description varchar(255), name varchar(255), primary key (id_product));
-create table review (rating integer not null check ((rating<=5) and (rating>=1)), id bigint not null, id_post bigint, id_user bigint, description varchar(255), title varchar(255), primary key (id));
-create table role (id_role bigint not null, name varchar(255), primary key (id_role));
-create table roles (id_role bigint not null, id_user bigint not null);
-create table subscription (id_subscriber bigint, id_subscription bigint not null, id_user bigint, timestamp timestamp(6), primary key (id_subscription));
-create table tag (id_tag bigint not null, name varchar(255), primary key (id_tag));
-create table users (id_user bigint not null, email varchar(255), password varchar(255), username varchar(255), primary key (id_user));
+create table if not exists cart (id_cart bigint not null, id_user bigint unique, timestamp timestamp(6), primary key (id_cart));
+create table if not exists cart_product (id_cart bigint not null, id_product bigint not null, quantity bigint, primary key (id_cart, id_product));
+create table if not exists image (id_image bigint not null, id_post bigint, extension varchar(255), name varchar(255), primary key (id_image));
+create table if not exists likes (id_post bigint not null, id_user bigint not null);
+create table if not exists order_product (id_order bigint not null, id_product bigint not null, quantity bigint, primary key (id_order, id_product));
+create table if not exists orders (id_order bigint not null, id_payment bigint unique, id_user bigint, timestamp timestamp(6), state varchar(255) check (state in ('NOT_PAID','PROCESSING','SHIPPED','DELIVERED','CANCELLED','RETURNED')), primary key (id_order));
+create table if not exists payment (amount bigint, id_payment bigint not null, timestamp timestamp(6), primary key (id_payment));
+create table if not exists post (id_post bigint not null, id_user bigint, views bigint, description varchar(255), name varchar(255), primary key (id_post));
+create table if not exists post_tag (id_post bigint not null, id_tag bigint not null);
+create table if not exists product (price integer, id_post bigint unique, id_product bigint not null, name varchar(255), primary key (id_product));
+create table if not exists review (rating integer not null check ((rating<=5) and (rating>=1)), id bigint not null, id_post bigint, id_user bigint, description varchar(255), title varchar(255), primary key (id));
+create table if not exists role (id_role bigint not null, name varchar(255), primary key (id_role));
+create table if not exists roles (id_role bigint not null, id_user bigint not null);
+create table if not exists subscription (id_subscriber bigint, id_subscription bigint not null, id_user bigint, timestamp timestamp(6), primary key (id_subscription));
+create table if not exists tag (id_tag bigint not null, name varchar(255), primary key (id_tag));
+create table if not exists users (id_user bigint not null, email varchar(255), password varchar(255), username varchar(255), primary key (id_user));
 
 alter table if exists cart add constraint FKk0lcwd6e5q8ldue7je6efhdot foreign key (id_user) references users;
 alter table if exists cart_product add constraint FKm778sxvaac8r8mi6rqgb876gm foreign key (id_cart) references cart;
