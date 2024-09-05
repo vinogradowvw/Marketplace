@@ -54,6 +54,8 @@ class UserServiceUnitTests {
 	public void setUp() {
 		user = new User();
 		user.setId(1L);
+		user.setPassword("myNewPassword");
+		user.setUsername("newUsername");
 
 		role = new Role();
 
