@@ -7,7 +7,6 @@ import com.marketplace.demo.service.CrudServiceImpl;
 import com.marketplace.demo.service.ImageService.ImageService;
 import com.marketplace.demo.service.JWTService;
 import com.marketplace.demo.service.SubscriptionService.SubscriptionService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.repository.CrudRepository;
