@@ -12,9 +12,10 @@ import java.util.List;
 @Setter
 @Getter
 @NoArgsConstructor
+@SequenceGenerator(name = "role_seq", sequenceName = "role_seq", allocationSize = 1)
 public class Role implements EntityWithId<Long>{
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "role_seq")
     @Column(name  = "id_role")
     private Long id;
     private String name;

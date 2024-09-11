@@ -46,8 +46,8 @@ public class UserController {
         return userDTOConverter.toDTO(userService.readById(id).get());
     }
 
-    @GetMapping(path = "/{username}" )
-    public UserDTO getUserByUsername(@PathVariable("username")String username) {
+    @GetMapping(path = "/username" )
+    public UserDTO getUserByUsername(@RequestParam("username")String username) {
         return userDTOConverter.toDTO(userService.findByUsername(username));
     }
 
