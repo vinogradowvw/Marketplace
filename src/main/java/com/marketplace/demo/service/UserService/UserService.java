@@ -349,9 +349,10 @@ public class UserService extends CrudServiceImpl<User, Long> implements UserServ
                 "There is no user with " + username + " username."
         ));
 
-        return new org.springframework.security.core.userdetails.User(
+        return new CustomUserDetails(
                 user.getUsername(),
                 user.getPassword(),
+                user.getID(),
                 user.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList())
         );
     }

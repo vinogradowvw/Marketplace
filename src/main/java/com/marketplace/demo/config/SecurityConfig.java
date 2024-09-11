@@ -1,5 +1,6 @@
 package com.marketplace.demo.config;
 
+import com.marketplace.demo.service.SecurityService;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,6 +13,7 @@ import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -31,6 +33,7 @@ public class SecurityConfig {
 
     private final ApplicationContext applicationContext;
     private final JwtFilter jwtFilter;
+    private final SecurityService service;
 
     @Value("${bcrypt.rounds}")
     private int rounds;
@@ -48,7 +51,12 @@ public class SecurityConfig {
                                 "/post/{id:[0-9]+}/rating", "/post/{id:[0-9]+}/views",
                                 "/product", "/product/{id:[0-9]+}", "/review",
                                 "review/{id:[0-9]+}", "/tag/**").permitAll()
-                        .requestMatchers(HttpMethod.DELETE, "/user/{id:[0-9]+}").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/user/{id:[0-9]+}").access((auth, req) -> {
+                            String path = req.getRequest().getRequestURI();
+                            Long id = Long.valueOf(path.substring(path.lastIndexOf('/') + 1));
+
+                            return new AuthorizationDecision(service.canDeleteUser(auth.get(), id));
+                        })
                         .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
                 .logout(Customizer.withDefaults())
