@@ -297,29 +297,19 @@ public class UserService extends CrudServiceImpl<User, Long> implements UserServ
         throw new IllegalArgumentException("User with ID " + user.getID() + " does not exists");
     }
 
-    public List<User> getSubscribers(User user){
+    public List<Subscription> getSubscribers(User user){
         if (userRepository.existsById(user.getID())){
-            List<User> subscribers = new ArrayList<>();
 
-            for (Subscription sub : user.getSubscribers()){
-                subscribers.add(sub.getSubscriber());
-            }
-
-            return subscribers;
+            return new ArrayList<>(user.getSubscribers());
         }
 
         throw new IllegalArgumentException("User with ID " + user.getID() + " does not exists");
     }
 
-    public List<User> getSubscription(User user){
+    public List<Subscription> getSubscription(User user){
         if (userRepository.existsById(user.getID())){
-            List<User> subscribedUsers = new ArrayList<>();
 
-            for (Subscription sub : user.getSubscriptions()){
-                subscribedUsers.add(sub.getUser());
-            }
-
-            return subscribedUsers;
+            return new ArrayList<>(user.getSubscriptions());
         }
 
         throw new IllegalArgumentException("User with ID " + user.getID() + " does not exists");

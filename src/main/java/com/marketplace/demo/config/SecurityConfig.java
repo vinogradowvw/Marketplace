@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -39,8 +40,14 @@ public class SecurityConfig {
 
         return http.csrf(customizer -> customizer.disable())
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("login", "register")
-                        .permitAll()
+                        .requestMatchers("login", "register").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/post/{id:[0-9]+}/views").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/user", "/user/{id:[0-9]+}",
+                                "/user/{id:[a-zA-Z]+}", "/user/{id:[0-9]+}/posts",
+                                "/image/{id:[0-9]+}", "/post", "/post/{id:[0-9]+}",
+                                "/post/{id:[0-9]+}/rating", "/post/{id:[0-9]+}/views",
+                                "/product", "/product/{id:[0-9]+}", "/review",
+                                "review/{id:[0-9]+}", "/tag/**").permitAll()
                         .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
                 .logout(Customizer.withDefaults())
@@ -81,7 +88,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public DefaultWebSecurityExpressionHandler webSecurityExpressionHandler() {
+    public DefaultWebSecurityExpressionHandler customWebSecurityExpressionHandler() {
         DefaultWebSecurityExpressionHandler expressionHandler = new DefaultWebSecurityExpressionHandler();
         expressionHandler.setRoleHierarchy(roleHierarchy());
         return expressionHandler;
@@ -89,6 +96,6 @@ public class SecurityConfig {
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer(DefaultWebSecurityExpressionHandler webSecurityExpressionHandler){
-        return (web -> web.expressionHandler(webSecurityExpressionHandler));
+        return (web -> web.expressionHandler(customWebSecurityExpressionHandler()));
     }
 }

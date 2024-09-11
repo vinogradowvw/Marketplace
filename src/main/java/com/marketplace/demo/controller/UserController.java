@@ -20,6 +20,7 @@ import java.util.Optional;
 public class UserController {
 
     private final DTOConverter<UserDTO, User> userDTOConverter;
+    private final DTOConverter<SubscriptionDTO, Subscription> subscriptionDTOConverter;
     private final DTOConverter<PostDTO, Post> postDTOConverter;
     private final DTOConverter<OrderDTO, Order> orderDTOConverter;
     private final DTOConverter<RoleDTO, Role> roleDTOConverter;
@@ -65,13 +66,13 @@ public class UserController {
     }
 
     @GetMapping(path = "/{id}/subscribers")
-    public List<UserDTO> getSubscribers(@PathVariable("id")Long id){
-        return userService.getSubscribers(userService.readById(id).get()).stream().map(userDTOConverter::toDTO).toList();
+    public List<SubscriptionDTO> getSubscribers(@PathVariable("id")Long id){
+        return userService.getSubscribers(userService.readById(id).get()).stream().map(subscriptionDTOConverter::toDTO).toList();
     }
 
     @GetMapping(path = "/{id}/subscriptions")
-    public List<UserDTO> getSubscriptions(@PathVariable("id")Long id){
-        return userService.getSubscription(userService.readById(id).get()).stream().map(userDTOConverter::toDTO).toList();
+    public List<SubscriptionDTO> getSubscriptions(@PathVariable("id")Long id){
+        return userService.getSubscription(userService.readById(id).get()).stream().map(subscriptionDTOConverter::toDTO).toList();
     }
 
     @GetMapping(path = "/{id}/role")

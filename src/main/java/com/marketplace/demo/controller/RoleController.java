@@ -20,7 +20,6 @@ public class RoleController {
 
     private RoleService roleService;
     private DTOConverter<RoleDTO, Role> dtoConverter;
-    private UserService userService;
 
     @GetMapping
     public List<RoleDTO> getAllRoles() {
@@ -38,6 +37,11 @@ public class RoleController {
     @PostMapping
     public RoleDTO createRole(@RequestBody RoleDTO roleDTO) {
         return dtoConverter.toDTO(roleService.create(dtoConverter.toEntity(roleDTO)));
+    }
+
+    @GetMapping(path = "/{name}")
+    public RoleDTO getRoleByName(@PathVariable("name") String name) {
+        return dtoConverter.toDTO(roleService.findByName(name).get());
     }
 
     @DeleteMapping(path = "/{id}")
