@@ -48,6 +48,7 @@ public class SecurityConfig {
                                 "/post/{id:[0-9]+}/rating", "/post/{id:[0-9]+}/views",
                                 "/product", "/product/{id:[0-9]+}", "/review",
                                 "review/{id:[0-9]+}", "/tag/**").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/user/{id:[0-9]+}").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
                 .logout(Customizer.withDefaults())
