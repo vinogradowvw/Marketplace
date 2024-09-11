@@ -4,7 +4,6 @@ import com.marketplace.demo.controller.converter.DTOConverter;
 import com.marketplace.demo.controller.dto.CartDTO;
 import com.marketplace.demo.controller.dto.OrderDTO;
 import com.marketplace.demo.controller.dto.ProductDTO;
-import com.marketplace.demo.controller.dto.UserDTO;
 import com.marketplace.demo.domain.Cart;
 import com.marketplace.demo.domain.Order;
 import com.marketplace.demo.domain.Product;
