@@ -8,6 +8,7 @@ import com.marketplace.demo.service.SubscriptionService.SubscriptionService;
 import com.marketplace.demo.service.UserService.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -138,6 +139,7 @@ public class UserController {
     }
 
      @DeleteMapping(path = "/{id}")
+     @PreAuthorize("hasRole('ADMIN') or hasRole('MODERATOR') or #id == principal.id")
      public void deleteUser(@PathVariable("id") Long id){
          userService.deleteById(id);
      }
