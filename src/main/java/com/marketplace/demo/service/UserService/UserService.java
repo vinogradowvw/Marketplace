@@ -7,7 +7,6 @@ import com.marketplace.demo.service.CrudServiceImpl;
 import com.marketplace.demo.service.ImageService.ImageService;
 import com.marketplace.demo.service.JWTService;
 import com.marketplace.demo.service.SubscriptionService.SubscriptionService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.repository.CrudRepository;
@@ -298,29 +297,19 @@ public class UserService extends CrudServiceImpl<User, Long> implements UserServ
         throw new IllegalArgumentException("User with ID " + user.getID() + " does not exists");
     }
 
-    public List<User> getSubscribers(User user){
+    public List<Subscription> getSubscribers(User user){
         if (userRepository.existsById(user.getID())){
-            List<User> subscribers = new ArrayList<>();
 
-            for (Subscription sub : user.getSubscribers()){
-                subscribers.add(sub.getSubscriber());
-            }
-
-            return subscribers;
+            return new ArrayList<>(user.getSubscribers());
         }
 
         throw new IllegalArgumentException("User with ID " + user.getID() + " does not exists");
     }
 
-    public List<User> getSubscription(User user){
+    public List<Subscription> getSubscription(User user){
         if (userRepository.existsById(user.getID())){
-            List<User> subscribedUsers = new ArrayList<>();
 
-            for (Subscription sub : user.getSubscriptions()){
-                subscribedUsers.add(sub.getUser());
-            }
-
-            return subscribedUsers;
+            return new ArrayList<>(user.getSubscriptions());
         }
 
         throw new IllegalArgumentException("User with ID " + user.getID() + " does not exists");

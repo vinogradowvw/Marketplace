@@ -125,19 +125,19 @@ class UserServiceUnitTests {
 
 	@Test
 	public void getSubscribers() {
-		List<User> subs = userService.getSubscribers(user);
+		List<Subscription> subs = userService.getSubscribers(user);
 
-		for (User sub : subs) {
-			Assertions.assertTrue(checkSubscribers(user, sub));
+		for (Subscription sub : subs) {
+			Assertions.assertTrue(checkSubscribers(user, sub.getSubscriber()));
 		}
 	}
 
 	@Test
 	public void getSubscribedUsers() {
-		List<User> subscribedUsers = userService.getSubscription(user);
+		List<Subscription> subscribedUsers = userService.getSubscription(user);
 
-		for (User sub : subscribedUsers) {
-			Assertions.assertTrue(checkSubscriptions(user, sub));
+		for (Subscription sub : subscribedUsers) {
+			Assertions.assertTrue(checkSubscriptions(sub.getUser(), user));
 		}
 	}
 
