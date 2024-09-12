@@ -1,13 +1,17 @@
 FROM gradle:8.9.0-jdk17 AS builder
 WORKDIR /app
-COPY build.gradle /app
-COPY settings.gradle /app
-COPY . /app
-#RUN chmod +x ./gradlew && ./gradlew dependencies --no-daemon
-RUN chmod +x ./gradlew && ./gradlew build --no-daemon
+COPY gradlew .
+COPY gradle gradle
+COPY build.gradle .
+COPY settings.gradle .
+COPY . .
+RUN  chmod +x ./gradlew && ./gradlew clean build --refresh-dependencies --no-daemon
 
 FROM openjdk:17-jdk-slim
 WORKDIR /app
 COPY --from=builder /app/build/libs/demo-0.0.1-SNAPSHOT.jar /app/demo-0.0.1-SNAPSHOT.jar
 EXPOSE 8080
-CMD ["java", "-jar", "/app/demo-0.0.1-SNAPSHOT.jar"]
+
+ENV DATABASE_URL=jdbc:postgresql://db:5432/market_place
+
+CMD ["java", "-jar", "-Dspring.datasource.url=${DATABASE_URL}", "/app/demo-0.0.1-SNAPSHOT.jar"]
