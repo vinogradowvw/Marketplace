@@ -55,7 +55,19 @@ public class SecurityConfig {
                             String path = req.getRequest().getRequestURI();
                             Long id = Long.valueOf(path.substring(path.lastIndexOf('/') + 1));
 
-                            return new AuthorizationDecision(service.canDeleteUser(auth.get(), id));
+                            return new AuthorizationDecision(service.isAdminOrModerOrCalledUser(auth.get(), id));
+                        })
+                        .requestMatchers("/cart/{id:[0-9]+}/**").access((auth, req) -> {
+                            String path = req.getRequest().getRequestURI();
+                            Long id = Long.valueOf(path.split("/")[2]);
+
+                            return new AuthorizationDecision(service.isCalledByUserWithCart(auth.get(), id));
+                        })
+                        .requestMatchers("/order/{id:[0-9]+}/**").access((auth, req) -> {
+                            String path = req.getRequest().getRequestURI();
+                            Long id = Long.valueOf(path.split("/")[2]);
+
+                            return new AuthorizationDecision(service.orderSec(auth.get(), id));
                         })
                         .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
