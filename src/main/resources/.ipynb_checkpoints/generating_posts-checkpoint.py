@@ -4,7 +4,7 @@ product2 = {
     "id": 0,
     "price": 120.50,
     "name": "Ocean Breeze Knitted Blanket",
-    "post": 0,
+    "post": 1,
     "orders": [],
     "carts": []
 }
@@ -245,17 +245,17 @@ post1 = {
 }
 
 posts = [
-    # (product1, post1),
-    (product2, post2),
-    (product3, post3),
-    (product4, post4),
-    (product5, post5),
-    (product6, post6),
-    (product7, post7),
-    (product8, post8),
-    (product9, post9),
-    (product10, post10),
-    (product11, post11)
+    (product1, post1),
+    # (product2, post2),
+    # (product3, post3),
+    # (product4, post4),
+    # (product5, post5),
+    # (product6, post6),
+    # (product7, post7),
+    # (product8, post8),
+    # (product9, post9),
+    # (product10, post10),
+    # (product11, post11)
 ]
 
 for product, post in posts:
@@ -273,6 +273,9 @@ for product, post in posts:
 
     response_post = requests.post('http://localhost:8080/post', json=post)
 
+    print(response_post)
+    print(response_product)
+
     post_new = response_post.json()
 
     files = {
@@ -280,7 +283,7 @@ for product, post in posts:
     }
 
     image = requests.post('http://localhost:8080/image', json=image).json()
-    image_new = requests.post('http://localhost:8080/image/{}'.format(image['id']), files=files).json()
+    image = requests.post('http://localhost:8080/image/{}'.format(image['id']), files=files).json()
 
-    requests.post('http://localhost:8080/post/{}/product'.format(post_new['id']), params={'productId': product_new['id']})
-    requests.post('http://localhost:8080/post/{}/image'.format(post_new['id']), params={'imageId': image_new['id']})
+    requests.post('http://localhost:8080/post/{}/product'.format(post['id']), params={'productId': product_new['id']})
+    requests.post('http://localhost:8080/post/{}/image'.format(post['id']), params={'imageId': image['id']})
