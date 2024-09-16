@@ -108,7 +108,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Copy docker-compose file to VPS
-        uses: appleboy/scp-action@v0.1.6
+        uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.VPS_IP }}
           username: ${{ secrets.VPS_USERNAME }}
@@ -124,8 +124,8 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd market_place
-            docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-            docker pull ${{ secrets.DOCKER_USERNAME }}/backend
-            docker tag ${{ secrets.DOCKER_USERNAME }}/backend:latest backend/app:latest
+            docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/backend
+            docker tag ${{ secrets.DOCKERHUB_USERNAME }}/backend:latest backend/app:latest
             docker-compose -f docker-compose.yaml up -d
             docker-compose -f docker-compose.yaml ps
