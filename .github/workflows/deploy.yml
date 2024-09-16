@@ -109,7 +109,7 @@ jobs:
       - name: Copy docker-compose file to VPS
         uses: appleboy/scp-action@v0.1.6
         with:
-          host: ${{ secrets.VPS_PUBLIC_IP }}
+          host: ${{ secrets.VPS_IP }}
           username: ${{ secrets.VPS_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "docker-compose.yaml"
@@ -118,7 +118,7 @@ jobs:
       - name: Start services
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.VPS_PUBLIC_IP }}
+          host: ${{ secrets.VPS_IP }}
           username: ${{ secrets.VPS_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
@@ -126,5 +126,5 @@ jobs:
             docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
             docker pull ${{ secrets.DOCKER_USERNAME }}/backend
             docker tag ${{ secrets.DOCKER_USERNAME }}/backend:latest backend/app:latest
-#            docker-compose -f docker-compose.yaml pull -q
-            docker-compose -f docker-compose.yaml up
+            docker-compose -f docker-compose.yaml up -d
+            docker-compose -f docker-compose.yaml ps
