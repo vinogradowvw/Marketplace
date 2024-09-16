@@ -119,10 +119,8 @@ services:
       - "minio"
 
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
     container_name: app
+    image: backend/app:latest
     depends_on:
         - db
         - minio
@@ -131,16 +129,16 @@ services:
         - etcd
         - standalone
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/market_place
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=postgres
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
-      - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.PostgreSQLDialect
-      - SPRING_MINIO_URL=http://minio:9000
-      - SPRING_MINIO_ACCESS_KEY=minioadmin
-      - SPRING_MINIO_SECRET_KEY=minioadmin
-      - SPRING_MILVUS_HOST=standalone
-      - SPRING_MILVUS_PORT=19530
+      - DATASOURCE_URL=jdbc:postgresql://db:5432/market_place
+      - DATASOURCE_USERNAME=postgres
+      - DATASOURCE_PASSWORD=postgres
+      - JPA_HIBERNATE_DDL_AUTO=update
+      - JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.PostgreSQLDialect
+      - MINIO_URL=http://minio:9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin
+      - MILVUS_HOST=standalone
+      - MILVUS_PORT=19530
     ports:
       - "8080:8080"
     #volumes:
