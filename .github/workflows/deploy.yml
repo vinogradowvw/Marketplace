@@ -114,7 +114,7 @@ jobs:
           username: ${{ secrets.VPS_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "docker-compose.yaml"
-          target: "market_place/docker-compose.yaml"
+          target: "market_place"
 
       - name: Start services
         uses: appleboy/ssh-action@v1.0.3
