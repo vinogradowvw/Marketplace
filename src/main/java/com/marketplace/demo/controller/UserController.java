@@ -8,7 +8,6 @@ import com.marketplace.demo.service.SubscriptionService.SubscriptionService;
 import com.marketplace.demo.service.UserService.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -103,8 +102,8 @@ public class UserController {
         return userDTOConverter.toDTO(user);
     }
 
-    @PostMapping(path = "/{id}/role")
-    public UserDTO addRole(@PathVariable("id") Long userId, @RequestParam Long roleId){
+    @PostMapping(path = "/{id}/role/{roleId}")
+    public UserDTO addRole(@PathVariable("id") Long userId, @PathVariable("roleId") Long roleId){
         User user = userService.readById(userId).get();
         Role role = roleService.readById(roleId).get();
 

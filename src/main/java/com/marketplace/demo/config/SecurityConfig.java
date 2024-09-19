@@ -51,7 +51,7 @@ public class SecurityConfig {
                                 "/post/{id:[0-9]+}/rating", "/post/{id:[0-9]+}/views",
                                 "/product", "/product/{id:[0-9]+}", "/review",
                                 "review/{id:[0-9]+}", "/tag/**").permitAll()
-                        .requestMatchers(HttpMethod.DELETE, "/user/{id:[0-9]+}").access((auth, req) -> {
+                        .requestMatchers(HttpMethod.DELETE, "/user/{id:[0-9]+}/**").access((auth, req) -> {
                             String path = req.getRequest().getRequestURI();
                             Long id = Long.valueOf(path.substring(path.lastIndexOf('/') + 1));
 
@@ -69,6 +69,74 @@ public class SecurityConfig {
 
                             return new AuthorizationDecision(service.orderSec(auth.get(), id));
                         })
+                        .requestMatchers(HttpMethod.POST, "/post", "/post/{id:[0-9]+}/user", "/product").hasRole("SELLER")
+                        .requestMatchers(HttpMethod.POST, "/post/{id:[0-9]+}/like",
+                                "post/{id:[0-9]+}/review").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/post/{id:[0-9]+}/review/{id:[0-9]+}",
+                                "/review/{id:[0-9]+}").access((auth, req) ->{
+                            String path = req.getRequest().getRequestURI();
+                            Long id = Long.valueOf(path.substring(path.lastIndexOf('/') + 1));
+
+                            return new AuthorizationDecision(service.reviewSec(auth.get(), id));
+                        })
+                        .requestMatchers(HttpMethod.DELETE, "/post/{id:[0-9]+}/**").access((auth, req) -> {
+                            String path = req.getRequest().getRequestURI();
+                            Long id = Long.valueOf(path.split("/")[2]);
+
+                            return new AuthorizationDecision(service.postSec(auth.get(), id));
+                        })
+                        .requestMatchers(HttpMethod.PUT, "/post/{id:[0-9]+}/**}").access((auth, req) -> {
+                            String path = req.getRequest().getRequestURI();
+                            Long id = Long.valueOf(path.substring(path.lastIndexOf('/') + 1));
+
+                            return new AuthorizationDecision(service.postSec(auth.get(), id));
+                        })
+                        .requestMatchers(HttpMethod.POST, "/post/{id:[0-9]+}/**").access((auth, req) -> {
+                            String path = req.getRequest().getRequestURI();
+                            Long id = Long.valueOf(path.split("/")[2]);
+
+                            return new AuthorizationDecision(service.postSec(auth.get(), id));
+                        })
+                        .requestMatchers("/product/{id:[0-9]+}/**").access((auth, req) -> {
+                            String path = req.getRequest().getRequestURI();
+                            Long id = Long.valueOf(path.split("/")[2]);
+
+                            return new AuthorizationDecision(service.productSec(auth.get(), id));
+                        })
+                        .requestMatchers(HttpMethod.PUT, "/review/{id:[0-9]+}").access((auth, req) -> {
+                            String path = req.getRequest().getRequestURI();
+                            Long id = Long.valueOf(path.split("/")[2]);
+
+                            return new AuthorizationDecision(service.reviewSec(auth.get(), id));
+                        })
+                        .requestMatchers(HttpMethod.GET, "/user/{id:[0-9]+}/orders",
+                                "/user/{id:[0-9]+}/role").access((auth, req) -> {
+                            String path = req.getRequest().getRequestURI();
+                            Long id = Long.valueOf(path.split("/")[2]);
+
+                            return new AuthorizationDecision(service.isAdminOrModerOrCalledUser(auth.get(), id));
+                        })
+                        .requestMatchers(HttpMethod.POST, "/role/{id:[0-9]+}/role/{roleId:[0-9]+}").access((auth, req) -> {
+                            String path = req.getRequest().getRequestURI();
+                            Long id = Long.valueOf(path.split("/")[4]);
+
+                            return new AuthorizationDecision(service.isRoleUser(auth.get(), id));
+                        })
+                        .requestMatchers("/user/{id:[0-9]+}/subscribers/**",
+                                "/user/{id:[0-9]+}/subscription/**").access((auth, req) -> {
+                            String path = req.getRequest().getRequestURI();
+                            Long id = Long.valueOf(path.split("/")[2]);
+
+                            return new AuthorizationDecision(service.isAdminOrModerOrCalledUser(auth.get(), id));
+                        })
+                        .requestMatchers(HttpMethod.PUT, "/user/{id:[0-9]+}").access((auth, req) -> {
+                            String path = req.getRequest().getRequestURI();
+                            Long id = Long.valueOf(path.split("/")[2]);
+
+                            return new AuthorizationDecision(service.isAdminOrModerOrCalledUser(auth.get(), id));
+                        })
+                        .requestMatchers("/user/{id:[0-9]+}/role/{roleId:[0-9]+}",
+                                "/role/**", "tag/**").hasRole("MODERATOR")
                         .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
                 .logout(Customizer.withDefaults())

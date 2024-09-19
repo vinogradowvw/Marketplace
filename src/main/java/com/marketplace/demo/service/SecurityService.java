@@ -1,11 +1,12 @@
 package com.marketplace.demo.service;
 
-import com.marketplace.demo.domain.Cart;
-import com.marketplace.demo.domain.CustomUserDetails;
-import com.marketplace.demo.domain.Order;
+import com.marketplace.demo.domain.*;
 import com.marketplace.demo.service.CartService.CartService;
 import com.marketplace.demo.service.OrderService.OrderService;
-import com.marketplace.demo.service.UserService.UserService;
+import com.marketplace.demo.service.PostService.PostService;
+import com.marketplace.demo.service.ProductService.ProductService;
+import com.marketplace.demo.service.ReviewService.ReviewService;
+import com.marketplace.demo.service.RoleService.RoleService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,8 +18,29 @@ import java.util.Optional;
 @AllArgsConstructor
 public class SecurityService {
 
+    private ProductService productService;
     private CartService cartService;
     private OrderService orderService;
+    private PostService postService;
+    private ReviewService reviewService;
+    private RoleService roleService;
+
+    private boolean moderatorAndSupAgCheck(Authentication authentication, Long userId) {
+
+        if (authentication != null && authentication.getPrincipal() instanceof UserDetails){
+
+            if (authentication.getAuthorities().stream()
+                    .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN") || auth.getAuthority().equals("ROLE_MODERATOR")
+                            || auth.getAuthority().equals("ROLE_SUPPORT_AGENT"))){
+                return true;
+            }
+
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            return userDetails.getId().equals(userId);
+        }
+
+        return false;
+    }
 
     public boolean isAdminOrModerOrCalledUser(Authentication authentication, Long userId) {
 
@@ -52,18 +74,35 @@ public class SecurityService {
 
         Optional<Order> order = orderService.readById(oderId);
 
-        if (authentication != null && authentication.getPrincipal() instanceof UserDetails && order.isPresent()){
+        return order.filter(value -> moderatorAndSupAgCheck(authentication, value.getUser().getID())).isPresent();
+    }
 
-            if (authentication.getAuthorities().stream()
-                    .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN") || auth.getAuthority().equals("ROLE_MODERATOR")
-                             || auth.getAuthority().equals("ROLE_SUPPORT_AGENT"))){
-                return true;
-            }
+    public boolean postSec(Authentication authentication, Long postId) {
 
-            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-            return userDetails.getId().equals(order.get().getUser().getID());
-        }
+        Optional<Post> post = postService.readById(postId);
 
-        return false;
+        return post.filter(val -> moderatorAndSupAgCheck(authentication, val.getUser().getID())).isPresent();
+    }
+
+    public boolean reviewSec(Authentication authentication, Long reviewId){
+
+        Optional<Review> review = reviewService.readById(reviewId);
+
+        return review.filter(val -> isAdminOrModerOrCalledUser(authentication, val.getAuthor().getID())).isPresent();
+    }
+
+    public boolean productSec(Authentication authentication, Long reviewId){
+
+        Optional<Product> product = productService.readById(reviewId);
+
+        return product.filter(val -> isAdminOrModerOrCalledUser(authentication, val.getPost().
+                getUser().getID())).isPresent();
+    }
+
+    public boolean isRoleUser(Authentication authentication, Long roleId){
+
+        Optional<Role> role = roleService.readById(roleId);
+
+        return role.filter(v -> v.getName().equals("ROLE_USER")).isPresent();
     }
 }
