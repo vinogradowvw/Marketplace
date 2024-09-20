@@ -116,11 +116,11 @@ public class SecurityConfig {
 
                             return new AuthorizationDecision(service.isAdminOrModerOrCalledUser(auth.get(), id));
                         })
-                        .requestMatchers(HttpMethod.POST, "/role/{id:[0-9]+}/role/{roleId:[0-9]+}").access((auth, req) -> {
+                        .requestMatchers(HttpMethod.POST, "/user/{id:[0-9]+}/role/{roleId:[0-9]+}").access((auth, req) -> {
                             String path = req.getRequest().getRequestURI();
                             Long id = Long.valueOf(path.split("/")[4]);
 
-                            return new AuthorizationDecision(service.isRoleUser(auth.get(), id));
+                            return new AuthorizationDecision(service.isRoleSec(auth.get(), id));
                         })
                         .requestMatchers("/user/{id:[0-9]+}/subscribers/**",
                                 "/user/{id:[0-9]+}/subscription/**").access((auth, req) -> {
@@ -135,7 +135,7 @@ public class SecurityConfig {
 
                             return new AuthorizationDecision(service.isAdminOrModerOrCalledUser(auth.get(), id));
                         })
-                        .requestMatchers("/user/{id:[0-9]+}/role/{roleId:[0-9]+}",
+                        .requestMatchers(
                                 "/role/**", "tag/**").hasRole("MODERATOR")
                         .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())

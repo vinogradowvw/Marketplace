@@ -99,10 +99,25 @@ public class SecurityService {
                 getUser().getID())).isPresent();
     }
 
-    public boolean isRoleUser(Authentication authentication, Long roleId){
+    public boolean isRoleSec(Authentication authentication, Long roleId){
 
         Optional<Role> role = roleService.readById(roleId);
 
-        return role.filter(v -> v.getName().equals("ROLE_USER")).isPresent();
+        if (role.isPresent()){
+
+            if (role.get().getName().equals("ROLE_USER")){
+                return true;
+            }
+
+            if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
+
+                if (authentication.getAuthorities().stream()
+                        .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN") || auth.getAuthority().equals("ROLE_MODERATOR"))) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }
