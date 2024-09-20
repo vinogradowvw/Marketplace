@@ -127,5 +127,4 @@ jobs:
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/backend
             docker tag ${{ secrets.DOCKERHUB_USERNAME }}/backend:latest backend/app:latest
-            docker-compose -f docker-compose.yaml up -d
-            docker-compose -f docker-compose.yaml ps
+            docker compose up -d --force-recreate
