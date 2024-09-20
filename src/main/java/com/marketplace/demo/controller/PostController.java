@@ -1,12 +1,13 @@
 package com.marketplace.demo.controller;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
 import com.marketplace.demo.domain.*;
 import com.marketplace.demo.service.ReviewService.ReviewService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,10 +27,9 @@ import com.marketplace.demo.service.ProductService.ProductService;
 import com.marketplace.demo.service.TagService.TagService;
 import com.marketplace.demo.service.UserService.UserService;
 
-import lombok.AllArgsConstructor;
+import org.springframework.web.client.RestClient;
 
 @RestController
-@AllArgsConstructor
 @RequestMapping(value = "/post", produces = MediaType.APPLICATION_JSON_VALUE)
 public class PostController {
     
@@ -40,6 +40,23 @@ public class PostController {
     private UserService userService;
     private TagService tagService;
     private ReviewService reviewService;
+    private String baseUrl;
+    private RestClient postClient;
+
+    @Autowired
+    PostController(PostService postService, DTOConverter<PostDTO, Post> postConverter,
+                   ImageService imageService, ProductService productService,
+                   UserService userService, TagService tagService, ReviewService reviewService, @Value("${api.url}") String baseUrl) {
+        this.postService = postService;
+        this.postConverter = postConverter;
+        this.imageService = imageService;
+        this.productService = productService;
+        this.userService = userService;
+        this.tagService = tagService;
+        this.reviewService = reviewService;
+        this.baseUrl = baseUrl + "/post";
+        postClient = RestClient.builder().baseUrl(this.baseUrl).build();
+    }
 
     @GetMapping
     public List<PostDTO> getAllPosts() {
@@ -60,7 +77,17 @@ public class PostController {
 
     @PostMapping
     public PostDTO createPost(@RequestBody PostDTO postDTO) {
-        return postConverter.toDTO(postService.create(postConverter.toEntity(postDTO)));
+
+        PostDTO post = postConverter.toDTO(postService.create(postConverter.toEntity(postDTO)));
+
+        postClient.post()
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(post)
+                .retrieve()
+                .toBodilessEntity();
+
+        return post;
     }
 
     @PutMapping(path = "/{id}")
@@ -74,6 +101,15 @@ public class PostController {
         });
 
         postService.update(id, oldPost.get());
+
+        postClient.post()
+                .uri("/save")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(oldPost.get())
+                .retrieve()
+                .toBodilessEntity();
+
         return postConverter.toDTO(oldPost.get());
     }
 
@@ -128,6 +164,14 @@ public class PostController {
     @PostMapping(path = "/{postId}/like")
     public PostDTO likePost(@PathVariable("postId") Long postId, @RequestParam Long userId) {
         Post post = postService.likePost(postService.readById(postId).get(), userService.readById(userId).get());
+
+        postClient.post()
+                .uri(baseUrl + "/user/like/user/" + userId + "/post/" + postId)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .toBodilessEntity();
+
         return postConverter.toDTO(post);
     }
 
