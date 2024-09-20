@@ -244,6 +244,10 @@ public class PostService extends CrudServiceImpl<Post, Long> implements PostServ
             throw new IllegalArgumentException("User didn't buy a product to write a review.");
         }
 
+        if (postRepository.existsPostWithReviewByUsername(user.getUsername(), post.getID())){
+            throw new IllegalArgumentException("User has already added review.");
+        }
+
         review.setAuthor(user);
         review.setPost(post);
         user.getReviews().add(review);

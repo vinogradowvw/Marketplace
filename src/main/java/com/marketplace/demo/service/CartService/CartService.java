@@ -35,6 +35,10 @@ public class CartService extends CrudServiceImpl<Cart, Long> implements CartServ
             throw new IllegalArgumentException("There is no product with id: " + product.getID());
         }
 
+        if (product.getPost().getUser().getID().equals(cart.getUser().getID())){
+            throw new IllegalArgumentException("User cannot buy his product.");
+        }
+
         if (cartProductRepository.existsByCartAndProduct(cart, product)){
             CartProduct.CartProductId cartProductId = new CartProduct.CartProductId(cart.getID(), product.getID());
             CartProduct cartProduct = cartProductRepository.findById(cartProductId).get();

@@ -211,6 +211,10 @@ public class UserService extends CrudServiceImpl<User, Long> implements UserServ
                     throw new IllegalArgumentException("Subscription with user: " + user.getID() + " and subscriber: " + subscriber.getID() + " already exists");
                 }
 
+                if (user.getID().equals(subscriber.getID())){
+                    throw new IllegalArgumentException("User cannot follow himself.");
+                }
+
                 Subscription subscription = new Subscription();
                 subscription.setUser(user);
                 subscription.setSubscriber(subscriber);
