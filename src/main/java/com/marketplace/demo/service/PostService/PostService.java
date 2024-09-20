@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -287,6 +289,14 @@ public class PostService extends CrudServiceImpl<Post, Long> implements PostServ
         userRepository.save(user);
 
         return postRepository.save(post);
+    }
+
+    public List<Post> getEntities(List<Long> ids){
+        List<Post> posts = new ArrayList<>();
+
+        ids.forEach(id -> postRepository.findById(id).ifPresent(posts::add));
+
+        return posts;
     }
 
     public double getAVGPostRating(Post post) throws IllegalArgumentException{

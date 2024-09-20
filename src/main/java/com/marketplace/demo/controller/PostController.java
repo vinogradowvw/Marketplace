@@ -1,8 +1,6 @@
 package com.marketplace.demo.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import com.marketplace.demo.domain.*;
 import com.marketplace.demo.service.ReviewService.ReviewService;
@@ -117,6 +115,32 @@ public class PostController {
     public PostDTO addImageToPost(@PathVariable("id") Long postId, @RequestParam Long imageId) {
         Post post = postService.addImageToPost(postService.readById(postId).get(), imageService.readById(imageId).get());
         return postConverter.toDTO(post);
+    }
+
+    @GetMapping(path = "/post/recommendations/post/{postId}")
+    public List<PostDTO> getRecPostByPost(@PathVariable("postId") Long postId) {
+
+        List<Long> postIds = Arrays.asList(Objects.requireNonNull(postClient.get()
+                .uri("/recommendations/post/" + postId)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .toEntity(Long[].class)
+                .getBody()));
+
+        return postService.getEntities(postIds).stream().map(postConverter::toDTO).toList();
+    }
+
+    @GetMapping(path = "/post/recommendations/user/{userId}")
+    public List<PostDTO> getRecPostByUser(@PathVariable("userId") Long userId) {
+
+        List<Long> postIds = Arrays.asList(Objects.requireNonNull(postClient.get()
+                .uri("/recommendations/user/" + userId)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .toEntity(Long[].class)
+                .getBody()));
+
+        return postService.getEntities(postIds).stream().map(postConverter::toDTO).toList();
     }
 
     @DeleteMapping(path = "/{postId}/image/{imageId}")
