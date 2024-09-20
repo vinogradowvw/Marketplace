@@ -126,6 +126,6 @@ jobs:
             cd market_place
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/backend
-            docker image rmi -f backend/app:latest || true
             docker tag ${{ secrets.DOCKERHUB_USERNAME }}/backend:latest backend/app:latest
             docker compose up -d --force-recreate
+            docker image prune -f

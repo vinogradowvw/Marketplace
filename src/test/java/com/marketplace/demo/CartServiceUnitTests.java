@@ -42,7 +42,11 @@ class CartServiceUnitTests {
 	private CartProduct cartProduct;
 	private Product product;
 	private Product productNew;
+	private Post postNew;
 	private CartProduct.CartProductId cartProductId;
+	private User buyer;
+	private User seller;
+	private Post post;
 
 	@BeforeEach
 	void setRules() {
@@ -64,17 +68,30 @@ class CartServiceUnitTests {
 		cart = new Cart();
 		cart.setId(1L);
 
-		User user = new User();
-		user.setId(1L);
-		cart.setUser(user);
-		user.setCart(cart);
+		buyer = new User();
+		buyer.setId(1L);
+		seller = new User();
+		seller.setId(2L);
+
+		cart.setUser(buyer);
+		buyer.setCart(cart);
 
 		product = new Product();
 		product.setId(1L);
+		post = new Post();
+		post.setId(1L);
+		product.setPost(post);
+		post.setProduct(product);
+		post.setUser(seller);
 		productNew = new Product();
 		productNew.setId(2L);
 		product.setPrice(1257);
 		productNew.setPrice(2460);
+		postNew = new Post();
+		postNew.setId(2L);
+		postNew.setProduct(productNew);
+		productNew.setPost(postNew);
+		postNew.setUser(seller);
 
 		cartProductId = new CartProduct.CartProductId(cart.getID(), product.getID());
 		cartProduct = new CartProduct();
