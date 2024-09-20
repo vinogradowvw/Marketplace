@@ -12,7 +12,7 @@ CREATE SEQUENCE IF NOT EXISTS payment_seq start with 1 increment by 50;
 CREATE SEQUENCE IF NOT EXISTS post_seq start with 1 increment by 50;
 CREATE SEQUENCE IF NOT EXISTS product_seq start with 1 increment by 50;
 CREATE SEQUENCE IF NOT EXISTS review_seq start with 1 increment by 50;
-CREATE SEQUENCE IF NOT EXISTS role_seq start with 1 increment by 50;
+CREATE SEQUENCE IF NOT EXISTS role_seq start with 1 increment by 1;
 CREATE SEQUENCE IF NOT EXISTS subscription_seq start with 1 increment by 50;
 CREATE SEQUENCE IF NOT EXISTS tag_seq start with 1 increment by 50;
 CREATE SEQUENCE IF NOT EXISTS users_seq start with 1 increment by 50;

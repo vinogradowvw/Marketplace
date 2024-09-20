@@ -15,5 +15,5 @@ VALUES (nextval('role_seq'), 'ROLE_ADMIN'),
 
 INSERT INTO roles (id_role, id_user)
 VALUES (1, 1),
-       (51, 1),
-       (201, 1);
+       (2, 1),
+       (5, 1);
