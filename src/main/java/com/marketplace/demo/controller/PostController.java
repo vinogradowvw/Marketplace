@@ -2,6 +2,8 @@ package com.marketplace.demo.controller;
 
 import java.util.*;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marketplace.demo.domain.*;
 import com.marketplace.demo.service.ReviewService.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +42,7 @@ public class PostController {
     private ReviewService reviewService;
     private String baseUrl;
     private RestClient postClient;
+    private ObjectMapper objectMapper;
 
     @Autowired
     PostController(PostService postService, DTOConverter<PostDTO, Post> postConverter,
@@ -54,6 +57,7 @@ public class PostController {
         this.reviewService = reviewService;
         this.baseUrl = baseUrl + "/post";
         postClient = RestClient.builder().baseUrl(this.baseUrl).build();
+        objectMapper = new ObjectMapper();
     }
 
     @GetMapping
@@ -74,15 +78,18 @@ public class PostController {
     }
 
     @PostMapping
-    public PostDTO createPost(@RequestBody PostDTO postDTO) {
+    public PostDTO createPost(@RequestBody PostDTO postDTO) throws JsonProcessingException {
 
-        PostDTO post = postConverter.toDTO(postService.create(postConverter.toEntity(postDTO)));
+        Post postObj = postService.create(postConverter.toEntity(postDTO));
+        PostDTO post = postConverter.toDTO(postObj);
+
+        String postJSON = objectMapper.writeValueAsString(post);
 
         postClient.post()
                 .uri("/save")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(post)
+                .body(postJSON)
                 .retrieve()
                 .toBodilessEntity();
 
