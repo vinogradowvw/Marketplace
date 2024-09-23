@@ -1,9 +1,9 @@
-DROP SCHEMA public CASCADE;
-CREATE SCHEMA public;
+-- DROP SCHEMA public CASCADE;
+-- CREATE SCHEMA public;
 
-DROP SEQUENCE IF EXISTS users_seq;
-DROP SEQUENCE IF EXISTS cart_seq;
-DROP SEQUENCE IF EXISTS role_seq;
+-- DROP SEQUENCE IF EXISTS users_seq;
+-- DROP SEQUENCE IF EXISTS cart_seq;
+-- DROP SEQUENCE IF EXISTS role_seq;
 
 CREATE SEQUENCE IF NOT EXISTS cart_seq start with 1 increment by 50;
 CREATE SEQUENCE IF NOT EXISTS image_seq start with 1 increment by 50;
@@ -17,6 +17,7 @@ CREATE SEQUENCE IF NOT EXISTS subscription_seq start with 1 increment by 50;
 CREATE SEQUENCE IF NOT EXISTS tag_seq start with 1 increment by 50;
 CREATE SEQUENCE IF NOT EXISTS users_seq start with 1 increment by 50;
 
+create table if not exists users (id_user bigint not null, email varchar(255), password varchar(255), username varchar(255), primary key (id_user));
 create table if not exists cart (id_cart bigint not null, id_user bigint unique, timestamp timestamp(6), primary key (id_cart));
 create table if not exists cart_product (id_cart bigint not null, id_product bigint not null, quantity bigint, primary key (id_cart, id_product));
 create table if not exists image (id_image bigint not null, id_post bigint, extension varchar(255), name varchar(255), primary key (id_image));
@@ -32,7 +33,6 @@ create table if not exists role (id_role bigint not null, name varchar(255), pri
 create table if not exists roles (id_role bigint not null, id_user bigint not null);
 create table if not exists subscription (id_subscriber bigint, id_subscription bigint not null, id_user bigint, timestamp timestamp(6), primary key (id_subscription));
 create table if not exists tag (id_tag bigint not null, name varchar(255), primary key (id_tag));
-create table if not exists users (id_user bigint not null, email varchar(255), password varchar(255), username varchar(255), primary key (id_user));
 
 alter table if exists cart add constraint FKk0lcwd6e5q8ldue7je6efhdot foreign key (id_user) references users;
 alter table if exists cart_product add constraint FKm778sxvaac8r8mi6rqgb876gm foreign key (id_cart) references cart;

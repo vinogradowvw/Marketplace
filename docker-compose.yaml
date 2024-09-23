@@ -100,7 +100,7 @@ services:
 
   standalone:
     container_name: milvus-standalone
-    image: milvusdb/milvus:v2.4.5
+    image: milvusdb/milvus:latest
     restart: always
     command: ["milvus", "run", "standalone"]
     security_opt:
@@ -125,7 +125,9 @@ services:
 
   app:
     container_name: app
-    image: backend/app:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     restart: always
     depends_on:
         - db
