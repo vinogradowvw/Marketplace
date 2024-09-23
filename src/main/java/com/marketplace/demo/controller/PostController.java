@@ -79,6 +79,7 @@ public class PostController {
         PostDTO post = postConverter.toDTO(postService.create(postConverter.toEntity(postDTO)));
 
         postClient.post()
+                .uri("/save")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(post)
