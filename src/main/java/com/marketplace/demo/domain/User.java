@@ -1,5 +1,6 @@
 package com.marketplace.demo.domain;
 
+import com.marketplace.demo.domain.emailValidation.NotEmail;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -30,6 +31,7 @@ public class User implements EntityWithId<Long>{
     @Column(name = "id_user")
     private Long id;
     @NotBlank(message = "Username can not be empty.")
+    @NotEmail(message = "Username cannot be email.")
     private String username;
     @NotBlank(message = "Email can not be empty.")
     @Email(message = "Incorrect email address.")

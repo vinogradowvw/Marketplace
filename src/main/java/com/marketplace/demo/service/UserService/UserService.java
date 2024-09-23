@@ -89,6 +89,10 @@ public class UserService extends CrudServiceImpl<User, Long> implements UserServ
             if (userRepository.existsByUsername(user.getUsername())){
                 throw new IllegalArgumentException("User with username " + user.getUsername() + " already exists");
             }
+
+            if (userRepository.existsByEmail(user.getEmail())){
+                throw new IllegalArgumentException("User with email " + user.getEmail() + " already exists");
+            }
         }
 
         Cart cart = new Cart();
@@ -347,17 +351,23 @@ public class UserService extends CrudServiceImpl<User, Long> implements UserServ
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
 
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(
-                "There is no user with " + username + " username."
-        ));
+        Optional<User> user = userRepository.findByUsername(usernameOrEmail);
+
+        if (user.isEmpty()){
+            user = userRepository.findByEmail(usernameOrEmail);
+
+            if (user.isEmpty()){
+                throw new UsernameNotFoundException("There is no user with this email or username: " + usernameOrEmail);
+            }
+        }
 
         return new CustomUserDetails(
-                user.getUsername(),
-                user.getPassword(),
-                user.getID(),
-                user.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList())
+                user.get().getUsername(),
+                user.get().getPassword(),
+                user.get().getID(),
+                user.get().getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList())
         );
     }
 }
