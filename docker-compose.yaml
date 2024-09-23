@@ -125,9 +125,7 @@ services:
 
   app:
     container_name: app
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: backend/app:latest
     restart: always
     depends_on:
         - db
