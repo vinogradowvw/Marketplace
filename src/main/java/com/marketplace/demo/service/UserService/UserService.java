@@ -334,8 +334,17 @@ public class UserService extends CrudServiceImpl<User, Long> implements UserServ
     }
 
     public String verify(User user, AuthenticationManager authManager){
+
+        String usernameOrEmail;
+
+        if (user.getUsername().isEmpty()){
+            usernameOrEmail = user.getEmail();
+        } else{
+            usernameOrEmail = user.getUsername();
+        }
+
         Authentication authentication = authManager.authenticate(
-                new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword())
+                new UsernamePasswordAuthenticationToken(usernameOrEmail, user.getPassword())
         );
 
         if (authentication.isAuthenticated()){
