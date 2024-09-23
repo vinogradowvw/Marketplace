@@ -1,9 +1,4 @@
-DROP SCHEMA public CASCADE;
 CREATE SCHEMA public;
-
-DROP SEQUENCE IF EXISTS users_seq;
-DROP SEQUENCE IF EXISTS cart_seq;
-DROP SEQUENCE IF EXISTS role_seq;
 
 CREATE SEQUENCE IF NOT EXISTS cart_seq start with 1 increment by 50;
 CREATE SEQUENCE IF NOT EXISTS image_seq start with 1 increment by 50;
