@@ -1,5 +1,37 @@
 import requests
 
+
+class BearerAuth(requests.auth.AuthBase):
+    def __init__(self, token):
+        self.token = token
+    def __call__(self, r):
+        r.headers["authorization"] = "Bearer " + self.token
+        return r
+
+
+base_url = 'http://localhost:8080'
+
+test_user = {
+    "username": "testuser01",
+    "email": "testmail01@gmail.com",
+    "password": "testpass01",
+    "likes": [],
+    "orders": [],
+    "posts": [],
+    "subscribers": [],
+    "subscriptions": [],
+    "cart": None,
+    "roles": [],
+    "reviews": []
+}
+headers = {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+}
+token = requests.post(url="{}/login".format(base_url), json=test_user, headers=headers)
+print(token.text)
+token = token.text
+
 product2 = {
     "id": 0,
     "price": 120.50,
@@ -245,7 +277,7 @@ post1 = {
 }
 
 posts = [
-    # (product1, post1),
+    (product1, post1),
     (product2, post2),
     (product3, post3),
     (product4, post4),
@@ -258,6 +290,7 @@ posts = [
     (product11, post11)
 ]
 
+
 for product, post in posts:
 
     image = {
@@ -267,20 +300,23 @@ for product, post in posts:
         "postId": 0
     }
 
-    response_product = requests.post('http://localhost:8080/product', json=product)
+    response_product = requests.post('{}/product'.format(base_url), json=product, auth=BearerAuth(token))
+    print(response_product.text)
+    product_new = response_product.json()  # ???????? JSON-?????
 
-    product_new = response_product.json()
-
-    response_post = requests.post('http://localhost:8080/post', json=post)
-
-    post_new = response_post.json()
+    response_post = requests.post('{}/post'.format(base_url), json=post, auth=BearerAuth(token))
+    post_new = response_post.json()  # ???????? JSON-?????
 
     files = {
         'file': ('{}.jpg'.format(image['name']), open('images/{}.jpg'.format(post['name']), 'rb'), 'image/jpeg')
     }
 
-    image = requests.post('http://localhost:8080/image', json=image).json()
-    image_new = requests.post('http://localhost:8080/image/{}'.format(image['id']), files=files).json()
+    image_response = requests.post('{}/image'.format(base_url), json=image, auth=BearerAuth(token))
+    image = image_response.json()  # ???????? JSON-?????
 
-    requests.post('http://localhost:8080/post/{}/product'.format(post_new['id']), params={'productId': product_new['id']})
-    requests.post('http://localhost:8080/post/{}/image'.format(post_new['id']), params={'imageId': image_new['id']})
+    image_new_response = requests.post('{}/image/{}'.format(base_url, image['id']), files=files, auth=BearerAuth(token))
+    image_new = image_new_response.json()  # ???????? JSON-?????
+
+    requests.post('{}/post/{}/product'.format(base_url, post_new['id']), params={'productId': product_new['id']}, auth=BearerAuth(token))
+    requests.post('{}/post/{}/image'.format(base_url, post_new['id']), params={'imageId': image_new['id']}, auth=BearerAuth(token))
+    requests.post('{}/post/{}/user'.format(base_url, post_new['id']), params={'userId': 1}, auth=BearerAuth(token))

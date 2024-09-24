@@ -83,13 +83,10 @@ public class PostController {
         Post postObj = postService.create(postConverter.toEntity(postDTO));
         PostDTO post = postConverter.toDTO(postObj);
 
-        String postJSON = objectMapper.writeValueAsString(post);
-
         postClient.post()
                 .uri("/save")
-                .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(postJSON)
+                .body(post)
                 .retrieve()
                 .toBodilessEntity();
 
