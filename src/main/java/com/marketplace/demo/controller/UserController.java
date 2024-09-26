@@ -7,8 +7,11 @@ import com.marketplace.demo.service.RoleService.RoleService;
 import com.marketplace.demo.service.SubscriptionService.SubscriptionService;
 import com.marketplace.demo.service.UserService.UserService;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestClient;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +19,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/user", produces = MediaType.APPLICATION_JSON_VALUE)
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserController {
 
     private final DTOConverter<UserDTO, User> userDTOConverter;
@@ -27,6 +30,8 @@ public class UserController {
     private final UserService userService;
     private final SubscriptionService subscriptionService;
     private final RoleService roleService;
+    @Value("${api.url}")
+    private String baseUrl;
 
     @GetMapping
     public List<UserDTO> getAllUsers() {
@@ -139,6 +144,13 @@ public class UserController {
 
      @DeleteMapping(path = "/{id}")
      public void deleteUser(@PathVariable("id") Long id){
-         userService.deleteById(id);
+
+        userService.deleteById(id);
+
+         RestClient.builder().baseUrl(baseUrl).build()
+                 .delete()
+                 .uri("/user/" + id)
+                 .retrieve()
+                 .toBodilessEntity();
      }
 }

@@ -42,7 +42,6 @@ public class PostController {
     private ReviewService reviewService;
     private String baseUrl;
     private RestClient postClient;
-    private ObjectMapper objectMapper;
 
     @Autowired
     PostController(PostService postService, DTOConverter<PostDTO, Post> postConverter,
@@ -57,7 +56,6 @@ public class PostController {
         this.reviewService = reviewService;
         this.baseUrl = baseUrl + "/post";
         postClient = RestClient.builder().baseUrl(this.baseUrl).build();
-        objectMapper = new ObjectMapper();
     }
 
     @GetMapping
@@ -81,16 +79,24 @@ public class PostController {
     public PostDTO createPost(@RequestBody PostDTO postDTO) throws JsonProcessingException {
 
         Post postObj = postService.create(postConverter.toEntity(postDTO));
-        PostDTO post = postConverter.toDTO(postObj);
 
-        postClient.post()
-                .uri("/save")
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(post)
-                .retrieve()
-                .toBodilessEntity();
+        return postConverter.toDTO(postObj);
+    }
 
-        return post;
+    @PostMapping(path = "/{id}")
+    public void sendPostToRecSys(@PathVariable("id") Long postId){
+
+        Optional<Post> postOpt = postService.readById(postId);
+
+        if (postOpt.isPresent()) {
+            PostDTO post = postConverter.toDTO(postOpt.get());
+
+            postClient.post()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(post)
+                    .retrieve()
+                    .toBodilessEntity();
+        }
     }
 
     @PutMapping(path = "/{id}")
@@ -104,14 +110,6 @@ public class PostController {
         });
 
         postService.update(id, oldPost.get());
-
-        postClient.post()
-                .uri("/save")
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(oldPost.get())
-                .retrieve()
-                .toBodilessEntity();
 
         return postConverter.toDTO(oldPost.get());
     }
@@ -233,7 +231,14 @@ public class PostController {
 
     @DeleteMapping(path = "/{id}")
     public void deletePost(@PathVariable("id") Long id) {
+
         postService.deleteById(id);
+
+        postClient.delete()
+                .uri("/" + id)
+                .retrieve()
+                .toBodilessEntity();
+
     }
 
 }
