@@ -6,7 +6,6 @@ import com.marketplace.demo.domain.*;
 import com.marketplace.demo.service.RoleService.RoleService;
 import com.marketplace.demo.service.SubscriptionService.SubscriptionService;
 import com.marketplace.demo.service.UserService.UserService;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
