@@ -24,7 +24,7 @@ public class KafkaSender {
 
     private final KafkaTemplate<String, JsonNode> recSysTemplate;
     private final ReplyingKafkaTemplate<String, JsonNode, JsonNode> replyingKafkaTemplate;
-    @Value("kafka.topic.recSys-req")
+    @Value("${kafka.topic.recSys-req}")
     private String topic;
 
     @Autowired
