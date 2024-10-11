@@ -29,6 +29,7 @@ dependencies {
 	implementation "org.springframework.boot:spring-boot-starter-security"
 	implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
 	implementation 'io.minio:minio:8.5.10'
+<<<<<<< HEAD
 	implementation 'org.apache.logging.log4j:log4j-api:2.23.1'
 	implementation 'org.apache.logging.log4j:log4j-core:2.23.1'
 	implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.23.1'
@@ -36,6 +37,9 @@ dependencies {
 	implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.2'
 	implementation 'com.fasterxml.jackson.core:jackson-annotations:2.17.2'
 	implementation 'com.fasterxml.jackson.core:jackson-core:2.17.2'
+=======
+	implementation 'commons-validator:commons-validator:1.7'
+>>>>>>> feature/spring-security
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'org.postgresql:postgresql:42.6.0'
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
