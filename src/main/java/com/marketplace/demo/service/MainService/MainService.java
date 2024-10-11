@@ -24,11 +24,9 @@ public class MainService {
 
         String key = "userId: " + userDTO.id();
 
-        JsonNode node = objectMapper.valueToTree(userDTO);
-
         ObjectNode rootNode = objectMapper.createObjectNode();
         rootNode.put("type", "user_service.init");
-        rootNode.set("user", node);
+        rootNode.put("user_id", userDTO.id());
 
         kafkaSender.recSysSend(key, rootNode);
     }

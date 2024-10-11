@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.kafka.support.KafkaHeaders;
 
-@Component
+/*@Component
 public class KafkaMultiListener {
 
     @KafkaListener(topics = "${kafka.topic.recSys-resp}", groupId = "${kafka.groupId.recSys}",
@@ -17,4 +17,4 @@ public class KafkaMultiListener {
         // Обработка полученного сообщения
     }
 
-}
+}*/
