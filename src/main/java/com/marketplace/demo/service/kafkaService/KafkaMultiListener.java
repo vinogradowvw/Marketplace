@@ -9,7 +9,7 @@ import org.springframework.kafka.support.KafkaHeaders;
 @Component
 public class KafkaMultiListener {
 
-    @KafkaListener(topics = "${kafka.topic.recSys-req}", groupId = "${kafka.groupId.recSys}",
+    @KafkaListener(topics = "${kafka.topic.recSys-resp}", groupId = "${kafka.groupId.recSys}",
             containerFactory = "kafkaRecSysListenerConsumerFactory")
     public void recSysListen(@Header(KafkaHeaders.RECEIVED_KEY) String key, JsonNode message) {
         System.out.println("Received message: " + message);
