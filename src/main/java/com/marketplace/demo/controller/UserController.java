@@ -1,16 +1,18 @@
 package com.marketplace.demo.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.marketplace.demo.controller.converter.DTOConverter;
 import com.marketplace.demo.controller.dto.*;
 import com.marketplace.demo.domain.*;
 import com.marketplace.demo.service.RoleService.RoleService;
 import com.marketplace.demo.service.SubscriptionService.SubscriptionService;
 import com.marketplace.demo.service.UserService.UserService;
+import com.marketplace.demo.service.kafkaService.KafkaSender;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestClient;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,8 +31,8 @@ public class UserController {
     private final UserService userService;
     private final SubscriptionService subscriptionService;
     private final RoleService roleService;
-    @Value("${api.url}")
-    private String baseUrl;
+    private final KafkaSender kafkaSender;
+    private final ObjectMapper objectMapper;
 
     @GetMapping
     public List<UserDTO> getAllUsers() {
@@ -67,6 +69,32 @@ public class UserController {
     @GetMapping(path = "/{id}/posts")
     public List<PostDTO> getPosts(@PathVariable("id")Long id){
         return userService.readById(id).get().getPosts().stream().map(postDTOConverter::toDTO).toList();
+    }
+
+    @GetMapping(path = "/recommendations/user/{userId}")
+    public List<UserDTO> getRecUsers(@PathVariable("userId") Long userId,
+                                     @RequestParam(defaultValue = "20") int limit){
+
+        List<Long> userIds = new ArrayList<>();
+
+        String key = "userId: " + userId;
+        ObjectNode obj = objectMapper.createObjectNode();
+        obj.put("type", "user_service.get_recommended_users_by_user_id");
+        obj.put("user_id", userId);
+        obj.put("limit", limit);
+
+        Optional<JsonNode> ansNode = kafkaSender.sendRecSysRequest(key, obj);
+        if (ansNode.isPresent()) {
+            JsonNode idsNode = ansNode.get().get("data");
+
+            if (idsNode.isArray()) {
+                for (JsonNode idNode : idsNode) {
+                    userIds.add(idNode.asLong());
+                }
+            }
+        }
+
+        return userService.getEntities(userIds).stream().map(userDTOConverter::toDTO).toList();
     }
 
     @GetMapping(path = "/{id}/subscribers")
@@ -146,10 +174,11 @@ public class UserController {
 
         userService.deleteById(id);
 
-         RestClient.builder().baseUrl(baseUrl).build()
-                 .delete()
-                 .uri("/user/" + id)
-                 .retrieve()
-                 .toBodilessEntity();
+         String key = "user: " + id;
+         ObjectNode rootNode = objectMapper.createObjectNode();
+         rootNode.put("type", "user_service.delete_by_id");
+         rootNode.put("user_id", id);
+
+         kafkaSender.recSysSend(key, rootNode);
      }
 }

@@ -75,8 +75,6 @@ public class UserService extends CrudServiceImpl<User, Long> implements UserServ
         this.bCryptPasswordEncoder = new BCryptPasswordEncoder(rounds);
     }
 
-
-
     @Override
     public User create(User user){
         Optional<Long> id = Optional.ofNullable(user.getID());
@@ -369,6 +367,14 @@ public class UserService extends CrudServiceImpl<User, Long> implements UserServ
                 user.get().getID(),
                 user.get().getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList())
         );
+    }
+
+    public List<User> getEntities(List<Long> ids){
+        List<User> users = new ArrayList<>();
+
+        ids.forEach(id -> userRepository.findById(id).ifPresent(users::add));
+
+        return users;
     }
 }
 

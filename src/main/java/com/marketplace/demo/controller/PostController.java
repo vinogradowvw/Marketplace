@@ -3,9 +3,12 @@ package com.marketplace.demo.controller;
 import java.util.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.marketplace.demo.domain.*;
 import com.marketplace.demo.service.ReviewService.ReviewService;
+import com.marketplace.demo.service.kafkaService.KafkaSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -27,7 +30,6 @@ import com.marketplace.demo.service.ProductService.ProductService;
 import com.marketplace.demo.service.TagService.TagService;
 import com.marketplace.demo.service.UserService.UserService;
 
-import org.springframework.web.client.RestClient;
 
 @RestController
 @RequestMapping(value = "/post", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -40,13 +42,13 @@ public class PostController {
     private UserService userService;
     private TagService tagService;
     private ReviewService reviewService;
-    private String baseUrl;
-    private RestClient postClient;
+    private ObjectMapper objectMapper;
+    private KafkaSender kafkaSender;
 
     @Autowired
-    PostController(PostService postService, DTOConverter<PostDTO, Post> postConverter,
-                   ImageService imageService, ProductService productService,
-                   UserService userService, TagService tagService, ReviewService reviewService, @Value("${api.url}") String baseUrl) {
+    PostController(PostService postService, DTOConverter<PostDTO, Post> postConverter, KafkaSender kafkaSender,
+                   ImageService imageService, ProductService productService, ObjectMapper objectMapper,
+                   UserService userService, TagService tagService, ReviewService reviewService) {
         this.postService = postService;
         this.postConverter = postConverter;
         this.imageService = imageService;
@@ -54,8 +56,8 @@ public class PostController {
         this.userService = userService;
         this.tagService = tagService;
         this.reviewService = reviewService;
-        this.baseUrl = baseUrl + "/post";
-        postClient = RestClient.builder().baseUrl(this.baseUrl).build();
+        this.kafkaSender = kafkaSender;
+        this.objectMapper = objectMapper;
     }
 
     @GetMapping
@@ -89,13 +91,14 @@ public class PostController {
         Optional<Post> postOpt = postService.readById(postId);
 
         if (postOpt.isPresent()) {
-            PostDTO post = postConverter.toDTO(postOpt.get());
+            String key = "post: " + postId;
 
-            postClient.post()
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(post)
-                    .retrieve()
-                    .toBodilessEntity();
+            JsonNode node = objectMapper.valueToTree(postOpt.get());
+            ObjectNode obj = objectMapper.createObjectNode();
+            obj.put("type", "post_service.upsert");
+            obj.set("post", node);
+
+            kafkaSender.recSysSend(key, obj);
         }
     }
 
@@ -120,28 +123,55 @@ public class PostController {
         return postConverter.toDTO(post);
     }
 
-    @GetMapping(path = "/post/recommendations/post/{postId}")
-    public List<PostDTO> getRecPostByPost(@PathVariable("postId") Long postId) {
+    @GetMapping(path = "/recommendations/post/{postId}")
+    public List<PostDTO> getRecPostByPost(@PathVariable("postId") Long postId,
+                                          @RequestParam(defaultValue = "20") int limit) {
 
-        List<Long> postIds = Arrays.asList(Objects.requireNonNull(postClient.get()
-                .uri("/recommendations/post/" + postId)
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .toEntity(Long[].class)
-                .getBody()));
+        List<Long> postIds = new ArrayList<>();
 
-        return postService.getEntities(postIds).stream().map(postConverter::toDTO).toList();
+        String key = "post: " + postId;
+        ObjectNode obj = objectMapper.createObjectNode();
+        obj.put("type", "post_service.get_recommended_posts_by_post_id");
+        obj.put("post_id", postId);
+        obj.put("limit", limit);
+
+        Optional<JsonNode> ansNode = kafkaSender.sendRecSysRequest(key, obj);
+        if (ansNode.isPresent()) {
+            JsonNode idsNode = ansNode.get().get("data");
+
+            if (idsNode.isArray()) {
+                for (JsonNode idNode : idsNode) {
+                    postIds.add(idNode.asLong());
+                }
+            }
+        }
+
+        return postService.getEntities(postIds)
+                .stream().map(postConverter::toDTO).toList();
     }
 
-    @GetMapping(path = "/post/recommendations/user/{userId}")
-    public List<PostDTO> getRecPostByUser(@PathVariable("userId") Long userId) {
+    @GetMapping(path = "/recommendations/user/{userId}")
+    public List<PostDTO> getRecPostByUser(@PathVariable("userId") Long userId,
+                                          @RequestParam(defaultValue = "20") int limit) {
 
-        List<Long> postIds = Arrays.asList(Objects.requireNonNull(postClient.get()
-                .uri("/recommendations/user/" + userId)
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .toEntity(Long[].class)
-                .getBody()));
+        List<Long> postIds = new ArrayList<>();
+
+        String key = "userId: " + userId;
+        ObjectNode obj = objectMapper.createObjectNode();
+        obj.put("type", "post_service.get_recommended_posts_by_user_id");
+        obj.put("user_id", userId);
+        obj.put("limit", limit);
+
+        Optional<JsonNode> ansNode = kafkaSender.sendRecSysRequest(key, obj);
+        if (ansNode.isPresent()) {
+            JsonNode idsNode = ansNode.get().get("data");
+
+            if (idsNode.isArray()) {
+                for (JsonNode idNode : idsNode) {
+                    postIds.add(idNode.asLong());
+                }
+            }
+        }
 
         return postService.getEntities(postIds).stream().map(postConverter::toDTO).toList();
     }
@@ -192,12 +222,14 @@ public class PostController {
     public PostDTO likePost(@PathVariable("postId") Long postId, @RequestParam Long userId) {
         Post post = postService.likePost(postService.readById(postId).get(), userService.readById(userId).get());
 
-        postClient.post()
-                .uri(baseUrl + "/user/like/user/" + userId + "/post/" + postId)
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .toBodilessEntity();
+        String key = "user: " + userId;
+
+        ObjectNode rootNode = objectMapper.createObjectNode();
+        rootNode.put("type", "user_service.update_users_vector");
+        rootNode.put("user_id", userId);
+        rootNode.put("post_id", postId);
+
+        kafkaSender.recSysSend(key, rootNode);
 
         return postConverter.toDTO(post);
     }
@@ -234,10 +266,13 @@ public class PostController {
 
         postService.deleteById(id);
 
-        postClient.delete()
-                .uri("/" + id)
-                .retrieve()
-                .toBodilessEntity();
+        String key = "post: " + id;
+
+        ObjectNode rootNode = objectMapper.createObjectNode();
+        rootNode.put("type", "post_service.delete_by_id");
+        rootNode.put("post_id", id);
+
+        kafkaSender.recSysSend(key, rootNode);
 
     }
 
