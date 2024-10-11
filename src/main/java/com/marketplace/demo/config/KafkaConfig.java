@@ -3,6 +3,8 @@ package com.marketplace.demo.config;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.kafka.annotation.EnableKafka;
+import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
+import org.springframework.kafka.requestreply.ReplyingKafkaTemplate;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -56,6 +58,26 @@ public class KafkaConfig {
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
         return new DefaultKafkaConsumerFactory<>(props);
+    }
+
+    @Bean(name="kafkaRecSysReplProducer")
+    public ReplyingKafkaTemplate<String, JsonNode, JsonNode> replyingTemplate(
+            @Qualifier("recSysProducerFactory") ProducerFactory<String, JsonNode> pf,
+            @Qualifier("recSysRepliesContainer") ConcurrentMessageListenerContainer<String, JsonNode> repliesContainer) {
+
+        return new ReplyingKafkaTemplate<>(pf, repliesContainer);
+    }
+
+    @Bean
+    public ConcurrentMessageListenerContainer<String, JsonNode> recSysRepliesContainer(
+            @Qualifier("kafkaRecSysListenerConsumerFactory")
+            ConcurrentKafkaListenerContainerFactory<String, JsonNode> containerFactory) {
+
+        ConcurrentMessageListenerContainer<String, JsonNode> repliesContainer =
+                containerFactory.createContainer(recSysRespTopic);
+        repliesContainer.getContainerProperties().setGroupId(recSysGroupId);
+        repliesContainer.setAutoStartup(false);
+        return repliesContainer;
     }
 
     @Bean
