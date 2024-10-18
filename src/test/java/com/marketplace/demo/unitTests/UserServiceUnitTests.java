@@ -1,4 +1,4 @@
-package com.marketplace.demo;
+package com.marketplace.demo.unitTests;
 
 
 import java.util.List;

@@ -22,28 +22,50 @@ repositories {
 }
 
 dependencies {
+	//Spring
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-validation:3.2.4'
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
 	implementation "org.springframework.boot:spring-boot-starter-security"
-	implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
+	implementation 'org.springframework.kafka:spring-kafka:3.1.1'
+
+	//Minio
 	implementation 'io.minio:minio:8.5.10'
+
+	//Logging
 	implementation 'org.apache.logging.log4j:log4j-api:2.23.1'
 	implementation 'org.apache.logging.log4j:log4j-core:2.23.1'
 	implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.23.1'
-	implementation 'org.springframework.kafka:spring-kafka:3.1.1'
+
+	//Json
 	implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.2'
 	implementation 'com.fasterxml.jackson.core:jackson-annotations:2.17.2'
 	implementation 'com.fasterxml.jackson.core:jackson-core:2.17.2'
+
+	//Validation
 	implementation 'commons-validator:commons-validator:1.7'
-	compileOnly 'org.projectlombok:lombok'
-	runtimeOnly 'org.postgresql:postgresql:42.6.0'
+
+	//WebToken
+	implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
+
+	//Lombok
+	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
+
+	//Database
+	runtimeOnly 'org.postgresql:postgresql:42.6.0'
+
+	//Testing
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'com.h2database:h2:2.2.224'
+	testImplementation "org.testcontainers:testcontainers:1.20.2"
+	testImplementation "org.testcontainers:junit-jupiter:1.20.2"
+	testImplementation 'org.springframework.kafka:spring-kafka-test'
+	testImplementation "org.testcontainers:kafka:1.20.2"
+	testImplementation 'org.awaitility:awaitility'
 }
 
 tasks.named('test') {

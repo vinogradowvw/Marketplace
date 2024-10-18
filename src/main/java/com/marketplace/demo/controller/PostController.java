@@ -10,7 +10,6 @@ import com.marketplace.demo.domain.*;
 import com.marketplace.demo.service.ReviewService.ReviewService;
 import com.marketplace.demo.service.kafkaService.KafkaSender;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
