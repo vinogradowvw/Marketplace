@@ -92,7 +92,9 @@ public class PostController {
         if (postOpt.isPresent()) {
             String key = "post: " + postId;
 
-            JsonNode node = objectMapper.valueToTree(postOpt.get());
+            PostDTO postDTO = postConverter.toDTO(postOpt.get());
+
+            JsonNode node = objectMapper.valueToTree(postDTO);
             ObjectNode obj = objectMapper.createObjectNode();
             obj.put("type", "post_service.upsert");
             obj.set("post", node);
