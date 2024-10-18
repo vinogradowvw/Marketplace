@@ -1,4 +1,3 @@
-/*
 package com.marketplace.demo.unitTests;
 
 import java.util.Optional;
@@ -198,15 +197,12 @@ class CartServiceUnitTests {
 
 		Mockito.verify(orderRepository, Mockito.times(2)).save(any(Order.class));
 		Mockito.verify(orderProductRepository, Mockito.times(2)).save(any(OrderProduct.class));
-		*/
-/* "product" has already been added to the cart(before the test), this is the reason
+		/* "product" has already been added to the cart(before the test), this is the reason
 		 * why the "product" is saved 1 time less than "productNew".
-		 *//*
-
+		 */
 		Mockito.verify(productRepository, Mockito.times(2)).save(product);
 		Mockito.verify(productRepository, Mockito.times(3)).save(productNew);
 		Mockito.verify(cartRepository, Mockito.times(3)).save(cart);
 
 	}
 }
-*/
