@@ -10,6 +10,10 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 @Service
 @Transactional
 @AllArgsConstructor
@@ -32,6 +36,19 @@ public class TagService extends CrudServiceImpl<Tag, Long> implements TagService
         }
 
         tagRepository.deleteById(id);
+    }
+
+    public List<Tag> getEntitiesbyIds(List<Long> ids) {
+
+        List<Tag> tags = new ArrayList<>();
+
+        for (Long id : ids) {
+            Optional<Tag> tag = tagRepository.findById(id);
+
+            tag.ifPresent(tags::add);
+        }
+
+        return tags;
     }
 
     @Override

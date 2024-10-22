@@ -5,6 +5,7 @@ import java.util.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.marketplace.demo.domain.*;
 import com.marketplace.demo.service.ReviewService.ReviewService;
@@ -94,10 +95,18 @@ public class PostController {
 
             PostDTO postDTO = postConverter.toDTO(postOpt.get());
 
-            JsonNode node = objectMapper.valueToTree(postDTO);
+            ObjectNode postObj = objectMapper.valueToTree(postDTO);
             ObjectNode obj = objectMapper.createObjectNode();
             obj.put("type", "post_service.upsert");
-            obj.set("post", node);
+
+            List<String> tagsName = new ArrayList<>();
+            List<Tag> tags = tagService.getEntitiesbyIds(postDTO.tags());
+            tags.forEach(t -> tagsName.add(t.getName()));
+
+            ArrayNode tagsArray = objectMapper.valueToTree(tagsName);
+
+            postObj.set("tags", tagsArray);
+            obj.set("post", postObj);
 
             kafkaSender.recSysSend(key, obj);
         }

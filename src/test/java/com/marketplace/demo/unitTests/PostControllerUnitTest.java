@@ -6,6 +6,7 @@ import com.marketplace.demo.controller.PostController;
 import com.marketplace.demo.controller.converter.DTOConverter;
 import com.marketplace.demo.controller.dto.PostDTO;
 import com.marketplace.demo.domain.Post;
+import com.marketplace.demo.domain.Tag;
 import com.marketplace.demo.service.ImageService.ImageService;
 import com.marketplace.demo.service.PostService.PostService;
 import com.marketplace.demo.service.ProductService.ProductService;
@@ -19,6 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 @SpringBootTest
@@ -52,8 +56,22 @@ public class PostControllerUnitTest {
         Post post = new Post();
         post.setId(postId);
         post.setName("Test Post");
+        Tag tag1 = new Tag();
+        tag1.setId(1L);
+        tag1.setName("tag1");
+        Tag tag2 = new Tag();
+        tag2.setId(2L);
+        tag2.setName("tag2");
+        tag1.setPosts(List.of(post));
+        tag2.setPosts(List.of(post));
+        post.setTags(List.of(tag1, tag2));
+        PostDTO postDTO = new PostDTO(1L, "Test Post", 0L, "desc",
+                null, null, new ArrayList<Long>(), List.of(1L, 2L), new ArrayList<Long>(),
+                new ArrayList<Long>());
 
         Mockito.when(postService.readById(postId)).thenReturn(Optional.of(post));
+        Mockito.when(tagService.getEntitiesbyIds(List.of(1L, 2L))).thenReturn(List.of(tag1, tag2));
+        Mockito.when(postConverter.toDTO(post)).thenReturn(postDTO);
 
         postController.sendPostToRecSys(postId);
 
