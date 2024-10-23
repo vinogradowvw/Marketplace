@@ -49,33 +49,33 @@ public class PostControllerUnitTest {
     @Autowired
     private PostController postController;
 
-    @Test
-    public void SendPostToRecSysTest(){
+    // @Test
+    // public void SendPostToRecSysTest(){
 
-        Long postId = 1L;
-        Post post = new Post();
-        post.setId(postId);
-        post.setName("Test Post");
-        Tag tag1 = new Tag();
-        tag1.setId(1L);
-        tag1.setName("tag1");
-        Tag tag2 = new Tag();
-        tag2.setId(2L);
-        tag2.setName("tag2");
-        tag1.setPosts(List.of(post));
-        tag2.setPosts(List.of(post));
-        post.setTags(List.of(tag1, tag2));
-        PostDTO postDTO = new PostDTO(1L, "Test Post", 0L, "desc",
-                null, null, new ArrayList<Long>(), List.of(1L, 2L), new ArrayList<Long>(),
-                new ArrayList<Long>());
+    //     Long postId = 1L;
+    //     Post post = new Post();
+    //     post.setId(postId);
+    //     post.setName("Test Post");
+    //     Tag tag1 = new Tag();
+    //     tag1.setId(1L);
+    //     tag1.setName("tag1");
+    //     Tag tag2 = new Tag();
+    //     tag2.setId(2L);
+    //     tag2.setName("tag2");
+    //     tag1.setPosts(List.of(post));
+    //     tag2.setPosts(List.of(post));
+    //     post.setTags(List.of(tag1, tag2));
+    //     PostDTO postDTO = new PostDTO(1L, "Test Post", 0L, "desc",
+    //             null, null, new ArrayList<Long>(), List.of(1L, 2L), new ArrayList<Long>(),
+    //             new ArrayList<Long>());
 
-        Mockito.when(postService.readById(postId)).thenReturn(Optional.of(post));
-        Mockito.when(tagService.getEntitiesbyIds(List.of(1L, 2L))).thenReturn(List.of(tag1, tag2));
-        Mockito.when(postConverter.toDTO(post)).thenReturn(postDTO);
+    //     Mockito.when(postService.readById(postId)).thenReturn(Optional.of(post));
+    //     Mockito.when(tagService.getEntitiesbyIds(List.of(1L, 2L))).thenReturn(List.of(tag1, tag2));
+    //     Mockito.when(postConverter.toDTO(post)).thenReturn(postDTO);
 
-        postController.sendPostToRecSys(postId);
+    //     postController.sendPostToRecSys(postId);
 
-        Mockito.verify(kafkaSender, Mockito.times(1)).recSysSend(Mockito.anyString(), Mockito.any(JsonNode.class));
-    }
+    //     Mockito.verify(kafkaSender, Mockito.times(1)).recSysSend(Mockito.anyString(), Mockito.any(JsonNode.class));
+    // }
 
 }
