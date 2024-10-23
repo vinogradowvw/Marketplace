@@ -25,7 +25,7 @@ public class TagController {
     private DTOConverter<PostDTO, Post> postConverter;
     private PostService postService;
 
-	@GetMapping
+	@GetMapping(path = "/hello")
 	public String helloFromServer() {
 		return "hello";
 	}
