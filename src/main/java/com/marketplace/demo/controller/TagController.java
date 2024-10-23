@@ -25,6 +25,11 @@ public class TagController {
     private DTOConverter<PostDTO, Post> postConverter;
     private PostService postService;
 
+	@GetMapping
+	public String helloFromServer() {
+		return "hello";
+	}
+
     @GetMapping
     public List<TagDTO> getAllTags(){
         Iterable<Tag> tags = tagService.readAll();
