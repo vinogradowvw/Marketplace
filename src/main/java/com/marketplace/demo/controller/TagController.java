@@ -27,7 +27,7 @@ public class TagController {
 
 	@GetMapping(path = "/hello")
 	public String helloFromServer() {
-		return "hello";
+		return "hello 24.10";
 	}
 
     @GetMapping
