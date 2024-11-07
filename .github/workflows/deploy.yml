@@ -11,6 +11,10 @@ jobs:
     name: Build
 
     steps:
+
+    - name: checksystem
+      run: df -h
+    
     - name: Checkout code
       uses: actions/checkout@v4
 
